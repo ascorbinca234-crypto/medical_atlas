@@ -70,7 +70,8 @@ projects/
 ## 4. VK ID
 
 1. [id.vk.com](https://id.vk.com/about/business/go) → кабинет → «Добавить приложение» → Web.
-2. Базовый домен: `ascorbinca234-crypto.github.io`. Доверенный Redirect URL: `API_URL/auth/vk/callback`.
+2. Базовый домен: домен API-шлюза без `https://` (`xxxx.apigw.yandexcloud.net`) — VK требует, чтобы он совпадал с доменом redirect. Доверенный Redirect URL: `API_URL/auth/vk/callback`.
+   Профиль бизнеса в VK Бизнес ID нужно подтвердить в течение 60 дней, иначе приложение заблокируют.
 3. Включите доступ к почте. Если VK не отдаст почту, аккаунт всё равно создастся, просто без адреса.
 4. Скопируйте ID приложения.
 
