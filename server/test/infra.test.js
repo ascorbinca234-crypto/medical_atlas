@@ -62,3 +62,21 @@ test('YDB Document API: формат запросов и условная зап
   assert.match(reqs[0].auth, /^AWS4-HMAC-SHA256 Credential=AK\/\d{8}\/ru-central1\/dynamodb\/aws4_request, SignedHeaders=content-type;host;x-amz-date;x-amz-target, Signature=[0-9a-f]{64}$/);
   assert.strictEqual(reqs[0].b.TableName, 'ma_users');
 });
+
+test('YDB: таблицы создаются сами при первом обращении', async () => {
+  const tables = new Set(), ops = [];
+  const res = (status, j) => ({ ok: status < 300, status, text: async () => JSON.stringify(j) });
+  const missing = name => res(400, { __type: 'com.amazonaws.dynamodb.v20120810#ResourceNotFoundException', message: 'Requested resource not found: ' + name });
+  const fake = async (url, o) => {
+    const op = o.headers['X-Amz-Target'].split('.')[1], b = JSON.parse(o.body); ops.push(op + ':' + b.TableName);
+    if (op === 'DescribeTable') return tables.has(b.TableName) ? res(200, { Table: { TableStatus: 'ACTIVE' } }) : missing(b.TableName);
+    if (op === 'CreateTable') { tables.add(b.TableName); return res(200, { TableDescription: { TableStatus: 'ACTIVE' } }); }
+    if (!tables.has(b.TableName)) return missing(b.TableName);
+    return res(200, {});
+  };
+  const s = ydbStore({ endpoint: 'https://docapi.example/ru-central1/b1g/etn', accessKeyId: 'AK', secretAccessKey: 'SK', prefix: 'ma_' }, fake);
+  assert.strictEqual(await s.getUser('nobody'), null);
+  assert.deepStrictEqual([...tables].sort(), ['ma_identities', 'ma_kv', 'ma_users']);
+  await s.ensure();
+  assert.strictEqual(ops.filter(o => o.startsWith('CreateTable')).length, 3, 'повторно таблицы не создаются');
+});

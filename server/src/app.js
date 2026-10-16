@@ -270,7 +270,11 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
 
   // ---------- маршруты ----------
   const routes = [
-    ['GET', /^\/health$/, async () => json(200, { ok: cfg.missing.length === 0, missing: cfg.missing, store: store.kind, providers: { yandex: prov.yandex.enabled, vk: prov.vk.enabled } })],
+    ['GET', /^\/health$/, async () => {
+      let tables = 'ok';
+      if (store.ensure && cfg.missing.length === 0) { try { await store.ensure(); } catch (e) { tables = 'ошибка: ' + e.message; } }
+      return json(200, { ok: cfg.missing.length === 0 && tables === 'ok', missing: cfg.missing, store: store.kind, tables, providers: { yandex: prov.yandex.enabled, vk: prov.vk.enabled } });
+    }],
     ['POST', /^\/auth\/register$/, register],
     ['POST', /^\/auth\/verify$/, verify],
     ['POST', /^\/auth\/resend$/, resend],

@@ -47,6 +47,10 @@ projects/
 
 ## 2. Яндекс Облако
 
+На Windows всё из этого раздела и раздела 6 делает скрипт `server/deploy/deploy.ps1`: положите рядом с ним `function.zip` и запустите `powershell -ExecutionPolicy Bypass -File deploy.ps1` (нужна программа `yc` после `yc init`). Ключи и пароли он хранит только на этом компьютере. Таблицы в базе сервер создаёт сам при первом запросе.
+
+Вручную:
+
 Нужен аккаунт в [console.yandex.cloud](https://console.yandex.cloud) с платёжным аккаунтом. Для небольшого проекта бесплатных лимитов Cloud Functions, API Gateway и YDB Serverless обычно хватает.
 
 1. **Сервисный аккаунт** `atlas-api` с ролями `ydb.editor` и `functions.functionInvoker`.
@@ -57,7 +61,7 @@ projects/
    cd server
    YDB_DOCAPI_ENDPOINT=… YDB_ACCESS_KEY_ID=… YDB_SECRET_ACCESS_KEY=… node scripts/create-tables.js
    ```
-5. **Функция** → Cloud Functions → «Создать функцию» `atlas-api`. Среда — Node.js 18 или новее, точка входа `index.handler`, память 256 МБ, таймаут 10 с. Код — архив `server/dist/function.zip` (как его собрать — в разделе 6).
+5. **Функция** → Cloud Functions → «Создать функцию» `atlas-api`. Среда — `nodejs22`, точка входа `index.handler`, память 256 МБ, таймаут 10 с. Код — архив `server/dist/function.zip` (как его собрать — в разделе 6).
 6. **API-шлюз** → API Gateway → «Создать». Спецификация — из `server/api-gateway.yaml`, подставьте ID функции и ID сервисного аккаунта. После создания скопируйте домен шлюза вида `https://xxxx.apigw.yandexcloud.net` — это **API_URL**.
 
 ## 3. Яндекс ID
