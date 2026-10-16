@@ -24,21 +24,28 @@ function Fail([string]$t) {
   exit 1
 }
 
-# Вызов программы yc с ответом в JSON (функция названа YcJson, чтобы не путаться с самой yc). -AllowFail: вернуть $null вместо остановки (например, «не найдено»).
+# Вызов программы yc с ответом в JSON (функция названа YcJson, чтобы не путаться с самой yc).
+# -AllowFail: если объекта нет (NotFound) — вернуть $null. Сетевые сбои повторяются до трёх раз.
 function YcJson {
   param([string[]]$A, [switch]$AllowFail)
-  $errFile = [System.IO.Path]::GetTempFileName()
-  $out = & yc @A --format json 2> $errFile
-  $code = $LASTEXITCODE
-  $err = ''
-  if (Test-Path $errFile) { $err = Get-Content $errFile -Raw; Remove-Item $errFile -ErrorAction SilentlyContinue }
-  if ($code -ne 0) {
-    if ($AllowFail) { return $null }
+  for ($try = 1; $try -le 3; $try++) {
+    $errFile = [System.IO.Path]::GetTempFileName()
+    $out = & yc @A --format json 2> $errFile
+    $code = $LASTEXITCODE
+    $err = ''
+    if (Test-Path $errFile) { $err = "$(Get-Content $errFile -Raw)"; Remove-Item $errFile -ErrorAction SilentlyContinue }
+    if ($code -eq 0) {
+      $text = ($out | Out-String).Trim()
+      if (-not $text) { return $null }
+      return ($text | ConvertFrom-Json)
+    }
+    if ($err -match 'DeadlineExceeded|Unavailable|connection|timeout|TLS|EOF') {
+      if ($try -lt 3) { Write-Host "Нет связи с Яндекс Облаком, повторяю ($try из 3)..." -ForegroundColor Yellow; Start-Sleep -Seconds 5; continue }
+      Fail ("нет связи с API Яндекс Облака. Выключи VPN или прокси, проверь интернет и запусти скрипт снова.`n" + $err)
+    }
+    if ($AllowFail -and $err -match 'NotFound|not found|не найден') { return $null }
     Fail ("yc " + ($A -join ' ') + "`n" + $err)
   }
-  $text = ($out | Out-String).Trim()
-  if (-not $text) { return $null }
-  return ($text | ConvertFrom-Json)
 }
 
 # ---------- сохранённые значения ----------
@@ -77,6 +84,8 @@ if (-not (Test-Path $Zip)) { Fail "Нет файла $Zip — он должен 
 $Folder = (& yc config get folder-id 2>$null | Out-String).Trim()
 if (-not $Folder) { Fail 'Не выбран каталог облака. Выполни команду: yc init' }
 Write-Host "Каталог: $Folder"
+$null = YcJson @('resource-manager', 'folder', 'get', '--id', $Folder)
+Write-Host 'Связь с Яндекс Облаком есть.'
 
 # ---------- 2. сервисный аккаунт и роли ----------
 Step 'Сервисный аккаунт'
