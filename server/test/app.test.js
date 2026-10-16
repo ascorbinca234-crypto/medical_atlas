@@ -210,3 +210,17 @@ test('OAuth: state короткий и подходит под требован�
   const state = new URL(s.headers.Location).searchParams.get('state');
   assert.match(state, /^[A-Za-z0-9_-]{32,64}$/);
 });
+
+test('заявка преподавателя уходит письмом в ящик проекта', async () => {
+  const { call, J, sent } = setup({ SMTP_USER: 'atlas.noreply@yandex.ru' });
+  let r = await call('POST', '/lead', { name: 'Ольга', contact: '', role: 'Репетитор' });
+  assert.strictEqual(J(r).error, 'no_contact');
+  r = await call('POST', '/lead', { name: 'Ольга Петровна', contact: 'olga@school.ru', role: 'Репетитор по биологии', message: 'Хочу для 10 учеников <b>', page: SITE });
+  assert.strictEqual(r.status, 200);
+  const m = sent[sent.length - 1];
+  assert.strictEqual(m.to, 'atlas.noreply@yandex.ru'); assert.strictEqual(m.replyTo, 'olga@school.ru');
+  assert.match(m.subject, /Ольга Петровна/); assert.match(m.html, /&lt;b&gt;/);
+  const n = sent.length;
+  r = await call('POST', '/lead', { name: 'Бот', contact: 'x@y.ru', website: 'spam.example' });
+  assert.strictEqual(r.status, 200); assert.strictEqual(sent.length, n, 'ловушка: письмо не отправляется');
+});

@@ -43,6 +43,7 @@ function config(e = process.env) {
       from: e.MAIL_FROM || e.SMTP_USER || '',
       fromName: e.MAIL_FROM_NAME || 'Медицинский атлас',
       outbox: e.MAIL_OUTBOX || '',
+      leadTo: e.LEAD_TO || e.SMTP_USER || '',
     },
     contentDir: e.CONTENT_DIR || path.join(__dirname, '..', 'content'),
     gzip: e.GZIP !== '0',

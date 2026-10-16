@@ -32,4 +32,13 @@ function resetEmail(link) {
   };
 }
 
-module.exports = { verifyEmail, resetEmail };
+function leadEmail({ name, contact, role, message, page }) {
+  const rows = [['Имя', name], ['Контакт', contact], ['Кто', role || '—'], ['Сообщение', message || '—'], ['Страница', page || '—']];
+  return {
+    subject: `Заявка преподавателя: ${name}`,
+    text: 'Новая заявка с сайта «Медицинский атлас»\n\n' + rows.map(([k, v]) => `${k}: ${v}`).join('\n') + '\n\nЕсли контакт — почта, просто ответьте на это письмо.',
+    html: `<!doctype html><html lang="ru"><body style="font-family:Arial,Helvetica,sans-serif;color:#1c1730"><h2 style="margin:0 0 12px">Заявка преподавателя</h2><table cellpadding="6" style="border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="color:#6b6480;vertical-align:top">${esc(k)}</td><td style="white-space:pre-wrap">${esc(v)}</td></tr>`).join('')}</table><p style="color:#6b6480">Если контакт — почта, просто ответьте на это письмо.</p></body></html>`,
+  };
+}
+
+module.exports = { verifyEmail, resetEmail, leadEmail };
