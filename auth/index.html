@@ -205,8 +205,21 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
   V.sent = function (q) {
     label('03', 'Почта');
     var email = q.get('email') || '';
-    view.innerHTML = '<h1>Проверьте почту</h1><p class="sub" data-msg>' + (q.get('again') ? 'Почта ещё не подтверждена. ' : '') + 'Мы отправили письмо со ссылкой на <b>' + esc(email) + '</b>. Откройте её, и вход завершится сам.</p>' +
-      '<p class="big">Письма нет? Проверьте папку «Спам» или отправьте ещё раз.</p><div class="stack"><button class="btn" id="again" type="button">Отправить письмо ещё раз</button><a class="btn" href="#login">Вернуться ко входу</a></div>';
+    view.innerHTML = '<h1>Проверьте почту</h1><p class="sub" data-msg>' + (q.get('again') ? 'Почта ещё не подтверждена. ' : '') + 'Мы отправили письмо на <b>' + esc(email) + '</b>. Введите код из письма или откройте ссылку в нём.</p>' +
+      '<form id="fc" novalidate><label class="f" for="code">Код из письма</label><div class="row"><input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="123 456"><button class="btn pri" type="submit">Подтвердить</button></div></form>' +
+      '<p class="big" style="margin-top:18px">Письма нет? Проверьте папку «Спам» или отправьте ещё раз.</p><div class="stack"><button class="btn" id="again" type="button">Отправить письмо ещё раз</button><a class="btn" href="#login">Вернуться ко входу</a></div>';
+    var fc = document.getElementById('fc');
+    fc.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var code = fc.code.value.replace(/\D/g, ''), btn = fc.querySelector('button');
+      if (code.length !== 6) return setMsg('err', 'Код — это 6 цифр из письма.');
+      busy(btn, true, '…');
+      MA.call('/auth/verify-code', { email: email, code: code }).then(function (r) { MA.setSession(r); goNext(); }, function (e) {
+        busy(btn, false);
+        if (e.code === 'already_verified') { location.hash = 'login?ok=' + encodeURIComponent(e.message); return; }
+        setMsg('err', e.message);
+      });
+    });
     var b = document.getElementById('again'), wait = 0, t = 0;
     function tick() { if (wait > 0) { b.disabled = true; b.textContent = 'Отправить ещё раз через ' + wait + ' с'; wait--; t = setTimeout(tick, 1000); } else { b.disabled = false; b.textContent = 'Отправить письмо ещё раз'; } }
     b.addEventListener('click', function () {
@@ -276,7 +289,12 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
       provider: 'Яндекс ID или VK ID не ответил. Попробуйте ещё раз через минуту.',
       provider_off: 'Этот способ входа пока не подключён. Войдите по почте.',
     };
-    view.innerHTML = '<h1>Вход не завершён</h1><p class="sub" data-msg></p>' + msg('err', reasons[q.get('reason')] || 'Что-то пошло не так. Попробуйте ещё раз.') + '<div class="stack"><a class="btn pri" href="#login">Попробовать снова</a></div>';
+    var who = { yandex: 'Яндекс ID', vk: 'VK ID' }[q.get('p')];
+    var text = reasons[q.get('reason')] || 'Что-то пошло не так. Попробуйте ещё раз.';
+    if (q.get('reason') === 'provider' && who) text = who + ' не дал завершить вход. Попробуйте ещё раз или войдите по почте.';
+    view.innerHTML = '<h1>Вход не завершён</h1><p class="sub" data-msg></p>' + msg('err', text) +
+      (q.get('detail') ? '<p class="foot" style="text-align:left">Подробности для разработчика: ' + esc(q.get('detail')) + '</p>' : '') +
+      '<div class="stack"><a class="btn pri" href="#login">Попробовать снова</a></div>';
   };
   V.account = function () {
     label('06', 'Аккаунт');

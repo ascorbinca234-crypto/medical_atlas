@@ -27,7 +27,7 @@ function setup(extra = {}) {
   let ipN = 0;
   const call = (method, p, body, headers = {}, query = {}) => app.handle({ method, path: p, query, headers: Object.assign({ origin: 'https://ma.example' }, headers), body: body ? JSON.stringify(body) : '', ip: '10.0.0.' + (headers.ip || 1) });
   const J = r => JSON.parse(r.body);
-  const tokenFrom = (m, kind) => decodeURIComponent(new RegExp('#' + kind + '\\?token=([^\\s<"]+)').exec(m.text)[1]);
+  const tokenFrom = (m, kind) => decodeURIComponent(new RegExp('#' + kind + '\\?token=([^\\s<"&]+)').exec(m.text)[1]);
   return { app, call, J, sent, store, calls, prof, tokenFrom, cfg };
 }
 
@@ -186,4 +186,27 @@ test('без настроек сервер отвечает 503 и подска�
   assert.strictEqual(r.status, 503); assert.match(JSON.parse(r.body).message, /SITE_URL/);
   const h = await app.handle({ method: 'GET', path: '/health', query: {}, headers: {}, body: '', ip: '1' });
   assert.strictEqual(h.status, 200); assert.strictEqual(JSON.parse(h.body).ok, false);
+});
+
+test('код из письма подтверждает почту и даёт вход', async () => {
+  const { call, J, sent } = setup();
+  await call('POST', '/auth/register', { email: 'code@b.ru', password: 'secret-123', name: 'Кодов', consent: true });
+  const code = /код подтверждения: (\d{3}) (\d{3})/i.exec(sent[0].text);
+  assert.ok(code, sent[0].text);
+  assert.match(sent[0].subject, /^Код \d{3} \d{3}/);
+  let r = await call('POST', '/auth/verify-code', { email: 'code@b.ru', code: '000000' === code[1] + code[2] ? '111111' : '000000' });
+  assert.strictEqual(r.status, 400);
+  r = await call('POST', '/auth/verify-code', { email: 'code@b.ru', code: code[1] + ' ' + code[2] });
+  assert.strictEqual(r.status, 200); assert.ok(J(r).accessToken);
+  r = await call('POST', '/auth/verify-code', { email: 'code@b.ru', code: code[1] + code[2] });
+  assert.strictEqual(J(r).error, 'already_verified');
+  r = await call('POST', '/auth/login', { email: 'code@b.ru', password: 'secret-123' });
+  assert.strictEqual(r.status, 200);
+});
+
+test('OAuth: state короткий и подходит под требования VK', async () => {
+  const { call } = setup();
+  const s = await call('GET', '/auth/vk/start');
+  const state = new URL(s.headers.Location).searchParams.get('state');
+  assert.match(state, /^[A-Za-z0-9_-]{32,64}$/);
 });

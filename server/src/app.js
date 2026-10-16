@@ -9,6 +9,7 @@ const emails = require('./emails');
 class HttpError extends Error { constructor(status, code, message, extra) { super(message); this.status = status; this.code = code; this.extra = extra; } }
 const bad = (code, message) => new HttpError(400, code, message);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CODE_WIN = 3600, CODE_WINDOWS = 24;   // код действует 24 часа
 const DUMMY_HASH = 's1$AAAAAAAAAAAAAAAAAAAAAA==$' + Buffer.alloc(64).toString('base64');
 
 function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
@@ -62,9 +63,11 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   }
   const newUser = o => Object.assign({ id: randomId(12), email: null, emailVerified: false, name: '', avatar: null, pw: null, tv: 0, ids: [], createdAt: new Date().toISOString() }, o);
   const link = (hash) => cfg.authPage + '#' + hash;
+  // 6-значный код из письма: выводится из id и почты пользователя и часа отправки, хранить его не нужно
+  const vcode = (u, w) => String(crypto.createHmac('sha256', K.jwt).update(`vcode|${u.id}|${u.email}|${w}`).digest().readUInt32BE(0) % 1000000).padStart(6, '0');
   async function sendVerify(u) {
     const token = seal({ t: 'verify', u: u.id, e: u.email, j: randomId(), exp: now() + 24 * 3600 }, K.seal);
-    const m = emails.verifyEmail(u.name, link('verify?token=' + token));
+    const m = emails.verifyEmail(u.name, link('verify?token=' + token + '&email=' + encodeURIComponent(u.email)), vcode(u, Math.floor(now() / CODE_WIN)));
     await mail.send(Object.assign({ to: u.email }, m));
   }
   async function sendReset(u) {
@@ -106,6 +109,22 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const u = await store.getUser(t.u);
     if (!u || u.email !== t.e) throw bad('bad_token', 'Ссылка устарела или уже использована. Войдите, и мы пришлём новую.');
     if (!(await store.once('used:' + t.j, 2 * 24 * 3600))) throw bad('bad_token', 'Эта ссылка уже использована. Войдите с почтой и паролем.');
+    u.emailVerified = true;
+    await store.putUser(u);
+    return json(200, session(u));
+  }
+
+  async function verifyCode(req) {
+    const b = body(req);
+    const email = checkEmail(normEmail(b.email)), code = String(b.code || '').replace(/\D/g, '');
+    if (code.length !== 6) throw bad('bad_code', 'Код — это 6 цифр из письма.');
+    await limit('vcode:' + email, 10, 900);
+    const u = await userByEmail(email);
+    if (u && u.emailVerified) throw bad('already_verified', 'Почта уже подтверждена. Войдите с почтой и паролем.');
+    const w = Math.floor(now() / CODE_WIN);
+    let ok = false;
+    if (u) for (let i = 0; i <= CODE_WINDOWS; i++) { const c = Buffer.from(vcode(u, w - i)); if (crypto.timingSafeEqual(c, Buffer.from(code))) ok = true; }
+    if (!ok) throw bad('bad_code', 'Неверный или устаревший код. Проверьте последнее письмо или отправьте новое.');
     u.emailVerified = true;
     await store.putUser(u);
     return json(200, session(u));
@@ -156,9 +175,11 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   async function oauthStart(req, p) {
     const P = prov[p];
     if (!P || !P.enabled) return toAuth('error?reason=provider_off');
-    const n = randomId(), { verifier, challenge } = pkce();
-    const state = seal({ t: 'st', p, v: verifier, n, exp: now() + 600 }, K.seal);
-    return redirect(P.authorizeUrl({ state, challenge }), { 'Set-Cookie': `ma_oauth=${n}; Path=/auth; Max-Age=600; HttpOnly; Secure; SameSite=Lax` });
+    // state — короткая случайная строка (VK требует 32+ символа a-z, A-Z, 0-9, _ и -);
+    // PKCE-verifier лежит в зашифрованной cookie, браузеру он не виден
+    const n = randomId(24), { verifier, challenge } = pkce();
+    const box = seal({ t: 'st', p, v: verifier, n, exp: now() + 600 }, K.seal);
+    return redirect(P.authorizeUrl({ state: n, challenge }), { 'Set-Cookie': `ma_oauth=${box}; Path=/auth; Max-Age=600; HttpOnly; Secure; SameSite=Lax` });
   }
 
   async function loginWith(p, prof) {
@@ -196,15 +217,15 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     let q = Object.assign({}, req.query);
     if (q.payload) { try { q = Object.assign(q, JSON.parse(q.payload)); } catch (e) { /* без payload */ } }
     if (q.error && !q.state) return toAuth('error?reason=cancel', clear);
-    const st = open(q.state, K.seal);
-    if (!st || st.t !== 'st' || st.p !== p || !st.n || cookie(req, 'ma_oauth') !== st.n) return toAuth('error?reason=state', clear);
+    const st = open(cookie(req, 'ma_oauth'), K.seal);
+    if (!st || st.t !== 'st' || st.p !== p || !st.n || q.state !== st.n) return toAuth('error?reason=state', clear);
     let prof;
     try { prof = await P.profile(q, st); } catch (e) {
       if (e.userCancel) return toAuth('error?reason=cancel', clear);
       log.error('oauth', p, e.message);
-      return toAuth('error?reason=provider', clear);
+      return toAuth('error?reason=provider&p=' + p + '&detail=' + encodeURIComponent(String(e.message).slice(0, 160)), clear);
     }
-    if (!prof || !prof.id || prof.id === 'undefined') return toAuth('error?reason=provider', clear);
+    if (!prof || !prof.id || prof.id === 'undefined') return toAuth('error?reason=provider&p=' + p + '&detail=' + encodeURIComponent('нет id пользователя в ответе'), clear);
     const u = await loginWith(p, prof);
     const code = seal({ t: 'login', u: u.id, j: randomId(), exp: now() + 120 }, K.seal);
     return toAuth('done?code=' + code, clear);
@@ -277,6 +298,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     }],
     ['POST', /^\/auth\/register$/, register],
     ['POST', /^\/auth\/verify$/, verify],
+    ['POST', /^\/auth\/verify-code$/, verifyCode],
     ['POST', /^\/auth\/resend$/, resend],
     ['POST', /^\/auth\/login$/, login],
     ['POST', /^\/auth\/forgot$/, forgot],
