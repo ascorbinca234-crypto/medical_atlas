@@ -154,7 +154,7 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
     return '<label class="f" for="' + id + '">' + lab + (hint ? ' <span class="hint">' + hint + '</span>' : '') + '</label><div class="inp"><input id="' + id + '" type="password" autocomplete="' + auto + '" required minlength="' + (auto === 'current-password' ? 1 : 8) + '" maxlength="128"><button type="button" class="eye" aria-pressed="false">Показать</button></div>';
   };
 
-  var V = {};
+  var V = {}, pendingMail = null;   // результат отправки письма при регистрации — для экрана «Проверьте почту»
   V.off = function () {
     label('—', 'Вход');
     view.innerHTML = '<h1>Вход пока не включён</h1><p class="sub">Атласы работают в открытом режиме. Когда вход заработает, здесь появятся почта, Яндекс ID и VK ID.</p><a class="btn pri" href="' + esc(MA.SITE_URL) + '">К атласам</a>';
@@ -198,14 +198,16 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
       if (!f.consent.checked) return setMsg('err', 'Отметьте согласие на обработку персональных данных.');
       busy(btn, true, 'Создаём аккаунт…');
       MA.call('/auth/register', { name: f.name.value, email: email, password: f.pw.value, consent: true }).then(function (r) {
+        pendingMail = r.mailError ? { err: r.mailError, detail: r.detail } : { sent: true };
         location.hash = 'sent?email=' + encodeURIComponent(r.email || email);
       }, function (e) { busy(btn, false); setMsg('err', e.message); });
     });
   };
   V.sent = function (q) {
     label('03', 'Почта');
-    var email = q.get('email') || '';
-    view.innerHTML = '<h1>Проверьте почту</h1><p class="sub" data-msg>' + (q.get('again') ? 'Почта ещё не подтверждена. ' : '') + 'Мы отправили письмо на <b>' + esc(email) + '</b>. Введите код из письма или откройте ссылку в нём.</p>' +
+    var email = q.get('email') || '', again = !!q.get('again');
+    var first = pendingMail; pendingMail = null;
+    view.innerHTML = '<h1>Проверьте почту</h1><p class="sub" data-msg>' + (again ? 'Почта ещё не подтверждена. ' : '') + 'Код и ссылка приходят на <b>' + esc(email) + '</b>. Письмо может идти пару минут; подойдёт код из любого из трёх последних писем.</p>' +
       '<form id="fc" novalidate><label class="f" for="code">Код из письма</label><div class="row"><input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="123 456"><button class="btn pri" type="submit">Подтвердить</button></div></form>' +
       '<p class="big" style="margin-top:18px">Письма нет? Проверьте папку «Спам» или отправьте ещё раз.</p><div class="stack"><button class="btn" id="again" type="button">Отправить письмо ещё раз</button><a class="btn" href="#login">Вернуться ко входу</a></div>';
     var fc = document.getElementById('fc');
@@ -221,11 +223,27 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
       });
     });
     var b = document.getElementById('again'), wait = 0, t = 0;
-    function tick() { if (wait > 0) { b.disabled = true; b.textContent = 'Отправить ещё раз через ' + wait + ' с'; wait--; t = setTimeout(tick, 1000); } else { b.disabled = false; b.textContent = 'Отправить письмо ещё раз'; } }
-    b.addEventListener('click', function () {
-      busy(b, true, 'Отправляем…');
-      MA.call('/auth/resend', { email: email }).then(function () { setMsg('ok', 'Отправили новое письмо.'); wait = 60; tick(); }, function (e) { busy(b, false); setMsg('err', e.message); });
-    });
+    function tick() { clearTimeout(t); if (wait > 0) { b.disabled = true; b.textContent = 'Отправить ещё раз через ' + wait + ' с'; wait--; t = setTimeout(tick, 1000); } else { b.disabled = false; b.textContent = 'Отправить письмо ещё раз'; } }
+    function fail(text, detail) {
+      setMsg('err', text);
+      if (detail) view.querySelector('.msg').insertAdjacentHTML('afterend', '<p class="foot" style="text-align:left">Подробности для разработчика: ' + esc(detail) + '</p>');
+    }
+    // ошибки отправки показываем как есть, а не «отправили»
+    function send(okText) {
+      b.disabled = true; b.textContent = 'Отправляем…';
+      MA.call('/auth/resend', { email: email }).then(function () { setMsg('ok', okText); wait = 60; tick(); }, function (e) {
+        var d = e.data || {};
+        b.disabled = false; b.textContent = 'Отправить письмо ещё раз';
+        if (e.code === 'resend_wait') { setMsg('ok', 'Письмо с кодом уже отправлено — проверьте почту и папку «Спам».'); wait = d.wait || 45; tick(); return; }
+        if (e.code === 'already_verified') { location.hash = 'login?ok=' + encodeURIComponent(e.message); return; }
+        if (e.code === 'no_account') { location.hash = 'register'; return; }
+        fail(e.message, d.detail);
+      });
+    }
+    b.addEventListener('click', function () { if (!b.disabled) send('Отправили новое письмо с новым кодом.'); });
+    if (first && first.err) fail(first.err, first.detail);
+    else if (first && first.sent) { wait = 45; tick(); }
+    else if (again) send('Почта ещё не подтверждена. Отправили новое письмо с кодом.');
     window.addEventListener('hashchange', function () { clearTimeout(t); }, { once: true });
   };
   V.forgot = function () {

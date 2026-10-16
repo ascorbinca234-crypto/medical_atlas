@@ -64,7 +64,7 @@ projects/
    cd server
    YDB_DOCAPI_ENDPOINT=… YDB_ACCESS_KEY_ID=… YDB_SECRET_ACCESS_KEY=… node scripts/create-tables.js
    ```
-5. **Функция** → Cloud Functions → «Создать функцию» `atlas-api`. Среда — `nodejs22`, точка входа `index.handler`, память 256 МБ, таймаут 10 с. Код — архив `server/dist/function.zip` (как его собрать — в разделе 6).
+5. **Функция** → Cloud Functions → «Создать функцию» `atlas-api`. Среда — `nodejs22`, точка входа `index.handler`, память 256 МБ, таймаут 30 с (отправка письма может занять несколько секунд). Код — архив `server/dist/function.zip` (как его собрать — в разделе 6).
 6. **API-шлюз** → API Gateway → «Создать». Спецификация — из `server/api-gateway.yaml`, подставьте ID функции и ID сервисного аккаунта. После создания скопируйте домен шлюза вида `https://xxxx.apigw.yandexcloud.net` — это **API_URL**.
 
 ## 3. Яндекс ID
@@ -116,6 +116,10 @@ cd server && node scripts/package.js      # → server/dist/function.zip
 Загрузите `function.zip` новой версией функции. Публичные `index.html` атласов закоммитьте в этот репозиторий.
 
 Проверка: откройте `API_URL/health`. Должно быть `"ok": true`. Если нет, в `missing` перечислено, чего не хватает.
+
+В том же ответе `providers` показывает, какие входы включены. `"vk": false` значит, что в выложенной версии функции нет `VK_CLIENT_ID`: в `deploy.ps1` на вопросе «ID приложения VK ID» введите ID приложения.
+
+Если письмо с кодом не дошло, причина видна на экране ввода кода («Подробности для разработчика») и в логах функции (строка `mail failed`). Каждое письмо приходит с новым кодом; действуют три последних.
 
 ## 7. Включить вход на сайте
 

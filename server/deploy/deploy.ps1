@@ -237,7 +237,7 @@ $envMap = @{}
 foreach ($e in $vars.GetEnumerator()) { $envMap[$e.Key] = "$($e.Value)" }
 $verBody = @{
   functionId = $fn.id; runtime = 'nodejs22'; entrypoint = 'index.handler'
-  resources = @{ memory = '268435456' }; executionTimeout = '10s'; serviceAccountId = $sa.id
+  resources = @{ memory = '268435456' }; executionTimeout = '30s'; serviceAccountId = $sa.id
   environment = $envMap; content = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($Zip))
 }
 Write-Host 'Загружаю архив и жду сборки функции (до пары минут)...'

@@ -1933,6 +1933,7 @@ opacity: 0;
 }
 }
 }
+@layer components{.team-points { display: grid; gap: 8px; margin-top: 16px; padding: 0; list-style: none; font-size: 14.5px; line-height: 1.4; color: #D7E0EC; }.team-points li { display: flex; gap: 10px; }.team-points li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: .5em; border-radius: 9999px; background: #67E8F9; }.msg-detail { margin-top: 8px; font-size: 12.5px; line-height: 1.4; color: #94A3B8; overflow-wrap: anywhere; }}
 /*tw:end*/
 </style>
 </head>
@@ -2081,7 +2082,7 @@ opacity: 0;
           <!-- код из письма -->
           <div id="authCode" hidden>
             <h2 class="text-[22px] font-bold tracking-tight text-white">Введите код из письма</h2>
-            <p class="mt-2 text-[14.5px] leading-relaxed text-mute">Отправили 6 цифр на <b id="codeEmail" class="break-all font-semibold text-ink"></b>. Письмо могло попасть в «Спам». Можно и просто открыть ссылку из письма.</p>
+            <p class="mt-2 text-[14.5px] leading-relaxed text-mute">Отправили 6 цифр на <b id="codeEmail" class="break-all font-semibold text-ink"></b>. Письмо может идти пару минут и попасть в «Спам» или «Промоакции». Подойдёт код из любого из трёх последних писем — или просто откройте ссылку из письма.</p>
             <div id="codeMsg" class="mt-4" aria-live="polite"></div>
             <form id="codeForm" class="mt-4 grid gap-3.5" novalidate>
               <label class="sr-only" for="codeInput">Код из письма</label>
@@ -2402,10 +2403,12 @@ opacity: 0;
       <div class="p-6 sm:p-9">
         <p class="text-[14px] font-semibold text-[#6EE7B7]">Founder &amp; Medical Lead</p>
         <h3 class="mt-1 text-[30px] font-bold tracking-tight text-white">Андрей</h3>
-        <p class="mt-4 max-w-2xl text-[16px] leading-relaxed text-[#C3CEDD]">Исследователь в области нейробиологии, психофармакологии и биохимии (ПСПбГМУ им. И.&nbsp;П.&nbsp;Павлова), соавтор научных публикаций, победитель медицинского хакатона Meditron (кейс SberMedAI). Преподаватель химии и биологии со стажем в частных школах и студенческий ментор. Отвечает за научную точность и методологию.</p>
+        <p class="mt-4 max-w-2xl text-[16px] leading-relaxed text-[#C3CEDD]">Исследователь в области нейробиологии, психофармакологии и биохимии, автор научных публикаций в журналах уровня Q3. Проходил стажировку в Сколтехе, выиграл грант на исследование ранней диагностики депрессии, победитель медицинского хакатона Meditron (кейс SberMedAI). Преподаватель химии и биологии со стажем в частных школах и студенческий ментор. Отвечает за научную точность и методологию.</p>
         <ul class="mt-6 flex flex-wrap gap-2 text-[13.5px]">
-          <li class="rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-[#E2E8F0]">ПСПбГМУ им. И.&nbsp;П.&nbsp;Павлова</li>
+          <li class="rounded-full border border-[#10B981]/40 bg-[#10B981]/10 px-3 py-1.5 text-[#A7F3D0]">Грант: ранняя диагностика депрессии</li>
           <li class="rounded-full border border-[#10B981]/40 bg-[#10B981]/10 px-3 py-1.5 text-[#A7F3D0]">Победитель Meditron · SberMedAI</li>
+          <li class="rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-[#E2E8F0]">Стажировка в Сколтехе</li>
+          <li class="rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-[#E2E8F0]">Публикации в журналах Q3</li>
           <li class="rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-[#E2E8F0]">Нейробиология и психофармакология</li>
           <li class="rounded-full border border-white/12 bg-white/[0.04] px-3 py-1.5 text-[#E2E8F0]">Преподаватель химии и биологии</li>
         </ul>
@@ -2414,19 +2417,29 @@ opacity: 0;
 
     <div class="mt-5 grid gap-5 md:grid-cols-3" data-reveal>
       <article class="glass glow-card overflow-hidden rounded-3xl">
-        <img src="assets/team/dev.jpg" alt="Технический лидер команды Med404" width="640" height="800" loading="lazy" class="aspect-[5/4] w-full object-cover object-top">
+        <img src="assets/team/dev.jpg" alt="Павел, Tech &amp; AI Lead" width="640" height="800" loading="lazy" class="aspect-[5/4] w-full object-cover object-top">
         <div class="p-6">
           <p class="text-[14px] font-semibold text-[#67E8F9]">Tech &amp; AI Lead</p>
-          <h3 class="mt-1 text-[21px] font-bold tracking-tight text-white">Команда разработки Med404</h3>
-          <p class="mt-3 text-[15px] leading-relaxed text-[#B6C2D4]">Архитекторы платформы и инженеры, победители медтех-хакатонов. Отвечают за быстрый интерфейс, интерактивные слои визуализации и алгоритмы умного поиска.</p>
+          <h3 class="mt-1 text-[21px] font-bold tracking-tight text-white">Павел</h3>
+          <p class="mt-3 text-[15px] leading-relaxed text-[#B6C2D4]">Команда разработки Med404. Отвечает за быстрый интерфейс, интерактивные слои визуализации и алгоритмы умного поиска.</p>
+          <ul class="team-points">
+            <li>Более 3 лет в ML</li>
+            <li>Победитель и призёр математических олимпиад</li>
+            <li>Научная деятельность: низкоранговые приближения и оптимизация</li>
+            <li>Автор агентных RAG-систем</li>
+          </ul>
         </div>
       </article>
       <article class="glass glow-card overflow-hidden rounded-3xl">
-        <img src="assets/team/mkt.jpg" alt="Маркетолог проекта" width="640" height="800" loading="lazy" class="aspect-[5/4] w-full object-cover object-top">
+        <img src="assets/team/mkt.jpg" alt="Давид, Growth &amp; Community" width="640" height="800" loading="lazy" class="aspect-[5/4] w-full object-cover object-top">
         <div class="p-6">
           <p class="text-[14px] font-semibold text-[#67E8F9]">Growth &amp; Community</p>
-          <h3 class="mt-1 text-[21px] font-bold tracking-tight text-white">Маркетинг</h3>
+          <h3 class="mt-1 text-[21px] font-bold tracking-tight text-white">Давид</h3>
           <p class="mt-3 text-[15px] leading-relaxed text-[#B6C2D4]">Продвижение проекта и связь со студентами: рассказывает, где атлас помогает, и собирает обратную связь.</p>
+          <ul class="team-points">
+            <li>Внедрил передовые стандарты обработки пользовательских запросов, снизив показатель оттока аудитории до минимальных значений</li>
+            <li>Заслужил высшую профессиональную репутацию благодаря умению оперативно принимать решения в условиях высокой динамики рынка</li>
+          </ul>
         </div>
       </article>
       <article class="glass glow-card flex flex-col overflow-hidden rounded-3xl">
@@ -2629,6 +2642,7 @@ opacity: 0;
     $('#codeEmail').textContent = email;
     $('#codeInput').value = '';
     message($('#codeMsg'), note ? 'ok' : '', note || '');
+    resendReady();
     show('code');
     setTimeout(function () { $('#codeInput').focus({ preventScroll: true }); }, 50);
   }
@@ -2643,8 +2657,8 @@ opacity: 0;
     }, function (e) {
       busy(btn, false);
       if (e.code === 'unverified') {
-        MA.call('/auth/resend', { email: email }).catch(function () {});
-        startCode(email, 'Почта ещё не подтверждена. Отправили новый код.');
+        startCode(email);
+        sendCode('Почта ещё не подтверждена. Отправили новый код.', 'Почта ещё не подтверждена. ');
         return;
       }
       message($('#authMsg'), 'err', e.message);
@@ -2660,6 +2674,8 @@ opacity: 0;
     busy(btn, true, 'Создаём аккаунт…');
     MA.call('/auth/register', { name: name, email: email, password: password, consent: true }).then(function (r) {
       busy(btn, false); startCode(r.email || email);
+      if (r.mailError) { codeError(r.mailError, r.detail); return; }
+      cooldown(45);
     }, function (e) {
       busy(btn, false);
       if (e.code === 'email_taken') { setTab('login'); $('#loginEmail').value = email; $('#loginPassword').focus(); }
@@ -2688,19 +2704,42 @@ opacity: 0;
     });
   });
 
-  var resendBtn = $('#resendBtn'), resendTimer = 0;
+  var resendBtn = $('#resendBtn'), resendTimer = 0, RESEND_LABEL = 'Отправить код ещё раз';
+  function resendReady() { clearInterval(resendTimer); resendTimer = 0; resendBtn.disabled = false; resendBtn.textContent = RESEND_LABEL; }
   function cooldown(sec) {
-    resendBtn.disabled = true;
     clearInterval(resendTimer);
-    resendTimer = setInterval(function () {
-      sec -= 1;
-      if (sec <= 0) { clearInterval(resendTimer); resendBtn.disabled = false; resendBtn.textContent = 'Отправить код ещё раз'; return; }
+    sec = Math.max(1, Math.ceil(sec));
+    resendBtn.disabled = true;
+    var tick = function () {
+      if (sec <= 0) { resendReady(); return; }
       resendBtn.textContent = 'Отправить ещё раз через ' + sec + ' с';
-    }, 1000);
-    resendBtn.textContent = 'Отправить ещё раз через ' + sec + ' с';
+      sec -= 1;
+    };
+    tick();
+    resendTimer = setInterval(tick, 1000);
+  }
+  function codeError(text, detail) {
+    message($('#codeMsg'), 'err', text);
+    if (detail) $('#codeMsg').insertAdjacentHTML('beforeend', '<p class="msg-detail">Подробности для разработчика: ' + esc(detail) + '</p>');
+  }
+  /* новое письмо с кодом; ошибки показываем как есть, а не «отправили» */
+  function sendCode(okText, waitPrefix) {
+    clearInterval(resendTimer);
+    resendBtn.disabled = true; resendBtn.textContent = 'Отправляем…';
+    return MA.call('/auth/resend', { email: pendingEmail }).then(function () {
+      message($('#codeMsg'), 'ok', okText); cooldown(60);
+    }, function (e) {
+      resendReady();
+      var d = e.data || {};
+      if (e.code === 'resend_wait') { message($('#codeMsg'), 'ok', (waitPrefix || '') + 'Письмо с кодом уже отправлено — проверьте почту и папку «Спам».'); cooldown(d.wait || 45); return; }
+      if (e.code === 'already_verified') { show('forms'); setTab('login'); $('#loginEmail').value = pendingEmail; message($('#authMsg'), 'ok', e.message); return; }
+      if (e.code === 'no_account') { show('forms'); setTab('register'); $('#regEmail').value = pendingEmail; message($('#authMsg'), 'err', e.message); return; }
+      codeError(e.message, d.detail);
+    });
   }
   resendBtn.addEventListener('click', function () {
-    MA.call('/auth/resend', { email: pendingEmail }).then(function () { message($('#codeMsg'), 'ok', 'Отправили новое письмо с кодом.'); cooldown(60); }, function (e) { message($('#codeMsg'), 'err', e.message); });
+    if (resendBtn.disabled) return;
+    sendCode('Отправили новое письмо с новым кодом. Если его нет пару минут — загляните в «Спам».');
   });
   $('#changeEmail').addEventListener('click', function () { show('forms'); setTab('register'); $('#regEmail').value = pendingEmail; $('#regEmail').focus(); });
 
