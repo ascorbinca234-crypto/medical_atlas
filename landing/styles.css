@@ -156,6 +156,12 @@
   @media (prefers-reduced-motion: no-preference) { .clin-plate:not([hidden]) { animation: rise .45s cubic-bezier(.2, .7, .2, 1); } }
   .toggle[aria-pressed="true"] { border-color: rgba(16, 185, 129, .7); background: rgba(16, 185, 129, .14); color: #ECFDF5; }
 
+  /* достижения в карточках команды */
+  .team-points { display: grid; gap: 8px; margin-top: 16px; padding: 0; list-style: none; font-size: 14.5px; line-height: 1.4; color: #D7E0EC; }
+  .team-points li { display: flex; gap: 10px; }
+  .team-points li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: .5em; border-radius: 9999px; background: #67E8F9; }
+  .msg-detail { margin-top: 8px; font-size: 12.5px; line-height: 1.4; color: #94A3B8; overflow-wrap: anywhere; }
+
   /* мобильное меню */
   .sheet { background: rgba(7, 11, 20, .96); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
 }

@@ -42,7 +42,11 @@
         if (opts.raw && res.ok) return res;
         return res.text().then(function (t) {
           var j = {}; try { j = t ? JSON.parse(t) : {}; } catch (e) { j = {}; }
-          if (!res.ok) throw fail(j.error || 'http_' + res.status, j.message || 'Ошибка сервера (' + res.status + ').', res.status);
+          if (!res.ok) {
+            var err = fail(j.error || 'http_' + res.status, j.message || 'Ошибка сервера (' + res.status + '). Попробуйте ещё раз через минуту.', res.status);
+            err.data = j;   // доп. поля ответа: wait, detail
+            throw err;
+          }
           return j;
         });
       });

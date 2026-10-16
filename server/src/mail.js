@@ -39,8 +39,8 @@ function smtpSend(o, to, message) {
   return new Promise((resolve, reject) => {
     const sock = o.secure ? tls.connect({ host: o.host, port: o.port, servername: o.host }) : net.connect({ host: o.host, port: o.port });
     sock.setEncoding('utf8');
-    sock.setTimeout(15000, () => { sock.destroy(); reject(new Error('SMTP: таймаут')); });
     let buf = '', step = 0, done = false;
+    sock.setTimeout(12000, () => { if (!done) { done = true; sock.destroy(); reject(new Error('SMTP: сервер не ответил за 12 с')); } });
     const data = message.replace(/\r\n\./g, '\r\n..');
     const steps = [
       [220, () => 'EHLO ' + (os.hostname() || 'localhost')],
@@ -66,7 +66,11 @@ function smtpSend(o, to, message) {
         const text = lines.slice(0, endIdx + 1).join(' | ');
         buf = lines.slice(endIdx + 1).join('\r\n');
         const [want, next] = steps[step];
-        if (code !== want) return fail(`ожидался ${want}, получен ответ «${text.slice(0, 200)}»`);
+        if (code !== want) {
+          const hint = code === 535 ? 'почта не приняла логин или пароль приложения (SMTP_USER, SMTP_PASS)'
+            : /^55\d$/.test(String(code)) ? 'почтовый сервер отклонил письмо' : `ожидался ${want}`;
+          return fail(`${hint}; ответ «${text.slice(0, 200)}»`);
+        }
         step++;
         if (!next) { done = true; sock.end(); return resolve(); }
         sock.write(next() + '\r\n');

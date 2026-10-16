@@ -9,7 +9,9 @@ const emails = require('./emails');
 class HttpError extends Error { constructor(status, code, message, extra) { super(message); this.status = status; this.code = code; this.extra = extra; } }
 const bad = (code, message) => new HttpError(400, code, message);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const CODE_WIN = 3600, CODE_WINDOWS = 24;   // код действует 24 часа
+const CODE_WIN = 3600, CODE_WINDOWS = 24;   // коды старого формата (до новых писем): действуют 24 часа
+const CODE_TTL = 24 * 3600, CODE_KEEP = 3;  // каждый код живёт 24 часа, действуют три последних
+const RESEND_GAP = 45;                        // не чаще одного письма с кодом в 45 секунд
 const DUMMY_HASH = 's1$AAAAAAAAAAAAAAAAAAAAAA==$' + Buffer.alloc(64).toString('base64');
 
 function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
@@ -63,16 +65,42 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   }
   const newUser = o => Object.assign({ id: randomId(12), email: null, emailVerified: false, name: '', avatar: null, pw: null, tv: 0, ids: [], createdAt: new Date().toISOString() }, o);
   const link = (hash) => cfg.authPage + '#' + hash;
-  // 6-значный код из письма: выводится из id и почты пользователя и часа отправки, хранить его не нужно
-  const vcode = (u, w) => String(crypto.createHmac('sha256', K.jwt).update(`vcode|${u.id}|${u.email}|${w}`).digest().readUInt32BE(0) % 1000000).padStart(6, '0');
+  // код старого формата: выводился из id, почты и часа отправки. Принимаем, чтобы уже отправленные письма работали
+  const legacyCode = (u, w) => String(crypto.createHmac('sha256', K.jwt).update(`vcode|${u.id}|${u.email}|${w}`).digest().readUInt32BE(0) % 1000000).padStart(6, '0');
+  // в базе лежит не сам код, а его HMAC
+  const codeHash = (u, code) => crypto.createHmac('sha256', K.jwt).update(`vc2|${u.id}|${u.email}|${code}`).digest('hex').slice(0, 40);
+  function codeOk(u, code) {
+    const t = now(), h = Buffer.from(codeHash(u, code));
+    let ok = false;
+    for (const c of u.vcodes || []) if (c && c.exp > t && c.h && c.h.length === h.length && crypto.timingSafeEqual(Buffer.from(c.h), h)) ok = true;
+    if (!u.vcodes) {                           // письма старого формата: пока не было ни одного нового кода
+      const w = Math.floor(t / CODE_WIN);
+      for (let i = 0; i <= CODE_WINDOWS; i++) if (crypto.timingSafeEqual(Buffer.from(legacyCode(u, w - i)), Buffer.from(code))) ok = true;
+    }
+    return ok;
+  }
+  /** Отправка письма. Сбой почты не прячем: клиент получает понятную ошибку, причина пишется в лог функции. */
+  async function deliver(m) {
+    try { await mail.send(m); }
+    catch (e) {
+      const detail = String((e && e.message) || e).slice(0, 300);
+      log.error('mail failed:', detail);
+      throw new HttpError(502, 'mail_failed', 'Не получилось отправить письмо. Попробуйте ещё раз через минуту.', { detail });
+    }
+  }
+  // каждое письмо — новый код: у письма новая тема, и почтовик не склеивает его со старым
   async function sendVerify(u) {
-    const token = seal({ t: 'verify', u: u.id, e: u.email, j: randomId(), exp: now() + 24 * 3600 }, K.seal);
-    const m = emails.verifyEmail(u.name, link('verify?token=' + token + '&email=' + encodeURIComponent(u.email)), vcode(u, Math.floor(now() / CODE_WIN)));
-    await mail.send(Object.assign({ to: u.email }, m));
+    const t = now(), code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
+    u.vcodes = [{ h: codeHash(u, code), exp: t + CODE_TTL }, ...(u.vcodes || []).filter(c => c && c.exp > t)].slice(0, CODE_KEEP);
+    u.vsentAt = t;
+    await store.putUser(u);
+    const token = seal({ t: 'verify', u: u.id, e: u.email, j: randomId(), exp: t + CODE_TTL }, K.seal);
+    const m = emails.verifyEmail(u.name, link('verify?token=' + token + '&email=' + encodeURIComponent(u.email)), code, new Date(t * 1000));
+    await deliver(Object.assign({ to: u.email }, m));
   }
   async function sendReset(u) {
     const token = seal({ t: 'reset', u: u.id, f: fp(u.pw), exp: now() + 3600 }, K.seal);
-    await mail.send(Object.assign({ to: u.email }, emails.resetEmail(link('reset?token=' + token))));
+    await deliver(Object.assign({ to: u.email }, emails.resetEmail(link('reset?token=' + token))));
   }
   async function userByEmail(email) { const id = await store.getIdentity('email:' + email); return id ? store.getUser(id) : null; }
   function cookie(req, name) {
@@ -99,7 +127,9 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
       await store.putUser(u);
       if (!(await store.createIdentity('email:' + email, u.id))) { await store.deleteUser(u.id); throw new HttpError(409, 'email_taken', 'Аккаунт с этой почтой уже есть. Войдите или восстановите пароль.'); }
     }
-    await sendVerify(u);
+    // аккаунт уже создан: если письмо не ушло, всё равно ведём на экран кода, там можно отправить его снова
+    try { await sendVerify(u); }
+    catch (e) { if (e.code !== 'mail_failed') throw e; return json(201, { ok: true, needVerify: true, email, mailError: e.message, detail: e.extra && e.extra.detail }); }
     return json(201, { ok: true, needVerify: true, email });
   }
 
@@ -110,6 +140,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     if (!u || u.email !== t.e) throw bad('bad_token', 'Ссылка устарела или уже использована. Войдите, и мы пришлём новую.');
     if (!(await store.once('used:' + t.j, 2 * 24 * 3600))) throw bad('bad_token', 'Эта ссылка уже использована. Войдите с почтой и паролем.');
     u.emailVerified = true;
+    delete u.vcodes; delete u.vsentAt;
     await store.putUser(u);
     return json(200, session(u));
   }
@@ -120,22 +151,27 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     if (code.length !== 6) throw bad('bad_code', 'Код — это 6 цифр из письма.');
     await limit('vcode:' + email, 10, 900);
     const u = await userByEmail(email);
-    if (u && u.emailVerified) throw bad('already_verified', 'Почта уже подтверждена. Войдите с почтой и паролем.');
-    const w = Math.floor(now() / CODE_WIN);
-    let ok = false;
-    if (u) for (let i = 0; i <= CODE_WINDOWS; i++) { const c = Buffer.from(vcode(u, w - i)); if (crypto.timingSafeEqual(c, Buffer.from(code))) ok = true; }
-    if (!ok) throw bad('bad_code', 'Неверный или устаревший код. Проверьте последнее письмо или отправьте новое.');
+    if (u && u.emailVerified) throw bad('already_verified', verifiedMsg(u));
+    if (!u || !codeOk(u, code)) throw bad('bad_code', 'Неверный или устаревший код. Проверьте последнее письмо или отправьте новое.');
     u.emailVerified = true;
+    delete u.vcodes; delete u.vsentAt;
     await store.putUser(u);
     return json(200, session(u));
   }
+  const verifiedMsg = u => u.pw ? 'Почта уже подтверждена. Войдите с почтой и паролем.'
+    : 'Почта уже подтверждена: вы входили через VK ID или Яндекс ID. Войдите тем же способом или задайте пароль через «Забыли пароль?».';
 
   async function resend(req) {
     const email = checkEmail(normEmail(body(req).email));
-    await limit('resend:' + email, 3, 3600);
+    await limit('resendip:' + req.ip, 30, 3600);
     const u = await userByEmail(email);
-    if (u && !u.emailVerified) await sendVerify(u);
-    return json(200, { ok: true });
+    if (!u) throw bad('no_account', 'Аккаунта с этой почтой нет. Проверьте адрес или зарегистрируйтесь.');
+    if (u.emailVerified) throw bad('already_verified', verifiedMsg(u));
+    const wait = (u.vsentAt || 0) + RESEND_GAP - now();
+    if (wait > 0) throw new HttpError(429, 'resend_wait', `Письмо с кодом уже отправлено. Новое можно запросить через ${wait} с.`, { wait });
+    await limit('resend:' + email, 6, 3600);
+    await sendVerify(u);
+    return json(200, { ok: true, email });
   }
 
   async function login(req) {
@@ -262,7 +298,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     await limit('lead:' + req.ip, 5, 3600);
     await limit('leadall', 60, 3600);
     const replyTo = EMAIL_RE.test(contact) ? contact : undefined;
-    await mail.send(Object.assign({ to: cfg.mail.leadTo, replyTo }, emails.leadEmail({ name, contact, role, message, page })));
+    await deliver(Object.assign({ to: cfg.mail.leadTo, replyTo }, emails.leadEmail({ name, contact, role, message, page })));
     return json(200, { ok: true });
   }
 

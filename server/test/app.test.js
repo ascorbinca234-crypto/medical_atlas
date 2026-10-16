@@ -23,12 +23,13 @@ function setup(extra = {}) {
     if (url.startsWith('https://id.vk.ru/oauth2/user_info')) return r(prof.vk);
     throw new Error('unexpected fetch ' + url);
   };
-  const app = createApp({ cfg, store, mail: { send: async m => { sent.push(m); } }, fetchImpl, log: { error() {} } });
+  const mailCtl = { fail: null };
+  const app = createApp({ cfg, store, mail: { send: async m => { if (mailCtl.fail) throw new Error(mailCtl.fail); sent.push(m); } }, fetchImpl, log: { error() {} } });
   let ipN = 0;
   const call = (method, p, body, headers = {}, query = {}) => app.handle({ method, path: p, query, headers: Object.assign({ origin: 'https://ma.example' }, headers), body: body ? JSON.stringify(body) : '', ip: '10.0.0.' + (headers.ip || 1) });
   const J = r => JSON.parse(r.body);
   const tokenFrom = (m, kind) => decodeURIComponent(new RegExp('#' + kind + '\\?token=([^\\s<"&]+)').exec(m.text)[1]);
-  return { app, call, J, sent, store, calls, prof, tokenFrom, cfg };
+  return { app, call, J, sent, store, calls, prof, tokenFrom, cfg, mailCtl };
 }
 
 test('регистрация → письмо → подтверждение → вход', async () => {
@@ -223,4 +224,58 @@ test('заявка преподавателя уходит письмом в я�
   const n = sent.length;
   r = await call('POST', '/lead', { name: 'Бот', contact: 'x@y.ru', website: 'spam.example' });
   assert.strictEqual(r.status, 200); assert.strictEqual(sent.length, n, 'ловушка: письмо не отправляется');
+});
+
+const codeOf = m => { const c = /код подтверждения: (\d{3}) (\d{3})/i.exec(m.text); return c[1] + c[2]; };
+async function later(sec, fn) {
+  const real = Date.now;
+  Date.now = () => real() + sec * 1000;
+  try { return await fn(); } finally { Date.now = real; }
+}
+
+test('повторная отправка: каждый раз новый код и новая тема, действуют три последних', async () => {
+  const { call, J, sent } = setup();
+  await call('POST', '/auth/register', { email: 'again@b.ru', password: 'secret-123', consent: true });
+  let r = await call('POST', '/auth/resend', { email: 'again@b.ru' });
+  assert.strictEqual(r.status, 429); assert.strictEqual(J(r).error, 'resend_wait'); assert.ok(J(r).wait > 0);
+  assert.strictEqual(sent.length, 1, 'сразу после регистрации второе письмо не шлём');
+  r = await later(50, () => call('POST', '/auth/resend', { email: 'again@b.ru' }));
+  assert.strictEqual(r.status, 200);
+  r = await later(100, () => call('POST', '/auth/resend', { email: 'Again@B.ru ' }));
+  assert.strictEqual(r.status, 200);
+  assert.strictEqual(sent.length, 3);
+  const codes = sent.map(codeOf);
+  assert.strictEqual(new Set(codes).size, 3, 'коды разные: ' + codes);
+  assert.strictEqual(new Set(sent.map(m => m.subject)).size, 3, 'темы писем разные');
+  assert.match(sent[2].text, /Письмо отправлено \d+ [а-я]+, \d\d:\d\d \(МСК\)/);
+  r = await later(110, () => call('POST', '/auth/verify-code', { email: 'again@b.ru', code: codes[0] }));
+  assert.strictEqual(r.status, 200, 'код из первого письма тоже действует'); assert.ok(J(r).accessToken);
+  r = await later(200, () => call('POST', '/auth/resend', { email: 'again@b.ru' }));
+  assert.strictEqual(J(r).error, 'already_verified');
+});
+
+test('повторная отправка: нет аккаунта, ограничение, старый код вытесняется', async () => {
+  const { call, J, sent } = setup();
+  let r = await call('POST', '/auth/resend', { email: 'nobody@b.ru' });
+  assert.strictEqual(r.status, 400); assert.strictEqual(J(r).error, 'no_account');
+  await call('POST', '/auth/register', { email: 'many@b.ru', password: 'secret-123', consent: true });
+  for (let i = 1; i <= 3; i++) assert.strictEqual((await later(50 * i, () => call('POST', '/auth/resend', { email: 'many@b.ru' }))).status, 200);
+  r = await later(300, () => call('POST', '/auth/verify-code', { email: 'many@b.ru', code: codeOf(sent[0]) }));
+  assert.strictEqual(J(r).error, 'bad_code', 'действуют только три последних кода');
+  r = await later(300, () => call('POST', '/auth/verify-code', { email: 'many@b.ru', code: codeOf(sent[3]) }));
+  assert.strictEqual(r.status, 200);
+});
+
+test('сбой почты: регистрация ведёт на экран кода, повторная отправка возвращает причину', async () => {
+  const { call, J, sent, mailCtl } = setup();
+  mailCtl.fail = 'SMTP: почтовый сервер отклонил письмо; ответ «554 5.7.1 Message rejected under suspicion of SPAM»';
+  let r = await call('POST', '/auth/register', { email: 'fail@b.ru', password: 'secret-123', consent: true });
+  assert.strictEqual(r.status, 201); assert.ok(J(r).mailError); assert.match(J(r).detail, /554/);
+  r = await later(50, () => call('POST', '/auth/resend', { email: 'fail@b.ru' }));
+  assert.strictEqual(r.status, 502); assert.strictEqual(J(r).error, 'mail_failed'); assert.match(J(r).detail, /SPAM/);
+  mailCtl.fail = null;
+  r = await later(100, () => call('POST', '/auth/resend', { email: 'fail@b.ru' }));
+  assert.strictEqual(r.status, 200); assert.strictEqual(sent.length, 1);
+  r = await later(110, () => call('POST', '/auth/verify-code', { email: 'fail@b.ru', code: codeOf(sent[0]) }));
+  assert.strictEqual(r.status, 200);
 });

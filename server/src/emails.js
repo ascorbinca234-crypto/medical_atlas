@@ -14,13 +14,22 @@ function layout(title, body, button, link, after) {
 </table></td></tr></table></body></html>`;
 }
 
-function verifyEmail(name, link, code) {
+// «16 октября, 22:45 (МСК)» без зависимости от ICU в среде функции
+const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+function mskTime(d) {
+  const m = new Date(d.getTime() + 3 * 3600e3), p = n => String(n).padStart(2, '0');
+  return `${m.getUTCDate()} ${MONTHS[m.getUTCMonth()]}, ${p(m.getUTCHours())}:${p(m.getUTCMinutes())} (МСК)`;
+}
+
+function verifyEmail(name, link, code, sentAt = new Date()) {
   const hi = name ? `Здравствуйте, ${esc(name)}!` : 'Здравствуйте!';
   const pretty = code.slice(0, 3) + ' ' + code.slice(3);
+  const when = mskTime(sentAt);
+  const after = `Код и ссылка действуют 24 часа. Письмо отправлено ${when}. Если вы не регистрировались, просто удалите его.`;
   return {
     subject: `Код ${pretty} — подтвердите почту в Медицинском атласе`,
-    text: `${name ? 'Здравствуйте, ' + name + '!' : 'Здравствуйте!'}\n\nВаш код подтверждения: ${pretty}\nВведите его на странице регистрации или просто откройте ссылку:\n${link}\n\nКод и ссылка действуют 24 часа. Если вы не регистрировались, просто удалите это письмо.`,
-    html: layout('Подтвердите почту', `${hi}<br>Введите этот код на странице регистрации:<div style="margin:16px 0 4px;font-family:Consolas,Menlo,monospace;font-size:32px;font-weight:bold;letter-spacing:6px;color:#1c1730">${pretty}</div>или нажмите кнопку — почта подтвердится сама.`, 'Подтвердить почту', link, 'Код и ссылка действуют 24 часа. Если вы не регистрировались, просто удалите это письмо.'),
+    text: `${name ? 'Здравствуйте, ' + name + '!' : 'Здравствуйте!'}\n\nВаш код подтверждения: ${pretty}\nВведите его на странице регистрации или просто откройте ссылку:\n${link}\n\n${after}`,
+    html: layout('Подтвердите почту', `${hi}<br>Введите этот код на странице регистрации:<div style="margin:16px 0 4px;font-family:Consolas,Menlo,monospace;font-size:32px;font-weight:bold;letter-spacing:6px;color:#1c1730">${pretty}</div>или нажмите кнопку — почта подтвердится сама.`, 'Подтвердить почту', link, esc(after)),
   };
 }
 
