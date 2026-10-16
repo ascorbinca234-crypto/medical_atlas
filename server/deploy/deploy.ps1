@@ -10,6 +10,7 @@ try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 
 $Here      = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Zip       = Join-Path $Here 'function.zip'
+if (-not (Test-Path $Zip)) { $Zip = Join-Path $HOME 'Documents\medical_atlas_deploy\function.zip' }
 $SiteUrl   = 'https://ascorbinca234-crypto.github.io/medical_atlas'
 $Name      = 'atlas-api'
 $DbName    = 'atlas-db'
@@ -47,6 +48,35 @@ function YcJson {
     Fail ("yc " + ($A -join ' ') + "`n" + $err)
   }
 }
+
+# Запросы к API Яндекс Облака напрямую (функции и API-шлюз): не зависят от поиска адресов в yc.
+$Script:Iam = $null
+function Api([string]$Method, [string]$Url, $Body) {
+  if (-not $Script:Iam) {
+    $Script:Iam = (& yc iam create-token 2>$null | Out-String).Trim()
+    if (-not $Script:Iam) { Fail 'Не получилось получить токен доступа: выполни yc init и запусти скрипт снова.' }
+  }
+  $p = @{ Method = $Method; Uri = $Url; Headers = @{ Authorization = "Bearer $Script:Iam" }; TimeoutSec = 120 }
+  if ($null -ne $Body) { $p.ContentType = 'application/json; charset=utf-8'; $p.Body = [System.Text.Encoding]::UTF8.GetBytes(($Body | ConvertTo-Json -Depth 6 -Compress)) }
+  for ($try = 1; $try -le 3; $try++) {
+    try { return Invoke-RestMethod @p }
+    catch {
+      $msg = "$($_.ErrorDetails.Message)"; if (-not $msg) { $msg = $_.Exception.Message }
+      $code = 0; try { $code = [int]$_.Exception.Response.StatusCode } catch { }
+      if (($code -eq 0 -or $code -ge 500) -and $try -lt 3) { Write-Host "Повторяю запрос ($try из 3)..." -ForegroundColor Yellow; Start-Sleep -Seconds 5; continue }
+      Fail "$Method $Url`n$msg"
+    }
+  }
+}
+function Wait-Op($op, [string]$What) {
+  for ($i = 0; $i -lt 120 -and -not $op.done; $i++) { Start-Sleep -Seconds 3; $op = Api 'GET' "https://operation.api.cloud.yandex.net/operations/$($op.id)" $null }
+  if (-not $op.done) { Fail "${What}: операция не завершилась за 6 минут." }
+  if ($op.error) { Fail "${What}: $($op.error.message)" }
+  return $op
+}
+$FnApi = 'https://serverless-functions.api.cloud.yandex.net/functions/v1'
+$GwApi = 'https://serverless-apigateway.api.cloud.yandex.net/apigateways/v1'
+function NameFilter([string]$n) { return [uri]::EscapeDataString("name=""$n""") }
 
 # ---------- сохранённые значения ----------
 $State = @{}
@@ -129,8 +159,14 @@ if (-not $State.secret) {
 
 # ---------- 5. функция и API-шлюз ----------
 Step 'Функция'
-$fn = YcJson @('serverless', 'function', 'get', '--name', $Name) -AllowFail
-if (-not $fn) { $fn = YcJson @('serverless', 'function', 'create', '--name', $Name) }
+$list = Api 'GET' "$FnApi/functions?folderId=$Folder&filter=$(NameFilter $Name)" $null
+$fn = @($list.functions) | Where-Object { $_ } | Select-Object -First 1
+if (-not $fn) {
+  $null = Wait-Op (Api 'POST' "$FnApi/functions" @{ folderId = $Folder; name = $Name }) 'Создание функции'
+  $list = Api 'GET' "$FnApi/functions?folderId=$Folder&filter=$(NameFilter $Name)" $null
+  $fn = @($list.functions) | Where-Object { $_ } | Select-Object -First 1
+}
+if (-not $fn) { Fail 'Функция не создалась.' }
 Write-Host "Функция: $($fn.id)"
 
 Step 'API-шлюз'
@@ -154,12 +190,13 @@ paths:
         tag: "`$latest"
         service_account_id: $($sa.id)
 "@
-$specFile = Join-Path $env:TEMP 'atlas-gateway.yaml'
-[System.IO.File]::WriteAllText($specFile, $spec)
-$gw = YcJson @('serverless', 'api-gateway', 'get', '--name', $Name) -AllowFail
-if ($gw) { $null = YcJson @('serverless', 'api-gateway', 'update', '--name', $Name, '--spec', $specFile) }
-else { $null = YcJson @('serverless', 'api-gateway', 'create', '--name', $Name, '--spec', $specFile) }
-$gw = YcJson @('serverless', 'api-gateway', 'get', '--name', $Name)
+$gws = Api 'GET' "$GwApi/apigateways?folderId=$Folder&filter=$(NameFilter $Name)" $null
+$gw = @($gws.apiGateways) | Where-Object { $_ } | Select-Object -First 1
+if ($gw) { $null = Wait-Op (Api 'PATCH' "$GwApi/apigateways/$($gw.id)" @{ updateMask = 'openapiSpec'; openapiSpec = $spec }) 'Обновление API-шлюза' }
+else { $null = Wait-Op (Api 'POST' "$GwApi/apigateways" @{ folderId = $Folder; name = $Name; openapiSpec = $spec }) 'Создание API-шлюза' }
+$gws = Api 'GET' "$GwApi/apigateways?folderId=$Folder&filter=$(NameFilter $Name)" $null
+$gw = @($gws.apiGateways) | Where-Object { $_ } | Select-Object -First 1
+if (-not $gw) { Fail 'API-шлюз не создался.' }
 if (-not $gw.domain) { Fail 'У API-шлюза нет адреса.' }
 $ApiUrl = 'https://' + $gw.domain
 Write-Host "Адрес сервера: $ApiUrl" -ForegroundColor Green
@@ -182,10 +219,15 @@ $vars = [ordered]@{
 }
 if ($State.yandexId -and $State.yandexSecret) { $vars.YANDEX_CLIENT_ID = $State.yandexId; $vars.YANDEX_CLIENT_SECRET = $State.yandexSecret }
 if ($State.vkId) { $vars.VK_CLIENT_ID = $State.vkId }
-foreach ($e in $vars.GetEnumerator()) { if ("$($e.Value)" -match ',') { Fail "Значение $($e.Key) содержит запятую — проверь, что вставил." } }
-$envArg = ($vars.GetEnumerator() | ForEach-Object { "$($_.Key)=$($_.Value)" }) -join ','
-$null = YcJson @('serverless', 'function', 'version', 'create', '--function-id', $fn.id, '--runtime', 'nodejs22', '--entrypoint', 'index.handler',
-  '--memory', '256MB', '--execution-timeout', '10s', '--source-path', $Zip, '--service-account-id', $sa.id, '--environment', $envArg)
+$envMap = @{}
+foreach ($e in $vars.GetEnumerator()) { $envMap[$e.Key] = "$($e.Value)" }
+$verBody = @{
+  functionId = $fn.id; runtime = 'nodejs22'; entrypoint = 'index.handler'
+  resources = @{ memory = '268435456' }; executionTimeout = '10s'; serviceAccountId = $sa.id
+  environment = $envMap; content = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($Zip))
+}
+Write-Host 'Загружаю архив и жду сборки функции (до пары минут)...'
+$null = Wait-Op (Api 'POST' "$FnApi/versions" $verBody) 'Выкладка кода'
 Write-Host 'Код выложен.'
 
 # ---------- 8. проверка ----------
