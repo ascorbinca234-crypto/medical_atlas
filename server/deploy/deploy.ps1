@@ -1,4 +1,18 @@
-﻿# Медицинский атлас — развёртывание сервера входа в Яндекс Облаке.
+﻿# Medical Atlas: deploy script for Yandex Cloud (see DEPLOY.md).
+# Run:  powershell -ExecutionPolicy Bypass -File deploy.ps1
+# This header is plain ASCII on purpose: Windows PowerShell 5.1 may read the file in the wrong
+# encoding, so the real script below is kept as text and re-read as UTF-8 before it runs.
+$__text = [System.IO.File]::ReadAllText($PSCommandPath, (New-Object System.Text.UTF8Encoding($false)))
+$__b = '#==' + 'BODY-START=='
+$__e = '#==' + 'BODY-END=='
+$__i = $__text.IndexOf($__b)
+$__j = $__text.LastIndexOf($__e)
+if ($__i -lt 0 -or $__j -le $__i) { Write-Host 'deploy.ps1 is damaged, please download it again.' -ForegroundColor Red; exit 1 }
+$Here = Split-Path -Parent $PSCommandPath
+$__code = $__text.Substring($__i + $__b.Length, $__j - $__i - $__b.Length)
+$__unused = @'
+#==BODY-START==
+# Медицинский атлас — развёртывание сервера входа в Яндекс Облаке.
 # Запуск в PowerShell (после шага 2 инструкции, когда yc init уже выполнен):
 #   powershell -ExecutionPolicy Bypass -File "$HOME\Documents\medical_atlas_deploy\deploy.ps1"
 # Скрипт можно запускать повторно: он находит уже созданное и обновляет код и настройки.
@@ -8,7 +22,7 @@ $ErrorActionPreference = 'Continue'
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$Here      = Split-Path -Parent $MyInvocation.MyCommand.Path
+if (-not $Here) { $Here = Join-Path $HOME 'Documents\medical_atlas_deploy' }
 $Zip       = Join-Path $Here 'function.zip'
 if (-not (Test-Path $Zip)) { $Zip = Join-Path $HOME 'Documents\medical_atlas_deploy\function.zip' }
 $SiteUrl   = 'https://ascorbinca234-crypto.github.io/medical_atlas'
@@ -257,3 +271,6 @@ Write-Host "Redirect URI для Яндекс ID: $ApiUrl/auth/yandex/callback"
 Write-Host "Базовый домен для VK ID: $($gw.domain)"
 Write-Host "Redirect URL для VK ID: $ApiUrl/auth/vk/callback"
 Write-Host 'Напиши в чат «готово» — остальное я увижу сам.'
+#==BODY-END==
+'@
+& ([ScriptBlock]::Create($__code))
