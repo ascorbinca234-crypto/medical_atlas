@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Вход — Медицинский атлас</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@500&display=swap">
+<style>
+:root {
+  --bg: #f4f3f8; --surface: #fcfcfe; --frost: #e7e5ee; --edge: #d8d4e3;
+  --ink: #1c1730; --muted: #5d566f; --hema: #4a3a8c; --eosin: #c4426f; --ok: #1f7a55;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #13111b; --surface: #1b1826; --frost: #252131; --edge: #332e45; --ink: #ece9f6; --muted: #a59eb9; --hema: #a596f2; --eosin: #f07aa4; --ok: #5fd0a0; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #13111b; --surface: #1b1826; --frost: #252131; --edge: #332e45; --ink: #ece9f6; --muted: #a59eb9; --hema: #a596f2; --eosin: #f07aa4; --ok: #5fd0a0; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+a { color: var(--hema); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 18px; border-bottom: 1px solid var(--edge); }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-family: var(--f-display); font-size: 14px; font-weight: 500; }
+.brand svg { width: 34px; height: 14px; color: var(--hema); }
+.back { color: var(--muted); font-size: 14px; text-decoration: none; }
+.back:hover { color: var(--ink); }
+main { display: grid; place-items: start center; padding-block: clamp(28px, 7vw, 72px) 56px; }
+
+/* карточка как предметное стекло: слева матовая полоса для подписи */
+.slide { width: min(100%, 520px); display: grid; grid-template-columns: 56px minmax(0, 1fr); background: var(--surface); border: 1px solid var(--edge); border-radius: 6px; overflow: hidden; }
+.label { border-right: 1px solid var(--edge); background-color: var(--frost); background-image: radial-gradient(color-mix(in oklab, var(--ink) 12%, transparent) .7px, transparent 1px); background-size: 4px 4px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px 0; font-family: var(--f-mono); font-size: 11px; letter-spacing: .08em; color: var(--muted); }
+.label span { writing-mode: vertical-rl; transform: rotate(180deg); text-transform: uppercase; }
+.label b { color: var(--ink); font-weight: 600; }
+.body { padding: 26px clamp(18px, 4vw, 30px) 28px; min-width: 0; }
+h1 { font-family: var(--f-display); font-weight: 500; font-size: clamp(22px, 4vw, 27px); line-height: 1.2; margin: 0 0 6px; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0 0 22px; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 22px; background: var(--bg); border: 1px solid var(--edge); border-radius: 8px; }
+.tabs a { text-align: center; padding: 8px 10px; border-radius: 5px; color: var(--muted); text-decoration: none; font-weight: 500; font-size: 15px; }
+.tabs a[aria-current="page"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(20, 16, 40, .08); }
+form { display: grid; gap: 14px; }
+label.f { display: grid; gap: 6px; font-size: 14px; font-weight: 500; }
+.inp { position: relative; }
+input[type=email], input[type=password], input[type=text] { width: 100%; font: inherit; font-size: 16px; padding: 11px 13px; border: 1px solid var(--edge); border-radius: 6px; background: var(--bg); color: var(--ink); }
+input:focus-visible { outline: 2px solid var(--hema); outline-offset: 1px; border-color: transparent; }
+.eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; padding: 6px 8px; cursor: pointer; border-radius: 4px; }
+.eye:hover { color: var(--ink); }
+.inp input[type=password], .inp input[data-pw] { padding-right: 84px; }
+.hint { font-weight: 400; color: var(--muted); font-size: 13px; }
+.check { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 14px; color: var(--muted); }
+.check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--hema); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font: inherit; font-weight: 600; font-size: 15.5px; padding: 12px 16px; border-radius: 6px; border: 1px solid var(--edge); background: var(--surface); color: var(--ink); cursor: pointer; text-decoration: none; }
+.btn:hover { border-color: var(--hema); }
+.btn:focus-visible { outline: 2px solid var(--hema); outline-offset: 2px; }
+.btn.pri { background: var(--hema); border-color: var(--hema); color: var(--surface); }
+.btn.pri:hover { filter: brightness(1.08); }
+.btn.danger { color: var(--eosin); }
+.btn.danger.armed { background: var(--eosin); border-color: var(--eosin); color: var(--surface); }
+.btn[disabled] { opacity: .6; cursor: progress; }
+.btn .pv { font-family: var(--f-mono); font-size: 12px; font-weight: 600; letter-spacing: .04em; padding: 2px 6px; border-radius: 3px; border: 1px solid currentColor; opacity: .8; }
+.or { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin: 20px 0 14px; color: var(--muted); font-family: var(--f-mono); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.or::before, .or::after { content: ""; height: 1px; background: var(--edge); }
+.prov { display: grid; gap: 8px; }
+.links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-top: 18px; font-size: 14.5px; }
+.msg { margin: 0 0 16px; padding: 11px 13px; border-radius: 6px; font-size: 14.5px; border: 1px solid; }
+.msg.err { color: var(--eosin); border-color: color-mix(in oklab, var(--eosin) 40%, var(--edge)); background: color-mix(in oklab, var(--eosin) 7%, var(--surface)); }
+.msg.ok { color: var(--ok); border-color: color-mix(in oklab, var(--ok) 40%, var(--edge)); background: color-mix(in oklab, var(--ok) 7%, var(--surface)); }
+.big { font-size: 15.5px; color: var(--muted); margin: 0 0 18px; }
+.big b { color: var(--ink); overflow-wrap: anywhere; }
+.spin { display: inline-block; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--edge); border-top-color: var(--hema); animation: sp .8s linear infinite; vertical-align: -3px; margin-right: 8px; }
+@keyframes sp { to { transform: rotate(360deg); } }
+.who { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; align-items: center; margin-bottom: 20px; }
+.ava { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in oklab, var(--hema) 16%, var(--surface)); color: var(--hema); font-family: var(--f-display); font-size: 22px; overflow: hidden; }
+.ava img { width: 100%; height: 100%; object-fit: cover; }
+.who b { display: block; font-size: 18px; overflow-wrap: anywhere; }
+.who span { color: var(--muted); font-size: 14.5px; overflow-wrap: anywhere; }
+dl.props { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 16px; margin: 0 0 22px; font-size: 14.5px; }
+dl.props dt { color: var(--muted); font-family: var(--f-mono); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding-top: 3px; }
+dl.props dd { margin: 0; overflow-wrap: anywhere; }
+.stack { display: grid; gap: 8px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.row .btn { width: auto; }
+.foot { margin-top: 18px; color: var(--muted); font-size: 13px; text-align: center; }
+@media (max-width: 440px) { .slide { grid-template-columns: 40px minmax(0, 1fr); } .label { font-size: 10px; } }
+@media (prefers-reduced-motion: reduce) { .spin { animation-duration: 2.4s; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="../">
+      <svg viewBox="0 0 34 14" aria-hidden="true"><rect x=".5" y=".5" width="33" height="13" rx="1.5" fill="none" stroke="currentColor"/><rect x="1" y="1" width="10" height="12" fill="currentColor" opacity=".25"/><circle cx="22" cy="7" r="3.6" fill="currentColor"/></svg>
+      Медицинский атлас
+    </a>
+    <a class="back" id="back" href="../">← К атласам</a>
+  </header>
+  <main>
+    <section class="slide" aria-live="polite">
+      <div class="label" aria-hidden="true"><b id="lblNo">№ 00</b><span id="lblTxt">Вход</span></div>
+      <div class="body" id="view"></div>
+    </section>
+  </main>
+</div>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(function () {
+  'use strict';
+  var MA = window.MA, view = document.getElementById('view');
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+
+  // куда вернуться после входа: только страницы этого сайта
+  try {
+    var nx = new URL(location.href).searchParams.get('next');
+    if (nx && new URL(nx, location.href).href.indexOf(MA.SITE_URL) === 0) localStorage.setItem('ma-next', JSON.stringify({ u: new URL(nx, location.href).href, t: Date.now() }));
+  } catch (e) { /* без next */ }
+  // куда вернуться после входа; храним в localStorage на час, чтобы ссылка из письма в новой вкладке тоже вела обратно
+  function next() {
+    var n = null;
+    try { var x = JSON.parse(localStorage.getItem('ma-next') || 'null'); if (x && x.t > Date.now() - 3600e3) n = x.u; } catch (e) { /* */ }
+    return n || MA.SITE_URL;
+  }
+  function goNext() { var u = next(); try { localStorage.removeItem('ma-next'); } catch (e) { /* */ } location.replace(u); }
+  document.getElementById('back').href = next();
+
+  function parse() {
+    var h = location.hash.slice(1), i = h.indexOf('?');
+    var name = i < 0 ? h : h.slice(0, i), q = new URLSearchParams(i < 0 ? '' : h.slice(i + 1));
+    return { name: name, q: q };
+  }
+  function label(no, txt) { document.getElementById('lblNo').textContent = '№ ' + no; document.getElementById('lblTxt').textContent = txt; }
+  function msg(kind, text) { return text ? '<p class="msg ' + kind + '" role="' + (kind === 'err' ? 'alert' : 'status') + '">' + esc(text) + '</p>' : ''; }
+  function setMsg(kind, text) { var m = view.querySelector('.msg'); if (m) m.remove(); view.querySelector('[data-msg]').insertAdjacentHTML('afterend', msg(kind, text)); }
+  function busy(btn, on, text) { if (!btn) return; if (on) { btn.dataset.t = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spin" aria-hidden="true"></span>' + esc(text || 'Подождите…'); } else { btn.disabled = false; if (btn.dataset.t) btn.innerHTML = btn.dataset.t; } }
+  function eyes() {
+    view.querySelectorAll('.eye').forEach(function (b) {
+      b.addEventListener('click', function () { var i = b.parentNode.querySelector('input'); var show = i.type === 'password'; i.type = show ? 'text' : 'password'; i.setAttribute('data-pw', ''); b.textContent = show ? 'Скрыть' : 'Показать'; b.setAttribute('aria-pressed', String(show)); });
+    });
+  }
+  var providers = '<div class="or">или</div><div class="prov">' +
+    '<a class="btn" id="pY" href="' + esc(MA.API + '/auth/yandex/start') + '"><span class="pv">ID</span>Войти через Яндекс ID</a>' +
+    '<a class="btn" id="pV" href="' + esc(MA.API + '/auth/vk/start') + '"><span class="pv">ID</span>Войти через VK ID</a></div>';
+  function tabs(cur) {
+    return '<nav class="tabs" aria-label="Вход или регистрация"><a href="#login"' + (cur === 'login' ? ' aria-current="page"' : '') + '>Вход</a><a href="#register"' + (cur === 'register' ? ' aria-current="page"' : '') + '>Регистрация</a></nav>';
+  }
+  var pwField = function (id, lab, auto, hint) {
+    return '<label class="f" for="' + id + '">' + lab + (hint ? ' <span class="hint">' + hint + '</span>' : '') + '</label><div class="inp"><input id="' + id + '" type="password" autocomplete="' + auto + '" required minlength="' + (auto === 'current-password' ? 1 : 8) + '" maxlength="128"><button type="button" class="eye" aria-pressed="false">Показать</button></div>';
+  };
+
+  var V = {};
+  V.off = function () {
+    label('—', 'Вход');
+    view.innerHTML = '<h1>Вход пока не включён</h1><p class="sub">Атласы работают в открытом режиме. Когда вход заработает, здесь появятся почта, Яндекс ID и VK ID.</p><a class="btn pri" href="' + esc(MA.SITE_URL) + '">К атласам</a>';
+  };
+  V.login = function (q) {
+    label('01', 'Вход');
+    view.innerHTML = tabs('login') + '<h1>Вход</h1><p class="sub" data-msg>После входа откроются все темы атласов.</p>' + msg('ok', q.get('ok')) +
+      '<form id="f" novalidate><label class="f" for="email">Почта</label><input id="email" type="email" autocomplete="email" required inputmode="email">' + pwField('pw', 'Пароль', 'current-password') +
+      '<button class="btn pri" type="submit">Войти</button></form>' + providers +
+      '<div class="links"><a href="#forgot">Забыли пароль?</a><a href="#register">Создать аккаунт</a></div>';
+    eyes();
+    var f = document.getElementById('f');
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var email = f.email.value.trim(), btn = f.querySelector('button[type=submit]');
+      if (!email || !f.pw.value) return setMsg('err', 'Введите почту и пароль.');
+      busy(btn, true, 'Входим…');
+      MA.call('/auth/login', { email: email, password: f.pw.value }).then(function (r) { MA.setSession(r); goNext(); }, function (e) {
+        busy(btn, false);
+        if (e.code === 'unverified') { location.hash = 'sent?email=' + encodeURIComponent(email) + '&again=1'; return; }
+        setMsg('err', e.message);
+      });
+    });
+  };
+  V.register = function () {
+    label('02', 'Регистрация');
+    view.innerHTML = tabs('register') + '<h1>Регистрация</h1><p class="sub" data-msg>Аккаунт бесплатный. Он нужен, чтобы открыть все темы атласов.</p>' +
+      '<form id="f" novalidate><label class="f" for="name">Как к вам обращаться</label><input id="name" type="text" autocomplete="name" maxlength="60">' +
+      '<label class="f" for="email">Почта</label><input id="email" type="email" autocomplete="email" required inputmode="email">' + pwField('pw', 'Пароль', 'new-password', 'не короче 8 символов') +
+      '<label class="check"><input id="consent" type="checkbox"><span>Соглашаюсь на обработку персональных данных по <a href="../privacy.html" target="_blank" rel="noopener">политике конфиденциальности</a></span></label>' +
+      '<button class="btn pri" type="submit">Создать аккаунт</button></form>' + providers +
+      '<p class="foot">Входя через Яндекс ID или VK ID, вы тоже соглашаетесь с <a href="../privacy.html" target="_blank" rel="noopener">политикой</a>.</p>' +
+      '<div class="links"><span></span><a href="#login">У меня уже есть аккаунт</a></div>';
+    eyes();
+    var f = document.getElementById('f');
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var email = f.email.value.trim(), btn = f.querySelector('button[type=submit]');
+      if (!email) return setMsg('err', 'Введите почту.');
+      if (f.pw.value.length < 8) return setMsg('err', 'Пароль должен быть не короче 8 символов.');
+      if (!f.consent.checked) return setMsg('err', 'Отметьте согласие на обработку персональных данных.');
+      busy(btn, true, 'Создаём аккаунт…');
+      MA.call('/auth/register', { name: f.name.value, email: email, password: f.pw.value, consent: true }).then(function (r) {
+        location.hash = 'sent?email=' + encodeURIComponent(r.email || email);
+      }, function (e) { busy(btn, false); setMsg('err', e.message); });
+    });
+  };
+  V.sent = function (q) {
+    label('03', 'Почта');
+    var email = q.get('email') || '';
+    view.innerHTML = '<h1>Проверьте почту</h1><p class="sub" data-msg>' + (q.get('again') ? 'Почта ещё не подтверждена. ' : '') + 'Мы отправили письмо со ссылкой на <b>' + esc(email) + '</b>. Откройте её, и вход завершится сам.</p>' +
+      '<p class="big">Письма нет? Проверьте папку «Спам» или отправьте ещё раз.</p><div class="stack"><button class="btn" id="again" type="button">Отправить письмо ещё раз</button><a class="btn" href="#login">Вернуться ко входу</a></div>';
+    var b = document.getElementById('again'), wait = 0, t = 0;
+    function tick() { if (wait > 0) { b.disabled = true; b.textContent = 'Отправить ещё раз через ' + wait + ' с'; wait--; t = setTimeout(tick, 1000); } else { b.disabled = false; b.textContent = 'Отправить письмо ещё раз'; } }
+    b.addEventListener('click', function () {
+      busy(b, true, 'Отправляем…');
+      MA.call('/auth/resend', { email: email }).then(function () { setMsg('ok', 'Отправили новое письмо.'); wait = 60; tick(); }, function (e) { busy(b, false); setMsg('err', e.message); });
+    });
+    window.addEventListener('hashchange', function () { clearTimeout(t); }, { once: true });
+  };
+  V.forgot = function () {
+    label('04', 'Пароль');
+    view.innerHTML = '<h1>Восстановление пароля</h1><p class="sub" data-msg>Пришлём ссылку, по которой можно задать новый пароль.</p>' +
+      '<form id="f" novalidate><label class="f" for="email">Почта</label><input id="email" type="email" autocomplete="email" required inputmode="email"><button class="btn pri" type="submit">Прислать ссылку</button></form>' +
+      '<div class="links"><a href="#login">← Ко входу</a></div>';
+    var f = document.getElementById('f');
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var email = f.email.value.trim(), btn = f.querySelector('button[type=submit]');
+      if (!email) return setMsg('err', 'Введите почту.');
+      busy(btn, true, 'Отправляем…');
+      MA.call('/auth/forgot', { email: email }).then(function () {
+        busy(btn, false); setMsg('ok', 'Если аккаунт с этой почтой есть, письмо уже в пути. Ссылка действует 1 час.');
+      }, function (e) { busy(btn, false); setMsg('err', e.message); });
+    });
+  };
+  V.reset = function (q) {
+    label('05', 'Пароль');
+    var token = q.get('token') || '';
+    history.replaceState(null, '', location.pathname + location.search + '#reset');
+    if (!token) { view.innerHTML = '<h1>Ссылка неполная</h1><p class="sub">Откройте ссылку из письма целиком или запросите новую.</p><a class="btn pri" href="#forgot">Запросить новую ссылку</a>'; return; }
+    view.innerHTML = '<h1>Новый пароль</h1><p class="sub" data-msg>После сохранения вы войдёте, а на других устройствах сессии закроются.</p>' +
+      '<form id="f" novalidate>' + pwField('pw', 'Новый пароль', 'new-password', 'не короче 8 символов') + '<button class="btn pri" type="submit">Сохранить и войти</button></form>';
+    eyes();
+    var f = document.getElementById('f');
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var btn = f.querySelector('button[type=submit]');
+      if (f.pw.value.length < 8) return setMsg('err', 'Пароль должен быть не короче 8 символов.');
+      busy(btn, true, 'Сохраняем…');
+      MA.call('/auth/reset', { token: token, password: f.pw.value }).then(function (r) { MA.setSession(r); goNext(); }, function (e) { busy(btn, false); setMsg('err', e.message); });
+    });
+  };
+  function finishing(title, path, body) {
+    view.innerHTML = '<h1>' + esc(title) + '</h1><p class="sub" data-msg><span class="spin" aria-hidden="true"></span>Секунду…</p>';
+    MA.call(path, body).then(function (r) { MA.setSession(r); goNext(); }, function (e) {
+      view.innerHTML = '<h1>Не получилось</h1><p class="sub" data-msg></p>' + msg('err', e.message) + '<div class="stack"><a class="btn pri" href="#login">Ко входу</a></div>';
+    });
+  }
+  V.verify = function (q) {
+    label('03', 'Почта');
+    var token = q.get('token') || '';
+    history.replaceState(null, '', location.pathname + location.search + '#verify');
+    if (!token) { V.login(new URLSearchParams()); return; }
+    finishing('Подтверждаем почту', '/auth/verify', { token: token });
+  };
+  V.done = function (q) {
+    label('01', 'Вход');
+    var code = q.get('code') || '';
+    history.replaceState(null, '', location.pathname + location.search + '#done');
+    if (!code) { location.hash = 'login'; return; }
+    finishing('Входим', '/auth/exchange', { code: code });
+  };
+  V.error = function (q) {
+    label('01', 'Вход');
+    var reasons = {
+      cancel: 'Вход отменён. Можно попробовать ещё раз или войти по почте.',
+      state: 'Сессия входа устарела. Начните вход ещё раз с этой страницы.',
+      provider: 'Яндекс ID или VK ID не ответил. Попробуйте ещё раз через минуту.',
+      provider_off: 'Этот способ входа пока не подключён. Войдите по почте.',
+    };
+    view.innerHTML = '<h1>Вход не завершён</h1><p class="sub" data-msg></p>' + msg('err', reasons[q.get('reason')] || 'Что-то пошло не так. Попробуйте ещё раз.') + '<div class="stack"><a class="btn pri" href="#login">Попробовать снова</a></div>';
+  };
+  V.account = function () {
+    label('06', 'Аккаунт');
+    if (!MA.signedIn()) { location.hash = 'login'; return; }
+    view.innerHTML = '<h1>Аккаунт</h1><p class="sub" data-msg><span class="spin" aria-hidden="true"></span>Загружаем…</p>';
+    MA.api('/me').then(function (r) {
+      var u = r.user, names = { email: 'почта и пароль', yandex: 'Яндекс ID', vk: 'VK ID' };
+      var ways = u.providers.filter(function (p) { return p !== 'email' || u.hasPassword; }).map(function (p) { return names[p] || p; });
+      var ava = u.avatar ? '<img src="' + esc(u.avatar) + '" alt="" referrerpolicy="no-referrer">' : esc((u.name || u.email || '?').charAt(0).toUpperCase());
+      view.innerHTML = '<h1>Аккаунт</h1><p class="sub" data-msg>Все темы атласов открыты.</p>' +
+        '<div class="who"><span class="ava" aria-hidden="true">' + ava + '</span><div><b>' + esc(u.name || 'Без имени') + '</b><span>' + esc(u.email || 'почта не указана') + '</span></div></div>' +
+        '<dl class="props"><dt>Вход</dt><dd>' + esc(ways.join(', ') || '—') + '</dd><dt>С нами с</dt><dd>' + esc(new Date(u.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })) + '</dd></dl>' +
+        '<form id="fn" novalidate><label class="f" for="name">Имя</label><div class="row"><input id="name" type="text" maxlength="60" value="' + esc(u.name) + '"><button class="btn" type="submit">Сохранить</button></div></form>' +
+        '<div class="stack" style="margin-top:22px"><a class="btn pri" href="' + esc(next()) + '">К атласам</a><button class="btn" id="out" type="button">Выйти</button><button class="btn" id="outAll" type="button">Выйти на всех устройствах</button>' +
+        (u.email && !u.hasPassword ? '<a class="btn" href="#forgot">Задать пароль для входа по почте</a>' : '') +
+        '<button class="btn danger" id="del" type="button">Удалить аккаунт</button></div>';
+      var fn = document.getElementById('fn');
+      fn.addEventListener('submit', function (ev) {
+        ev.preventDefault(); var b = fn.querySelector('button'); busy(b, true, '…');
+        MA.api('/me', { method: 'PATCH', body: { name: fn.name.value } }).then(function (r) { busy(b, false); var s = JSON.parse(localStorage.getItem('ma-session') || '{}'); s.user = r.user; localStorage.setItem('ma-session', JSON.stringify(s)); setMsg('ok', 'Имя сохранено.'); }, function (e) { busy(b, false); setMsg('err', e.message); });
+      });
+      document.getElementById('out').addEventListener('click', function () { MA.logout(false).then(function () { location.replace(MA.SITE_URL); }); });
+      document.getElementById('outAll').addEventListener('click', function () { MA.logout(true).then(function () { location.hash = 'login?ok=' + encodeURIComponent('Вы вышли на всех устройствах.'); }); });
+      var del = document.getElementById('del');
+      del.addEventListener('click', function () {
+        if (!del.classList.contains('armed')) { del.classList.add('armed'); del.textContent = 'Нажмите ещё раз: аккаунт удалится навсегда'; return; }
+        busy(del, true, 'Удаляем…');
+        MA.api('/me', { method: 'DELETE' }).then(function () { MA.logout(false).then(function () { location.hash = 'login?ok=' + encodeURIComponent('Аккаунт удалён.'); }); }, function (e) { busy(del, false); setMsg('err', e.message); });
+      });
+    }, function (e) {
+      if (e.code === 'signed-out') { location.hash = 'login'; return; }
+      view.innerHTML = '<h1>Аккаунт</h1><p class="sub" data-msg></p>' + msg('err', e.message);
+    });
+  };
+
+  function route() {
+    if (!MA.enabled()) { V.off(); return; }
+    var r = parse();
+    var name = V[r.name] && r.name !== 'off' ? r.name : (MA.signedIn() ? 'account' : 'login');
+    if ((name === 'login' || name === 'register') && MA.signedIn() && !r.q.get('ok')) name = 'account';
+    V[name](r.q);
+    document.title = { login: 'Вход', register: 'Регистрация', sent: 'Проверьте почту', forgot: 'Восстановление пароля', reset: 'Новый пароль', verify: 'Подтверждение почты', done: 'Вход', error: 'Вход не завершён', account: 'Аккаунт' }[name] + ' — Медицинский атлас';
+    var first = view.querySelector('input:not([type=checkbox])'); if (first && name !== 'account') first.focus({ preventScroll: true });
+  }
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>

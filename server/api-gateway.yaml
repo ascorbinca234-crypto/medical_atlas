@@ -1,0 +1,20 @@
+# Спецификация API-шлюза Yandex API Gateway: все запросы передаются функции atlas-api.
+# Подставьте ID функции и ID сервисного аккаунта с ролью functions.functionInvoker.
+openapi: 3.0.0
+info:
+  title: medical-atlas-api
+  version: 1.0.0
+paths:
+  /{path+}:
+    x-yc-apigateway-any-method:
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <ID_ФУНКЦИИ>
+        tag: "$latest"
+        service_account_id: <ID_СЕРВИСНОГО_АККАУНТА>
