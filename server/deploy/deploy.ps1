@@ -16,6 +16,7 @@ $__unused = @'
 # Запуск в PowerShell (после шага 2 инструкции, когда yc init уже выполнен):
 #   powershell -ExecutionPolicy Bypass -File "$HOME\Documents\medical_atlas_deploy\deploy.ps1"
 # Скрипт можно запускать повторно: он находит уже созданное и обновляет код и настройки.
+# Без вопросов (берёт сохранённые значения): переменная окружения MA_AUTO=1, ID приложения VK — MA_VK_ID.
 # Ключи и пароли сохраняются только на этом компьютере: %LOCALAPPDATA%\medical-atlas\deploy-state.json
 
 $ErrorActionPreference = 'Continue'
@@ -101,8 +102,14 @@ function Save-State {
   New-Item -ItemType Directory -Force -Path $StateDir | Out-Null
   ($State | ConvertTo-Json) | Set-Content -Path $StateFile -Encoding UTF8
 }
+$Auto = $env:MA_AUTO -eq '1'
+if ("$env:MA_VK_ID".Trim()) { $State.vkId = "$env:MA_VK_ID".Trim(); Save-State }
 function Ask([string]$Label, [string]$Key, [switch]$Secret, [switch]$Optional) {
   $has = $State.ContainsKey($Key) -and $State[$Key]
+  if ($Auto) {
+    if ($has -or $Optional) { return }
+    Fail "нет сохранённого значения «$Label». Запусти deploy.ps1 обычным способом (без MA_AUTO) и введи его."
+  }
   $hint = ''
   if ($has -and $Secret) { $hint = ' [сохранено, Enter — оставить]' }
   elseif ($has) { $hint = " [$($State[$Key]), Enter — оставить]" }
@@ -263,6 +270,7 @@ $result = [ordered]@{
 ($result | ConvertTo-Json -Depth 5) | Set-Content -Path (Join-Path $Here 'result.json') -Encoding UTF8
 
 Write-Host ''
+if ($h -and $h.providers) { Write-Host ("Входы: VK ID — " + $(if ($h.providers.vk) { 'включён' } else { 'выключен' }) + ", Яндекс ID — " + $(if ($h.providers.yandex) { 'включён' } else { 'выключен' })) }
 if ($h -and $h.ok) { Write-Host 'Готово. Сервер работает.' -ForegroundColor Green }
 elseif ($h) { Write-Host ('Сервер отвечает, но не всё настроено: ' + ($h.missing -join ', ') + ' ' + $h.tables) -ForegroundColor Yellow }
 else { Write-Host 'Сервер пока не ответил. Напиши в чат — я посмотрю.' -ForegroundColor Yellow }
