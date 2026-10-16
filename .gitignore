@@ -1,0 +1,6 @@
+# закрытые части атласов — собираются из закрытого репозитория и не публикуются
+server/content/
+server/dist/
+server/.env
+node_modules/
+.DS_Store

@@ -1,0 +1,19 @@
+{
+ "substances": 68,
+ "bySec": {
+  "lip": 19,
+  "nit": 11,
+  "neuro": 12,
+  "vit": 8,
+  "nuc": 6,
+  "horm": 8,
+  "drug": 4
+ },
+ "reactions": 190,
+ "pairs": 25,
+ "cheat": {
+  "vit": 7,
+  "vitmn": 2,
+  "dis": 11
+ }
+}
