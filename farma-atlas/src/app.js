@@ -191,7 +191,7 @@ function lockActions(){
   const MA=window.MA, st=maState();
   if(st.auth==='error') return `<p class="par">Вы вошли, но закрытые темы не загрузились. Проверьте интернет и <button type="button" class="tlink" onclick="location.reload()">обновите страницу</button>.</p>`;
   if(!MA||!MA.enabled()) return `<p class="par">Вход работает на сайте атласа: <a href="https://ascorbinca234-crypto.github.io/medical_atlas/farma-atlas/">ascorbinca234-crypto.github.io/medical_atlas</a>.</p>`;
-  return `<div class="dz-act"><a class="btn pri" href="${esc(MA.loginUrl())}">Войти</a><a class="btn" href="${esc(MA.loginUrl('register'))}">Зарегистрироваться</a></div><p class="par lock-how">Вход через Яндекс ID, VK ID или почту. Это бесплатно.</p>`;
+  return `<div class="dz-act"><a class="btn pri" href="${esc(MA.loginUrl())}">Войти</a><a class="btn" href="${esc(MA.loginUrl('register'))}">Зарегистрироваться</a></div><p class="par lock-how">Регистрация бесплатная.</p>`;
 }
 function lockBanner(){
   if(!LOCKED_N) return '';

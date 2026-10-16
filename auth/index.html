@@ -21,6 +21,7 @@
 }
 :root[data-theme="dark"] { --bg: #13111b; --surface: #1b1826; --frost: #252131; --edge: #332e45; --ink: #ece9f6; --muted: #a59eb9; --hema: #a596f2; --eosin: #f07aa4; --ok: #5fd0a0; color-scheme: dark; }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 a { color: var(--hema); }
@@ -185,7 +186,7 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
       '<label class="f" for="email">Почта</label><input id="email" type="email" autocomplete="email" required inputmode="email">' + pwField('pw', 'Пароль', 'new-password', 'не короче 8 символов') +
       '<label class="check"><input id="consent" type="checkbox"><span>Соглашаюсь на обработку персональных данных по <a href="../privacy.html" target="_blank" rel="noopener">политике конфиденциальности</a></span></label>' +
       '<button class="btn pri" type="submit">Создать аккаунт</button></form>' + providers +
-      '<p class="foot">Входя через Яндекс ID или VK ID, вы тоже соглашаетесь с <a href="../privacy.html" target="_blank" rel="noopener">политикой</a>.</p>' +
+      '<p class="foot" data-prov-note>Входя через Яндекс ID или VK ID, вы тоже соглашаетесь с <a href="../privacy.html" target="_blank" rel="noopener">политикой</a>.</p>' +
       '<div class="links"><span></span><a href="#login">У меня уже есть аккаунт</a></div>';
     eyes();
     var f = document.getElementById('f');
@@ -320,7 +321,18 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
     document.title = { login: 'Вход', register: 'Регистрация', sent: 'Проверьте почту', forgot: 'Восстановление пароля', reset: 'Новый пароль', verify: 'Подтверждение почты', done: 'Вход', error: 'Вход не завершён', account: 'Аккаунт' }[name] + ' — Медицинский атлас';
     var first = view.querySelector('input:not([type=checkbox])'); if (first && name !== 'account') first.focus({ preventScroll: true });
   }
-  window.addEventListener('hashchange', route);
+  // какие способы входа включены на сервере: выключенные кнопки не показываем
+  var prov = null;
+  function applyProv() {
+    if (!prov) return;
+    var y = document.getElementById('pY'), v = document.getElementById('pV');
+    if (y) y.hidden = !prov.yandex;
+    if (v) v.hidden = !prov.vk;
+    var none = !prov.yandex && !prov.vk;
+    view.querySelectorAll('.or, .prov, [data-prov-note]').forEach(function (e) { e.hidden = none; });
+  }
+  if (MA.enabled()) fetch(MA.API + '/health').then(function (r) { return r.json(); }).then(function (j) { prov = j.providers || null; applyProv(); }, function () { /* покажем все */ });
+  window.addEventListener('hashchange', function () { route(); applyProv(); });
   route();
 })();
 </script>

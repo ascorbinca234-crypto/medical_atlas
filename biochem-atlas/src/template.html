@@ -1362,7 +1362,7 @@ DB.forEach(e => {
 if (LK) {
   const lt = document.createElement("a");
   lt.id = "lockTile"; lt.className = "card locktile"; lt.href = window.MA && window.MA.enabled() ? window.MA.loginUrl() : "#";
-  lt.innerHTML = LOCK_SVG + '<b></b><span>откроются после входа. Это бесплатно: Яндекс ID, VK ID или почта.</span>';
+  lt.innerHTML = LOCK_SVG + '<b></b><span>откроются после входа. Регистрация бесплатная.</span>';
   grid.appendChild(lt);
 }
 let favOnly = false, hideNames = lsGet("atlas-hide") === "1";
