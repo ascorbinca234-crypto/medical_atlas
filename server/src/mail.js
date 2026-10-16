@@ -7,12 +7,13 @@ const b64 = s => Buffer.from(s, 'utf8').toString('base64');
 const wrap = s => s.replace(/.{1,76}/g, '$&\r\n');
 const hdr = s => (/^[\x20-\x7e]*$/.test(s) ? s : '=?UTF-8?B?' + b64(s) + '?=');
 
-function buildMessage({ from, fromName, to, subject, text, html }) {
+function buildMessage({ from, fromName, to, replyTo, subject, text, html }) {
   const boundary = 'ma-' + crypto.randomBytes(12).toString('hex');
   const domain = String(from).split('@')[1] || 'localhost';
   return [
     `From: ${hdr(fromName)} <${from}>`,
     `To: <${to}>`,
+    ...(replyTo ? [`Reply-To: <${replyTo}>`] : []),
     `Subject: ${hdr(subject)}`,
     `Date: ${new Date().toUTCString()}`,
     `Message-ID: <${crypto.randomBytes(16).toString('hex')}@${domain}>`,
@@ -76,13 +77,13 @@ function smtpSend(o, to, message) {
 
 function mailer(o) {
   return {
-    async send({ to, subject, text, html }) {
+    async send({ to, replyTo, subject, text, html }) {
       if (o.transport === 'log') {
-        const line = JSON.stringify({ to, subject, text, at: new Date().toISOString() });
+        const line = JSON.stringify({ to, replyTo, subject, text, at: new Date().toISOString() });
         if (o.outbox) fs.appendFileSync(o.outbox, line + '\n'); else console.log('[mail]', line);
         return;
       }
-      const message = buildMessage({ from: o.from, fromName: o.fromName, to, subject, text, html });
+      const message = buildMessage({ from: o.from, fromName: o.fromName, to, replyTo, subject, text, html });
       await smtpSend(o, to, message);
     },
   };

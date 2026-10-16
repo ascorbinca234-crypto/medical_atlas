@@ -248,6 +248,24 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     return json(200, session(u));
   }
 
+  // ---------- заявки преподавателей ----------
+  async function lead(req) {
+    const b = body(req);
+    if (b.website) return json(200, { ok: true });                 // поле-ловушка для ботов
+    const name = cleanName(b.name), contact = String(b.contact || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+    const role = String(b.role || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+    const message = String(b.message || '').trim().slice(0, 1500);
+    const page = String(b.page || '').slice(0, 200);
+    if (!name) throw bad('no_name', 'Напишите, как к вам обращаться.');
+    if (contact.length < 4) throw bad('no_contact', 'Оставьте почту или Telegram, чтобы мы могли ответить.');
+    if (!cfg.mail.leadTo) throw new HttpError(503, 'no_inbox', 'Приём заявок пока не настроен.');
+    await limit('lead:' + req.ip, 5, 3600);
+    await limit('leadall', 60, 3600);
+    const replyTo = EMAIL_RE.test(contact) ? contact : undefined;
+    await mail.send(Object.assign({ to: cfg.mail.leadTo, replyTo }, emails.leadEmail({ name, contact, role, message, page })));
+    return json(200, { ok: true });
+  }
+
   // ---------- профиль ----------
   async function me(req) { return json(200, { user: view(await authUser(req)) }); }
   async function updateMe(req) {
@@ -312,6 +330,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     ['PATCH', /^\/me$/, updateMe],
     ['DELETE', /^\/me$/, deleteMe],
     ['GET', /^\/content\/([^/]+)$/, (req, m) => content(req, m[1])],
+    ['POST', /^\/lead$/, lead],
   ];
 
   async function handle(req) {
