@@ -4,3 +4,16 @@ server/dist/
 server/.env
 node_modules/
 .DS_Store
+
+# Локальные заметки о проекте и личные задачи
+/PROJECT.local.md
+/agent.md
+
+# Полная микробиология хранится вне публичного репозитория
+micro-atlas/dist/
+micro-atlas/src/g[0-9][0-9]_*.js
+!micro-atlas/src/g01_morph.js
+!micro-atlas/src/g02_phys.js
+micro-atlas/src/p[0-9][0-9]_*.js
+micro-atlas/src/pathogens_*.js
+micro-atlas/src/questions.js

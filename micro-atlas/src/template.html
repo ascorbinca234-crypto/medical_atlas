@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Микробиология в схемах. Два базовых конспекта доступны без подписки: морфология и физиология микроорганизмов.">
+<title>Атлас микробиологии — Medical Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400..600&family=JetBrains+Mono:wght@500&family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400..500&display=swap" rel="stylesheet">
+<style>/*CSS*/</style>
+</head>
+<body>
+<div class="app">
+  <header class="mbar">
+    <a href="../">Medical Atlas</a>
+    <button id="burger" aria-label="Открыть указатель тем" aria-controls="railbox" aria-expanded="false">Указатель</button>
+  </header>
+  <aside class="rail" id="railbox"></aside>
+  <main class="main" id="main"><p class="page" role="status">Загружаем атлас…</p></main>
+</div>
+<div class="scrim" id="scrim"></div>
+<div id="dz"></div>
+<noscript>Для просмотра интерактивного атласа включите JavaScript.</noscript>
+<script src="../auth/config.js"></script>
+<script src="../auth/auth.js"></script>
+<script src="../progress/progress.js"></script>
+<script>/*DATA*/</script>
+<script id="micro-app" type="text/plain">/*APP*/</script>
+<script>/*BOOT*/</script>
+</body>
+</html>

@@ -340,8 +340,17 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     return c;
   }
   async function content(req, atlas) {
-    await authUser(req);
+    const user = await authUser(req);
     if (!/^[a-z0-9-]{1,40}$/.test(atlas)) throw new HttpError(404, 'not_found', 'Нет такого атласа.');
+    // Microbiology launches with two public topics. Registration is not a paid grant.
+    // Access documents are server-owned; profile/progress endpoints cannot write them.
+    if (atlas === 'micro') {
+      const record = await store.getDoc('access:' + user.id);
+      const grant = record && record.d && record.d.micro;
+      if (!grant || grant.revoked || !Number.isFinite(grant.expiresAt) || grant.expiresAt <= Date.now()) {
+        throw new HttpError(403, 'subscription_required', 'Для полной микробиологии нужна действующая подписка.');
+      }
+    }
     const c = loadContent(atlas);
     if (!c) throw new HttpError(404, 'not_found', 'Нет такого атласа.');
     const headers = { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Content-Hash': c.hash };

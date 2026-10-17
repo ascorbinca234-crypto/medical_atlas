@@ -296,3 +296,29 @@ test('сбой почты: регистрация ведёт на экран к�
   r = await later(110, () => call('POST', '/auth/verify-code', { email: 'fail@b.ru', code: codeOf(sent[0]) }));
   assert.strictEqual(r.status, 200);
 });
+
+test('микробиология: регистрация не открывает платный материал; право проверяется при каждом запросе', async () => {
+  const { call, J, sent, tokenFrom, store, cfg } = setup();
+  fs.writeFileSync(path.join(cfg.contentDir, 'micro.js'), 'window.MICRO_FULL = true;');
+  assert.strictEqual((await call('GET', '/content/micro')).status, 401);
+  await call('POST', '/auth/register', { email: 'micro@example.com', password: 'secret-123', consent: true });
+  const session = J(await call('POST', '/auth/verify', { token: tokenFrom(sent[0], 'verify') }));
+  const headers = { authorization: 'Bearer ' + session.accessToken };
+  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403);
+  await call('PATCH', '/me', { name: 'Student', micro: { expiresAt: Date.now() + 86400000 }, entitlements: { micro: true } }, headers);
+  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'профиль не может выдать платный доступ');
+  const key = 'access:' + session.user.id;
+  await store.putDoc('access:someone-else', { micro: { expiresAt: Date.now() + 86400000 } }, 0);
+  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'чужая покупка не открывает доступ');
+  await store.putDoc(key, { biochem: { expiresAt: Date.now() + 86400000 } }, 0);
+  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'другой предмет не открывает микробиологию');
+  await store.putDoc(key, { micro: { expiresAt: Date.now() + 86400000 } }, 1);
+  const allowed = await call('GET', '/content/micro', null, headers);
+  assert.strictEqual(allowed.status, 200);
+  assert.match(allowed.headers['Cache-Control'], /no-store/);
+  assert.match(allowed.body, /MICRO_FULL/);
+  await store.putDoc(key, { micro: { expiresAt: Date.now() - 1 } }, 2);
+  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'истечение права проверяется даже при серверном кэше');
+  await store.putDoc(key, { micro: { expiresAt: Date.now() + 86400000, revoked: true } }, 3);
+  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'отзыв права применяется сразу');
+});

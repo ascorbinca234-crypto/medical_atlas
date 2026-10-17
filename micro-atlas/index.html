@@ -1,0 +1,1233 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Микробиология в схемах. Два базовых конспекта доступны без подписки: морфология и физиология микроорганизмов.">
+<title>Атлас микробиологии — Medical Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400..600&family=JetBrains+Mono:wght@500&family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400..500&display=swap" rel="stylesheet">
+<style>/* Layout: лабораторный журнал — слева указатель тем, справа один лист; схемы нумеруются как препараты */
+:root{
+  --paper:#F2F1F6; --sheet:#FFFFFF; --ink:#181427; --ink-2:#474264; --ink-3:#777195;
+  --rule:#D9D6E4; --rule-2:#E8E6F0;
+  --gv:#5B2E9D;  --gv-soft:#EDE6FB;   /* генциановый фиолетовый: Гр+, основной акцент */
+  --saf:#C22F55; --saf-soft:#FBE5EB;  /* сафранин: Гр−, опасность, токсины */
+  --zn:#9A6212;  --zn-soft:#F8EFDC;   /* фуксин Циля—Нильсена: кислотоустойчивые, предупреждения */
+  --mb:#1F6FB2;  --mb-soft:#E2EEF9;   /* метиленовый синий: вирусы, диагностика */
+  --mg:#17795C;  --mg-soft:#DEF1EA;   /* малахитовый зелёный: споры, грибы, норма */
+  --hl-y:#FCEB9B; --hl-ink:#1B1B1B;
+  --f-display:"Literata","PT Serif",Georgia,serif;
+  --f-body:"Golos Text","PT Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E0C18; --sheet:#171428; --ink:#E9E6F5; --ink-2:#B6B1CE; --ink-3:#8B85A3;
+    --rule:#2E2A45; --rule-2:#241F38;
+    --gv:#A98BF5; --gv-soft:#261F42; --saf:#FF8098; --saf-soft:#3B1A26;
+    --zn:#E0A94E; --zn-soft:#332715; --mb:#6FB2EA; --mb-soft:#152A3D; --mg:#4FC2A0; --mg-soft:#11312A;
+    --hl-y:#5C4B0E; --hl-ink:#F3F3F3;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E0C18; --sheet:#171428; --ink:#E9E6F5; --ink-2:#B6B1CE; --ink-3:#8B85A3;
+  --rule:#2E2A45; --rule-2:#241F38;
+  --gv:#A98BF5; --gv-soft:#261F42; --saf:#FF8098; --saf-soft:#3B1A26;
+  --zn:#E0A94E; --zn-soft:#332715; --mb:#6FB2EA; --mb-soft:#152A3D; --mg:#4FC2A0; --mg-soft:#11312A;
+  --hl-y:#5C4B0E; --hl-ink:#F3F3F3;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--gv)}
+button{font:inherit;color:inherit}
+sub,sup{line-height:0}
+[hidden]{display:none!important}
+
+/* ---------- каркас ---------- */
+.app{display:grid;grid-template-columns:296px minmax(0,1fr);min-height:100vh}
+.rail{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;overflow-y:auto;background:var(--sheet);border-right:1px solid var(--rule);padding:22px 16px 48px;display:flex;flex-direction:column;gap:16px}
+.brand{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink)}
+.brand b{font-family:var(--f-display);font-weight:600;font-size:22px;line-height:1.1;letter-spacing:-.01em}
+.brand span{font-size:12.5px;color:var(--ink-3)}
+.search{position:relative}
+.search input{width:100%;font:inherit;font-size:15px;padding:10px 12px 10px 34px;border:1px solid var(--rule);border-radius:9px;background:var(--paper);color:var(--ink)}
+.search input:focus{outline:2px solid var(--gv);outline-offset:1px;border-color:transparent}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--ink-3);fill:none;stroke-width:2}
+.results{display:flex;flex-direction:column;gap:2px;margin-top:6px;max-height:50vh;overflow:auto;flex:none}
+.results:empty{display:none}
+.results button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:0;background:transparent;padding:7px 10px;border-radius:7px;cursor:pointer;width:100%}
+.results button:hover,.results button:focus-visible{background:var(--gv-soft);outline:none}
+.results b{font-weight:600;font-size:14.5px}
+.results small{font-size:12px;color:var(--ink-3)}
+.results .none{font-size:13px;color:var(--ink-3);padding:6px 10px}
+.nav{display:flex;flex-direction:column;gap:16px;flex:none}
+.search{flex:none}
+.nav h6{margin:0 0 6px;font:600 11px/1.2 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);padding-left:10px}
+.nav a{display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:baseline;gap:6px;padding:6px 10px;border-radius:7px;text-decoration:none;color:var(--ink-2);font-size:14.5px;line-height:1.3}
+.nav a .n{font:500 12px/1.4 var(--f-mono);color:var(--ink-3)}
+.nav a:hover{background:var(--paper);color:var(--ink)}
+.nav a[aria-current="page"]{background:var(--gv-soft);color:var(--ink)}
+.nav a[aria-current="page"] .n{color:var(--gv)}
+.nav a:focus-visible{outline:2px solid var(--gv);outline-offset:-2px}
+.nav .fill{justify-self:end;font:500 11px/1 var(--f-mono);color:var(--ink-3)}
+.nav a[aria-current="page"] .fill{color:var(--gv)}
+
+.mbar{display:none}
+.scrim{display:none}
+.main{min-width:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 96px}
+.main > .page{margin-inline:auto}
+.page{max-width:1020px}
+
+@media (max-width:940px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .mbar{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--sheet);border-bottom:1px solid var(--rule);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .mbar a{font-family:var(--f-display);font-weight:600;font-size:18px;color:var(--ink);text-decoration:none}
+  .mbar button{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);background:var(--paper);border-radius:9px;padding:7px 11px;font-size:14px;cursor:pointer}
+  .rail{position:fixed;z-index:40;top:0;left:0;bottom:0;width:min(320px,86vw);transform:translateX(-102%);transition:transform .22s ease;padding-top:calc(18px + env(safe-area-inset-top,0px))}
+  .rail.open{transform:none;box-shadow:0 0 40px #0b0e1c40}
+  .scrim.on{display:block;position:fixed;inset:0;background:#0b0e1c59;z-index:30}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--sheet);z-index:25}
+}
+
+/* ---------- шапка листа ---------- */
+.eyebrow{font:600 11.5px/1.3 var(--f-body);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:0}
+.eyebrow .roman{color:var(--gv)}
+h1.title{font-family:var(--f-display);font-weight:600;font-size:clamp(28px,4.2vw,45px);line-height:1.08;letter-spacing:-.012em;text-wrap:balance;overflow-wrap:break-word;margin:.2em 0 .34em}
+.lede{font-size:17px;line-height:1.5;color:var(--ink-2);max-width:62ch;margin:0 0 14px}
+.ksrc{font-size:13px;color:var(--ink-3);margin:0 0 14px;max-width:70ch}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.btn{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;line-height:1.2;padding:8px 13px;border-radius:8px;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);text-decoration:none;cursor:pointer}
+.btn:hover{border-color:var(--gv)}
+.btn.pri{background:var(--gv);border-color:var(--gv);color:#fff}
+.btn.on{background:var(--gv-soft);border-color:var(--gv);color:var(--ink)}
+.btn:focus-visible,.pgrow:focus-visible,.qrow:focus-visible,.chip:focus-visible{outline:2px solid var(--gv);outline-offset:2px}
+
+/* ---------- блоки ---------- */
+h2.sec{font-family:var(--f-display);font-weight:600;font-size:clamp(21px,2.6vw,27px);line-height:1.2;letter-spacing:-.008em;margin:40px 0 4px;text-wrap:balance;scroll-margin-top:72px}
+.par{font-size:15.5px;color:var(--ink-2);max-width:68ch;margin:12px 0}
+.blk-no{font:500 12px/1 var(--f-mono);color:var(--gv);letter-spacing:.02em}
+.fig{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;margin:22px 0;overflow:hidden}
+.fig-head{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;padding:15px 18px 0}
+.fig-head h4{margin:0;font:600 17px/1.25 var(--f-display)}
+.fig-cap{font-size:13px;color:var(--ink-3);padding:0 18px 13px;margin:8px 0 0;max-width:80ch}
+
+.klist{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:15px 18px 17px;margin:20px 0}
+.klist h3{margin:0;font:600 16.5px/1.3 var(--f-display)}
+.klist ul,.klist ol{margin:8px 0 0;padding-left:20px;display:grid;gap:5px;font-size:14.8px;color:var(--ink-2)}
+.klist li b,.klist li strong{color:var(--ink)}
+.klist li i{font-style:italic}
+.klist ul.plain{list-style:none;padding-left:0}
+
+.kcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--cmin,210px)),1fr));gap:12px;padding:15px 18px 17px}
+.kcol{border:1px solid var(--rule);border-top:3px solid var(--gv);border-radius:10px;padding:10px 12px 12px;background:var(--paper);min-width:0}
+.kcol.c-saf{border-top-color:var(--saf)} .kcol.c-zn{border-top-color:var(--zn)} .kcol.c-mb{border-top-color:var(--mb)} .kcol.c-mg{border-top-color:var(--mg)} .kcol.c-n{border-top-color:var(--ink-3)}
+.kcol h5{margin:0;font:600 17px/1.2 var(--f-display);color:var(--ink)}
+.kcol > small{display:block;color:var(--ink-3);font-size:12.5px;margin-top:3px;line-height:1.4}
+.kcol ul,.kcol ol{margin:8px 0 0;padding-left:17px;font-size:13.6px;line-height:1.45;color:var(--ink-2);display:grid;gap:5px}
+.kcol li b{color:var(--ink)}
+.kroot{padding:14px 18px 0}
+.kroot span{display:inline-block;background:var(--gv-soft);border:1px solid var(--gv);border-radius:9px;padding:7px 12px;font:600 15px/1.3 var(--f-body)}
+
+.kfl{padding:6px 18px 14px;display:grid;gap:10px}
+.kfr h5{margin:0 0 5px;font:600 14px/1.3 var(--f-body)}
+.cf{display:flex;flex-wrap:wrap;align-items:center;gap:5px;font-size:13.6px;line-height:1.35}
+.cf span,.cf b{border-radius:6px;padding:3px 8px}
+.cf span{background:var(--paper);border:1px solid var(--rule-2);color:var(--ink-2)}
+.cf b{background:var(--gv-soft);border:1px solid var(--gv);font-weight:600;color:var(--ink)}
+.cf i{font-style:normal;color:var(--ink-3)}
+.kfn{margin:5px 0 0;font-size:13px;color:var(--ink-3)}
+
+.tbl{overflow-x:auto;border:1px solid var(--rule);border-radius:12px;background:var(--sheet);margin:20px 0}
+.fig .tbl{border:0;border-radius:0;border-top:1px solid var(--rule-2);margin:14px 0 0}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+.tbl th{text-align:left;font:600 10.5px/1.3 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:11px 14px;border-bottom:1px solid var(--rule);background:var(--paper)}
+.tbl td{padding:10px 14px;border-bottom:1px solid var(--rule-2);vertical-align:top;color:var(--ink-2)}
+.tbl td:first-child{color:var(--ink);font-weight:600}
+.tbl tr:last-child td{border-bottom:0}
+.tbl i{font-style:italic}
+.tbl mark{background:var(--hl-y);color:var(--hl-ink);padding:0 3px;border-radius:3px}
+
+.kwarn{margin:18px 0;padding:11px 15px;border-left:3px solid var(--zn);background:var(--zn-soft);border-radius:0 10px 10px 0;font-size:14.6px;max-width:860px}
+.kwarn b{display:block;font:600 11px/1.3 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--zn);margin-bottom:3px}
+.kwarn p{margin:0;color:var(--ink)}
+.kwarn.ask{border-left-color:var(--gv);background:var(--gv-soft)} .kwarn.ask b{color:var(--gv)}
+.kwarn.new{border-left-color:var(--mb);background:var(--mb-soft)} .kwarn.new b{color:var(--mb)}
+
+.todo{margin:18px 0;padding:12px 15px;border:1px dashed var(--rule);border-radius:10px;background:var(--sheet);font-size:14.2px;color:var(--ink-2);max-width:860px}
+.todo b{display:block;font:600 11px/1.3 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.todo ul{margin:6px 0 0;padding-left:18px;display:grid;gap:3px}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--sheet);border-radius:999px;padding:5px 12px;font-size:13.2px;cursor:pointer;color:var(--ink-2)}
+.chip:hover{border-color:var(--gv);color:var(--ink)}
+.chip.on{background:var(--gv);border-color:var(--gv);color:#fff}
+.chip .c{font:500 11.5px/1 var(--f-mono);opacity:.75}
+.tag{display:inline-block;font:500 11px/1.5 var(--f-mono);padding:2px 7px;border-radius:5px;background:var(--paper);border:1px solid var(--rule-2);color:var(--ink-3)}
+.tag.gp{background:var(--gv-soft);border-color:var(--gv);color:var(--gv)}
+.tag.gn{background:var(--saf-soft);border-color:var(--saf);color:var(--saf)}
+.tag.ku{background:var(--zn-soft);border-color:var(--zn);color:var(--zn)}
+.tag.vi{background:var(--mb-soft);border-color:var(--mb);color:var(--mb)}
+.tag.fu{background:var(--mg-soft);border-color:var(--mg);color:var(--mg)}
+
+/* ---------- главная ---------- */
+.hero h1{font-family:var(--f-display);font-weight:600;font-size:clamp(38px,6vw,66px);line-height:1;letter-spacing:-.02em;margin:.1em 0 .28em;text-wrap:balance}
+.hero h1 em{font-style:italic;font-weight:500;color:var(--gv)}
+.hero p{font-size:17.5px;line-height:1.5;color:var(--ink-2);max-width:66ch;margin:0 0 6px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:12px;margin:24px 0}
+.stat{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:13px 15px}
+.stat b{display:block;font:600 27px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.stat span{font-size:12.6px;color:var(--ink-3)}
+.bar{height:7px;border-radius:999px;background:var(--rule-2);overflow:hidden;margin-top:9px}
+.bar i{display:block;height:100%;background:var(--gv)}
+.cards2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px;margin:20px 0}
+.hcard{display:flex;flex-direction:column;gap:5px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:15px 17px;text-decoration:none;color:var(--ink)}
+.hcard:hover{border-color:var(--gv)}
+.hcard b{font:600 17px/1.25 var(--f-display)}
+.hcard span{font-size:14px;color:var(--ink-2)}
+.hcard small{font-size:12.4px;color:var(--ink-3);margin-top:2px}
+
+/* ---------- каталог возбудителей ---------- */
+.pglist{border:1px solid var(--rule);border-radius:12px;background:var(--sheet);overflow:hidden;margin:16px 0}
+.pgrow{display:grid;grid-template-columns:minmax(170px,1fr) minmax(0,1.5fr) auto;gap:6px 16px;align-items:baseline;width:100%;text-align:left;border:0;border-bottom:1px solid var(--rule-2);background:transparent;padding:11px 16px;cursor:pointer}
+.pgrow:last-child{border-bottom:0}
+.pgrow:hover{background:var(--paper)}
+.pgrow b{font-weight:600;font-size:15px}
+.pgrow b i{font-style:italic}
+.pgrow b em{font-style:normal;font-weight:500;color:var(--ink-3);font-size:13px;display:block}
+.pgrow .d{font-size:13.6px;color:var(--ink-2)}
+.pgrow .m{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.az{margin:26px 0 2px;font:600 20px/1 var(--f-display);color:var(--gv)}
+.cnt{font-size:13px;color:var(--ink-3);margin:10px 0}
+
+/* ---------- досье ---------- */
+.dz{position:fixed;inset:0;z-index:60}
+.dz-scrim{position:absolute;inset:0;background:#0b0e1c73}
+.dz-panel{position:absolute;top:0;right:0;bottom:0;width:min(680px,100%);background:var(--sheet);box-shadow:-28px 0 56px #0b0e1c40;overflow-y:auto;outline:none;padding-bottom:calc(48px + env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
+.dz-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:var(--sheet);border-bottom:1px solid var(--rule-2)}
+.dz-x{width:36px;height:36px;border-radius:50%;border:1px solid var(--rule);background:var(--paper);font-size:20px;line-height:1;cursor:pointer;color:var(--ink)}
+.dz-x:focus-visible{outline:2px solid var(--gv);outline-offset:2px}
+.dz-body{padding:16px 24px 8px}
+.dz-body h2{font-family:var(--f-display);font-weight:600;font-size:30px;line-height:1.08;margin:4px 0 2px;text-wrap:balance;overflow-wrap:break-word}
+.dz-body h2 i{font-style:italic}
+.dz-ru{margin:2px 0 0;color:var(--ink-2);font-size:15px}
+.dz-ru i{font-style:italic}
+.dz-tax{margin:10px 0 0;font:500 12.5px/1.5 var(--f-mono);color:var(--gv);background:var(--gv-soft);display:inline-block;padding:6px 10px;border-radius:7px}
+.dz-sum{margin:14px 0 0;font-size:15.5px;line-height:1.45;color:var(--ink);max-width:62ch}
+
+/* схема расположения клеток в мазке */
+.fvg{margin:16px 0 0;padding:10px 14px 9px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);display:flex;align-items:center;gap:14px;color:var(--gv)}
+.fvg svg{flex:none;width:104px;height:52px;fill:currentColor;stroke:none}
+.fvg svg [stroke]{stroke:currentColor}
+.fvg figcaption{font-size:13.2px;line-height:1.35;color:var(--ink-2)}
+.fvg.gn{color:var(--saf)} .fvg.ku{color:var(--zn)} .fvg.fu,.fvg.pr{color:var(--mg)} .fvg.vi{color:var(--mb)} .fvg.nw,.fvg.gx{color:var(--ink-3)}
+.dz-sec{margin-top:22px}
+.dz-sec > h3{font:600 11px/1.3 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.dz-sec > h3::after{content:"";flex:1;height:1px;background:var(--rule-2)}
+.dz-sec p{margin:0;font-size:14.8px;color:var(--ink-2);max-width:68ch}
+.dz-sec ul{margin:0;padding-left:19px;display:grid;gap:5px;font-size:14.6px;color:var(--ink-2)}
+.dz-sec li b{color:var(--ink)}
+.empty{font-size:13.6px;color:var(--ink-3);font-style:italic;border:1px dashed var(--rule);border-radius:8px;padding:9px 12px}
+
+/* ---------- вопросы экзамена ---------- */
+.qrow{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:baseline;width:100%;text-align:left;border:0;border-bottom:1px solid var(--rule-2);background:transparent;padding:10px 14px;cursor:pointer;color:var(--ink)}
+.qrow:last-child{border-bottom:0}
+.qrow:hover{background:var(--paper)}
+.qrow .n{font:500 12.5px/1.5 var(--f-mono);color:var(--ink-3)}
+.qrow .t{font-size:14.6px;line-height:1.4}
+.qrow .w{font-size:12px;color:var(--ink-3);white-space:nowrap}
+.qrow .t i{font-style:italic}
+.qrow[aria-expanded="true"]{background:var(--gv-soft)}
+.qhead{font:600 11px/1.3 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);padding:13px 14px 9px;border-bottom:1px solid var(--rule);background:var(--paper)}
+.qdet{padding:2px 14px 12px;border-bottom:1px solid var(--rule-2);background:var(--paper)}
+.qdet .chips{margin:6px 0 0}
+.qdet .chip i{font-style:italic}
+
+/* ---------- учить ---------- */
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:30px 24px;min-height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;margin:16px 0}
+.card .q{font:600 26px/1.2 var(--f-display);text-wrap:balance}
+.card .a{font-size:15.5px;color:var(--ink-2);max-width:60ch}
+.card .meta{font:500 11.5px/1 var(--f-mono);color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+
+.pager{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:56px;padding-top:18px;border-top:1px solid var(--rule)}
+.pager a{min-width:0;overflow-wrap:anywhere;display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);padding:12px 14px;border-radius:10px;border:1px solid var(--rule);background:var(--sheet)}
+.pager a:hover{border-color:var(--gv)}
+.pager a.nx{text-align:right;grid-column:2}
+.pager small{font-size:12px;color:var(--ink-3)}
+.pager b{font-weight:600;font-size:15px}
+
+@media print{.rail,.mbar,.acts,.pager{display:none}.app{display:block}}
+
+/* Shared site navigation */
+.site-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}.site-links a{color:var(--ink-2)}.site-links [data-ma-acct]{margin-left:auto}.ma-user{border:1px solid var(--rule);background:var(--paper);border-radius:8px;padding:5px 8px}.ma-menu{position:absolute;background:var(--sheet);border:1px solid var(--rule);padding:12px;z-index:30}.ma-menu a,.ma-menu button{display:block;margin:5px 0}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="mbar">
+    <a href="../">Medical Atlas</a>
+    <button id="burger" aria-label="Открыть указатель тем" aria-controls="railbox" aria-expanded="false">Указатель</button>
+  </header>
+  <aside class="rail" id="railbox"></aside>
+  <main class="main" id="main"><p class="page" role="status">Загружаем атлас…</p></main>
+</div>
+<div class="scrim" id="scrim"></div>
+<div id="dz"></div>
+<noscript>Для просмотра интерактивного атласа включите JavaScript.</noscript>
+<script src="../auth/config.js"></script>
+<script src="../auth/auth.js"></script>
+<script src="../progress/progress.js"></script>
+<script>/* ===== Ядро атласа: модель данных =====
+   Всё содержание атласа лежит в трёх массивах: TH (темы), PG (возбудители), QS (вопросы).
+   Формат описан в README.md. Два пробных конспекта поставляются публично; остальные темы, досье и вопросы — в закрытом пакете. */
+
+const TH = [];   /* темы (листы) */
+const PG = [];   /* карточки возбудителей */
+const QS = [];   /* вопросы экзамена */
+
+/* Тема (лист атласа).
+   T({id, blk:'gen'|'prv', no, title, short, lead, blocks:[...]}) */
+function T(o){ o.blocks = o.blocks || []; TH.push(o); return o; }
+
+/* Возбудитель.
+   P({id, n:'Staphylococcus aureus', ru:'Золотистый стафилококк',
+      sp:'вид по ICTV (для вирусов)', syn:'старые названия', tax:'систематика',
+      grp:'gpc', gr:'+', fv:'clusters', st:'gram', o2:'факультативный анаэроб',
+      tags:['oral'], sum:'одна строка для каталога',
+      morph, phys, cult, eco, epi, vir:[], dis:[], dx:[], rx, oral, nb})
+   Любое поле досье можно не заполнять — атлас покажет его как незаполненное.
+   Поле может быть строкой (абзац) или массивом строк (список). */
+function P(o){ PG.push(o); return o; }
+
+/* Вопрос экзамена. Q(блок, номер, текст, [id тем], {pg:[id возбудителей], empty:1}) */
+function Q(blk, no, text, th, o){ o = o || {}; QS.push({blk, no, text, th: th || [], pg: o.pg || [], empty: !!o.empty}); }
+
+/* ---- поля досье: порядок и подписи ---- */
+const PFIELDS = [
+  ['morph', 'Морфология',             'форма, тонкое строение, окраска по Граму и специальные окраски, капсула, споры, жгутики, расположение в мазке'],
+  ['phys',  'Физиология',             'отношение к кислороду и температуре, тип питания, ключевые биохимические свойства, устойчивость'],
+  ['cult',  'Культивирование',        'питательные среды, характер роста, сроки, гемолиз'],
+  ['eco',   'Экология',               'антропоноз / зооноз / сапроноз, естественная среда обитания'],
+  ['epi',   'Эпидемиология',          'источник, механизм и пути передачи, входные ворота'],
+  ['vir',   'Факторы вирулентности',  'адгезины, токсины, экзоферменты, факторы иммунопротекции'],
+  ['dis',   'Заболевания',            'нозологии и ключевые черты патогенеза'],
+  ['dx',    'Диагностика',            'материал для исследования и методы по срокам болезни'],
+  ['rx',    'Лечение и профилактика', 'препараты выбора, механизмы устойчивости, вакцины и сыворотки'],
+  ['oral',  'Роль в полости рта',     'место в микробиоте рта, участие в кариесе, болезнях эндодонта, пародонта и слизистой'],
+  ['nb',    'На что ловят',           'типичные уточняющие вопросы и частые ошибки']
+];
+/* для вирусов и прионов часть подписей другая */
+const PFIELDS_V = {
+  morph: 'Строение вириона',
+  phys:  'Репродукция и взаимодействие с клеткой',
+  cult:  'Культивирование',
+  eco:   'Экология',
+  vir:   'Патогенез',
+  oral:  'Проявления в полости рта'
+};
+/* поля, которые показываются пустыми как «не заполнено»; остальные — только если заполнены */
+const PCORE = ['morph','phys','cult','eco','epi','vir','dis','dx','rx'];
+
+/* ---- окраска по Граму и тип клеточной стенки: подпись и класс метки ---- */
+const GRAM = {
+  '+':    ['Гр+',       'gp'],
+  '-':    ['Гр−',       'gn'],
+  '±':    ['Гр±',       'gx'],
+  'ку':   ['КУ',        'ku'],
+  'сп':   ['спирохета', 'gn'],
+  'без':  ['без стенки','nw'],
+  'гриб': ['гриб',      'fu'],
+  'прост':['простейшее','pr'],
+  'вирус':['вирус',     'vi'],
+  'прион':['прион',     'vi']
+};
+
+/* ---- группы каталога (порядок показа) ---- */
+const PGROUPS = [
+  ['gpc',  'Грамположительные кокки'],
+  ['gnc',  'Грамотрицательные кокки'],
+  ['gpr',  'Грамположительные палочки'],
+  ['clos', 'Клостридии'],
+  ['ent',  'Энтеробактерии и вибрионы'],
+  ['gnr',  'Другие грамотрицательные палочки'],
+  ['gna',  'Грамотрицательные анаэробы'],
+  ['myc',  'Микобактерии'],
+  ['spir', 'Спирохеты'],
+  ['intra','Хламидии, риккетсии, микоплазмы'],
+  ['fungi','Грибы'],
+  ['proto','Простейшие'],
+  ['dnav', 'ДНК-вирусы'],
+  ['rnav', 'РНК-вирусы'],
+  ['prion','Прионы']
+];
+
+/* ---- метки для фильтра каталога ---- */
+const PTAGS = {
+  oral:  'полость рта',
+  pyo:   'гнойно-раневые',
+  resp:  'респираторные',
+  gut:   'кишечные',
+  uro:   'урогенитальные',
+  zoo:   'зооантропонозы',
+  vect:  'трансмиссивные',
+  myc:   'микозы',
+  vir:   'вирусы',
+  anaer: 'анаэробы',
+  intra: 'внутриклеточные',
+  bppl:  'приоритет ВОЗ 2024'
+};
+
+/* ---- вспомогательное ---- */
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function plural(n, one, few, many){
+  if (n % 10 === 1 && n % 100 !== 11) return one;
+  if (n % 10 >= 2 && n % 10 <= 4 && !(n % 100 >= 12 && n % 100 <= 14)) return few;
+  return many;
+}
+/* латинские названия курсивом: в данных пишем {Staphylococcus aureus} */
+function lat(s){ return String(s == null ? '' : s).replace(/\{([^}]+)\}/g, '<i>$1</i>'); }
+
+/* ===== Общая 1. Морфология микроорганизмов ===== */
+T({id:'g1', blk:'gen', no:1, title:'Морфология микроорганизмов',
+  short:'Систематика, формы, строение клетки, клеточная стенка, поверхностные структуры, споры, особые группы',
+  lead:'Что именно описывают словом «морфология» на экзамене: форма и группировка клеток, тип клеточной стенки, наличие капсулы, спор, жгутиков и ресничек — и то, какой окраской каждый признак выявляют.',
+  blocks:[
+
+  {t:'h', text:'Систематика и номенклатура'},
+  {t:'list', title:'Иерархия таксонов', ord:true, items:[
+    'Домен (доминион) → тип → класс → порядок → семейство → род → вид',
+    'Номенклатура <b>бинарная</b> (род + вид), предложена К. Линнеем; название вида пишут курсивом: {Staphylococcus aureus}, сокращённо {S. aureus}',
+    'Современная систематика филогенетическая — строится на сходстве последовательностей генов (прежде всего 16S рРНК), а не только на фенотипе']},
+  {t:'cols', title:'Вид, штамм, биовар', cmin:230, cols:[
+    {h:'Вид', s:'species', items:['Совокупность особей с общим происхождением и генотипом, сходными морфологическими, физиологическими и экологическими свойствами']},
+    {h:'Штамм', s:'strain', c:'mb', items:['Чистая культура одного вида, выделенная из конкретного источника и отличающаяся от других культур того же вида']},
+    {h:'Биовар', s:'biovar', c:'mg', items:['Внутривидовой вариант, отличающийся признаком: <b>хемовар</b> — биохимическим, <b>серовар</b> — антигенным, <b>фаговар</b> — чувствительностью к бактериофагу']}]},
+  {t:'warn', k:'ask', title:'Спросят', text:'Определения вида, штамма и биовара — дословно, и пример каждого варианта (серовары сальмонелл, фаговары стафилококка).'},
+
+  {t:'h', text:'Формы бактериальных клеток'},
+  {t:'cols', title:'Четыре формы и переходные варианты', cmin:195, cols:[
+    {h:'Кокки', items:['Шаровидные; делятся в одной или нескольких плоскостях, поэтому образуют группировки']},
+    {h:'Палочки', c:'saf', items:['Цилиндрические; группировки — диплобактерии, стрептобациллы','Коккобациллы — переходная форма']},
+    {h:'Извитые', c:'zn', items:['Вибрионы, спириллы, спирохеты — различают по числу и характеру завитков']},
+    {h:'Ветвящиеся', c:'mg', items:['Нитевидные клетки, переплетаясь, образуют псевдомицелий ({Actinomyces})']}],
+   cap:'Форму клетки задаёт пептидогликан: разрушение муреина превращает палочку в сферу.'},
+  {t:'table', title:'Группировки кокков', head:['Группировка','Плоскости деления','Пример'], rows:[
+    ['Микрококки','клетки расходятся поодиночке','{Micrococcus}'],
+    ['Диплококки','одна плоскость, пары','{Streptococcus pneumoniae} — ланцетовидный; {Neisseria gonorrhoeae} — в виде кофейных зёрен'],
+    ['Стрептококки','одна плоскость, цепочки','{Streptococcus pyogenes}'],
+    ['Тетракокки','две взаимно перпендикулярные','{Aerococcus}'],
+    ['Сарцины','три плоскости, пакеты по 8','{Sarcina ventriculi}'],
+    ['Стафилококки','несколько плоскостей, «гроздь»','{Staphylococcus aureus}']]},
+
+  {t:'h', text:'Строение бактериальной клетки'},
+  {t:'cols', title:'Обязательные и необязательные структуры', cmin:250, cols:[
+    {h:'Обязательные', items:['Нуклеоид — кольцевая ДНК без ядерной оболочки','Цитоплазма и цитоскелет','Рибосомы 70S (30S + 50S)','Цитоплазматическая мембрана (ЦПМ)']},
+    {h:'Необязательные', c:'saf', items:['Клеточная стенка (нет у микоплазм и L-форм)','Капсула и капсулоподобная оболочка, S-слой','Жгутики, пили (фимбрии)','Споры','Плазмиды и другие мобильные элементы','Включения — зёрна волютина у {Corynebacterium diphtheriae}']}]},
+
+  {t:'h', text:'Клеточная стенка: три типа'},
+  {t:'table', title:'Сравнение клеточных стенок', head:['Признак','Грамположительные','Грамотрицательные','Кислотоустойчивые'], rows:[
+    ['Слои','Толстый пептидогликан, в его толще тейхоевые и липотейхоевые кислоты, поверхностные белки','Тонкий пептидогликан в периплазме + наружная мембрана с ЛПС (или ЛОС) и поринами','Пептидогликан → арабиногалактан → миколовые кислоты → гликолипиды; сквозь стенку проходит липоарабиноманнан (ЛАМ)'],
+    ['Толщина ПГ','до 20–80 нм, многослойный','2–5 нм, 1–2 слоя','тонкий'],
+    ['Окраска по Граму','сине-фиолетовая','красная (розовая)','плохо окрашиваются'],
+    ['Специальная окраска','—','—','по Цилю—Нильсену: красные палочки на синем фоне'],
+    ['Маркеры (АГ и эндотоксины)','ПГ, тейхоевые и липотейхоевые кислоты','ЛПС (липид А + ядро + О-антиген), белки наружной мембраны','арабиногалактан, миколовые кислоты, гликолипиды'],
+    ['Примеры','{Staphylococcus}, {Streptococcus}, {Bacillus}, {Clostridium}, {Listeria}','{Escherichia coli}, {Salmonella}, {Vibrio cholerae}, {Neisseria}','{Mycobacterium}, {Nocardia}']]},
+  {t:'list', title:'Пептидогликан (муреин)', items:[
+    '<b>Горизонтальные цепи</b> — чередование N-ацетилглюкозамина и N-ацетилмурамовой кислоты, связь гликозидная',
+    '<b>Вертикальные сшивки</b> — короткие пептиды; у грамотрицательных в них входит диаминопимелиновая кислота',
+    'Сшивку катализируют <b>транспептидаза и карбоксипептидаза</b> — это пенициллинсвязывающие белки (ПСБ), мишень β-лактамов',
+    'Функции: форма клетки, механическая прочность, «молекулярное сито» (не пропускает макромолекулы, пропускает низкомолекулярные вещества)',
+    'Периплазматическое пространство между ЦПМ и стенкой содержит ферменты (в т. ч. β-лактамазы) и шапероны']},
+  {t:'warn', title:'Частый вопрос', text:'Чем липотейхоевые кислоты отличаются от тейхоевых: тейхоевые лежат только в толще пептидогликана, липотейхоевые заякорены в липидах ЦПМ.'},
+
+  {t:'h', text:'Поверхностный аппарат'},
+  {t:'list', title:'Послойно снаружи внутрь', items:[
+    '<b>Капсула</b> — 98 % воды, 2 % полисахаридов ({Klebsiella pneumoniae}) или полипептидов ({Bacillus anthracis}); функции: адгезия, защита от фагоцитоза и высыхания, антигенная',
+    '<b>Капсулоподобная оболочка</b> — рыхлая, из полисахаридов и гликолипидов, с неровным краем ({Francisella tularensis}, {Pseudomonas aeruginosa})',
+    '<b>S-слой</b> — кристаллоподобные самособирающиеся белки; хорошо выражен у микоплазм, работает как адгезин',
+    'Окраска капсулы — по <b>Бурри—Гинсу</b>: тушь даёт тёмный фон, клетка красная, капсула бесцветная (краситель она не берёт)']},
+  {t:'table', title:'Расположение жгутиков', head:['Тип','Расположение','Пример'], rows:[
+    ['Монотрих','один жгутик на полюсе','{Vibrio cholerae}'],
+    ['Лофотрих','пучок на одном полюсе','{Pseudomonas aeruginosa}, {Helicobacter pylori}'],
+    ['Амфитрих','жгутики на обоих полюсах','{Campylobacter}'],
+    ['Перитрих','по всей поверхности','{Escherichia coli}, {Salmonella}, {Proteus}']],
+   cap:'Жгутик — белок флагеллин; базальное тельце с дисками: M (в ЦПМ) и P (в пептидогликане) есть у всех, S (периплазма) и L (ЛПС наружной мембраны) — только у грамотрицательных, поэтому у Гр+ 2 диска, у Гр− 4. Шигеллы среди кишечных бактерий неподвижны.'},
+  {t:'list', title:'Пили (фимбрии)', items:[
+    'Тоньше жгутиков, без базального тельца, видны только в электронном микроскопе',
+    '<b>Общие пили</b> — адгезия; типы обозначают римскими цифрами по субстрату прикрепления',
+    '<b>Половые (F-) пили</b> — образуют цитоплазматический мостик при конъюгации',
+    'Пили — индивидуальный антиген и рецептор для адсорбции бактериофагов']},
+
+  {t:'h', text:'Споры'},
+  {t:'flow', title:'Морфогенез споры', rows:[{s:['впячивание ЦПМ','проспора с нуклеоидом и рибосомами','кортекс из особого пептидогликана','оболочки с дипиколинатом кальция','зрелая спора (иногда + экзоспориум)']}],
+   cap:'Спора — форма покоя для переживания неблагоприятных условий. Исключение: у актиномицетов споры служат размножению. Дипиколинат кальция и кератиноподобные оболочки дают термо- и радиоустойчивость, устойчивость к кислотам, щелочам и спиртам.'},
+  {t:'table', title:'Расположение и окраска спор', head:['Признак','Вариант','Пример'], rows:[
+    ['Расположение','терминальное («теннисная ракетка»)','{Clostridium tetani}'],
+    ['','субтерминальное','остальные клостридии'],
+    ['','центральное, без деформации клетки','{Bacillus anthracis}'],
+    ['Окраска по Ожешко','споры красные, вегетативные формы синие','—'],
+    ['Окраска по Цилю—Нильсену','споры красные (кислотоустойчивы), вегетативные формы не окрашиваются','—'],
+    ['Окраска по Шефферу—Фултону','споры зелёные (малахитовый зелёный), клетки красные','—']]},
+
+  {t:'h', text:'Микробные сообщества'},
+  {t:'cols', title:'Биоплёнка', n:'Биоплёнка = бактерии + матрикс + поверхностная оболочка', cmin:215, cols:[
+    {h:'Компоненты', items:['Сами бактерии — одного вида (колониеподобное сообщество) или разных (смешанное)','Межклеточный матрикс: полисахариды, белки, внеклеточная ДНК','Поверхностная мембрана с барьерной функцией']},
+    {h:'Роли клеток', c:'mb', items:['Персистеры — переживают антибиотик','Вегетативные — размножаются','Роящиеся — адгезия','Пловцы — расселение']},
+    {h:'Стадии', c:'mg', items:['Адгезия','Размножение','Созревание (синтез матрикса)','Рост','Расселение']}],
+   cap:'Контакты клеток: цитоплазматические мостики, тесное слипание участками стенок, кооперация через сигнальные молекулы (чувство кворума). Внеклеточная ДНК матрикса — субстрат для трансформации.'},
+
+  {t:'h', text:'Особые морфологические группы'},
+  {t:'table', title:'Чем отличаются и как изучают', head:['Группа','Ключевой морфологический признак','Метод изучения'], rows:[
+    ['Вибрионы','один первичный завиток, монотрих, очень подвижны','тёмнопольная микроскопия'],
+    ['Спириллы','1–3 завитка, амфитрихи','световая микроскопия'],
+    ['Спирохеты','подвижны за счёт фибрилл цитоскелета, а не жгутиков','тёмнопольная микроскопия, окраска по Романовскому—Гимзе'],
+    ['{Borrelia}','3–8 крупных неравномерных завитков; по Романовскому сине-фиолетовые','тёмное поле'],
+    ['{Treponema}','8–12 мелких равномерных завитков; по Романовскому бледно-розовые','тёмное поле'],
+    ['{Leptospira}','20–40 завитков и 2 вторичных изгиба — форма C или S','тёмное поле'],
+    ['{Rickettsia}','полиморфные Гр− палочки, облигатные внутриклеточные','окраска по Здродовскому: красные на синем фоне клетки'],
+    ['{Chlamydia}','двухфазный цикл: элементарные тельца (внеклеточные, инфекционные) ↔ ретикулярные (внутриклеточные, делящиеся)','цитологический метод, культура клеток'],
+    ['{Mycoplasma}','нет клеточной стенки, стеролы в ЦПМ, мельчайшие свободноживущие','электронная микроскопия; по Граму не окрашиваются'],
+    ['{Actinomyces}','Гр+ ветвящиеся, псевдомицелий, споры для размножения','микроскопия, посев на среды для анаэробов'],
+    ['Простейшие','эукариоты: ядро, мембранные органеллы, пелликула, нет клеточной стенки','нативный препарат, окраска по Романовскому—Гимзе']]},
+  {t:'list', title:'Клетки, лишённые стенки', items:[
+    '<b>Микоплазмы</b> — врождённо лишены стенки, отсюда устойчивость ко всем ингибиторам синтеза пептидогликана',
+    '<b>L-формы</b> — утратили стенку в процессе жизнедеятельности; <i>нестабильные</i> способны её восстановить, <i>стабильные</i> — нет',
+    '<b>Протопласт</b> — полностью лишённая стенки бывшая Гр+ клетка; <b>сферопласт</b> — бывшая Гр−, у которой сохранилась наружная мембрана']},
+  {t:'pg', title:'Возбудители, разбираемые по морфологии', ids:['staph-aureus','strep-pneumo','neis-gon','vibrio-cholerae','myco-tb','trepo-pallidum','mycoplasma-pneu','actino-israelii']},
+
+  {t:'todo', title:'Что добавить в тему', items:[
+    'Схемы-рисунки, которые просят рисовать: три типа клеточной стенки, базальное тельце жгутика, строение споры',
+    'Таблицу «окраска → что выявляет → результат» целиком (Грам, Циль—Нильсен, Ожешко, Бурри—Гинс, Романовский—Гимза, Нейссер, Здродовский)',
+    'Исторические этапы микробиологии и вирусологии (вопросы 1–2) — если нужны на экзамене',
+    'Размеры структур в нм и мкм для сравнения с разрешающей способностью светового микроскопа (0,2 мкм)']}
+]});
+
+/* ===== Общая 2. Физиология микроорганизмов ===== */
+T({id:'g2', blk:'gen', no:2, title:'Физиология микроорганизмов',
+  short:'Питание, энергия, кислород, температура, транспорт, адаптация, культивирование, стерилизация',
+  lead:'Отвечая «физиологию» любого возбудителя, называют три вещи подряд: отношение к кислороду, отношение к температуре, требовательность к питательным средам. Остальное — детали механизмов.',
+  blocks:[
+
+  {t:'h', text:'Типы питания и энергетического обмена'},
+  {t:'cols', title:'Две независимые классификации', cmin:235, cols:[
+    {h:'По источнику углерода', items:['<b>Автотрофы</b> — углерод из неорганических соединений (CO₂)','<b>Гетеротрофы</b> — углерод из органических веществ; к ним относится большинство возбудителей']},
+    {h:'По источнику энергии', c:'saf', items:['<b>Фототрофы</b> — энергия света','<b>Хемотрофы</b> — энергия окислительно-восстановительных реакций','из них <b>литотрофы</b> окисляют неорганические вещества, <b>органотрофы</b> — органические']},
+    {h:'По способности к синтезу', c:'mg', items:['<b>Прототрофы</b> — синтезируют все нужные органические вещества сами','<b>Ауксотрофы</b> — утратили синтез жизненно важного метаболита и нуждаются в готовом']}],
+   cap:'Сводный вывод: большинство бактерий — возбудителей болезней человека — хемоорганогетеротрофы. Механизм питания голофитный: всасывание готовых низкомолекулярных веществ, внутриклеточного переваривания нет.'},
+
+  {t:'h', text:'Отношение к кислороду'},
+  {t:'table', title:'Пять групп', head:['Группа','Условия роста','Примеры'], rows:[
+    ['Облигатные (строгие) аэробы','только при концентрации O₂ около атмосферной','{Mycobacterium tuberculosis}, {Bordetella pertussis}'],
+    ['Микроаэрофилы','2–5 % O₂','{Helicobacter pylori}, {Campylobacter jejuni}, {Treponema}'],
+    ['Факультативные анаэробы','растут и с кислородом, и без него','{Staphylococcus}, {Streptococcus}, {Escherichia coli}, {Salmonella}'],
+    ['Аэротолерантные анаэробы','кислород не используют, но переносят','{Clostridium perfringens}, {Lactobacillus}'],
+    ['Облигатные (строгие) анаэробы','только без кислорода','{Clostridium tetani}, {Clostridium botulinum}, {Bacteroides}, {Prevotella}, {Fusobacterium}']],
+   cap:'Причина нетерпимости строгих анаэробов к кислороду — отсутствие ферментов, обезвреживающих его активные формы: каталазы, пероксидазы, супероксиддисмутазы. Капнофилы — отдельная характеристика: нуждаются в повышенном CO₂.'},
+
+  {t:'h', text:'Отношение к температуре'},
+  {t:'cols', title:'Три группы', cmin:200, cols:[
+    {h:'Психрофилы', s:'−10…+20 °C', items:['Облигатные не растут выше 20 °C','Факультативные имеют оптимум 22–30 °C']},
+    {h:'Мезофилы', s:'30–40 °C', c:'saf', items:['Оптимум 37 °C — температура ядра тела','Сюда относится подавляющее большинство возбудителей, поэтому посевы инкубируют при 37 °C']},
+    {h:'Термофилы', s:'выше 40 °C', c:'zn', items:['Термотолерантные: оптимум 37 °C, рост сохраняется до 60 °C','Факультативные: максимум при 50–60 °C','Облигатные: не растут ниже 40 °C','Экстремальные: выше 80 °C']}],
+   cap:'Температура — ещё и регулятор: синтез многих факторов вирулентности включается именно при 37 °C (пример — амплификация tox-генов у холерного вибриона в организме человека).'},
+
+  {t:'h', text:'Транспорт веществ'},
+  {t:'cols', title:'В клетку', cmin:245, cols:[
+    {h:'С затратой энергии', s:'против градиента', items:['<b>Активный транспорт</b> с участием пермеаз — транслоказ, меняющих сродство к субстрату','<b>Фосфотрансферазный</b> — вещество фосфорилируется при переносе и дефосфорилируется внутри']},
+    {h:'Без затрат энергии', s:'по градиенту', c:'mg', items:['<b>Пассивная диффузия</b> — вода, O₂, CO₂','<b>Облегчённая диффузия</b> с участием мембранных транслоказ — например, глицерин']}]},
+  {t:'list', title:'Из клетки', items:[
+    'Общие для Гр+ и Гр− пути: фосфотрансферазный, транспорт в мембранных пузырьках, <b>эффлюкс-системы</b> (насосы, выбрасывающие в том числе антибиотики)',
+    'Системы секреции I–V характерны прежде всего для грамотрицательных: барьеров у них два — ЦПМ и наружная мембрана',
+    '<b>Sec-независимые</b> (I и III): канал не прерывается, секрет не изменяется. I тип — α-гемолизин {E. coli}; III тип — инжектосома-«шприц», доставляющая эффекторы прямо в клетку-мишень',
+    '<b>Sec-зависимые</b> (II, IV, V): транспорт в два этапа с остановкой в периплазме, где шапероны и пептидазы доводят белок до зрелой формы. II тип — экзотоксин A {P. aeruginosa}; IV — цитотоксин {H. pylori} и перенос ДНК при конъюгации; V (аутотранспортёры) — IgA-протеаза {N. gonorrhoeae}']},
+
+  {t:'h', text:'Конститутивные и индуцибельные процессы'},
+  {t:'table', title:'Ответы на стресс', head:['Процесс','Стимул','Что происходит'], rows:[
+    ['Тепловой шок','сублетально высокая температура','усиливается синтез шаперонов — белков теплового шока, поддерживающих конформацию белков'],
+    ['Холодовой шок','сублетально низкая температура','замедляется рост, синхронизируется клеточный цикл, повышается текучесть мембраны'],
+    ['Адаптивный ответ','повторяющееся действие одного мутагена','частота мутаций снижается, клетка «привыкает»'],
+    ['SOS-ответ','множественные повреждения ДНК','репарация идёт с ошибками, нуклеотиды перераспределяются рекомбинацией — геном сохраняется, но меняется']],
+   cap:'Конститутивные процессы идут постоянно (питание, дыхание, синтез структурных белков), индуцибельные — только в ответ на воздействие.'},
+
+  {t:'h', text:'Культивирование и выделение чистой культуры'},
+  {t:'flow', title:'Бактериологический метод — три дня', rows:[
+    {h:'1-е сутки', s:['материал от больного','посев на чашку с питательной средой','термостат 37 °C, 24 ч']},
+    {h:'2-е сутки', s:['изучение колоний','отбор подозрительных','пересев для получения чистой культуры']},
+    {h:'3-и сутки', s:['чистая культура','идентификация','определение чувствительности к антибиотикам']}],
+   cap:'Цель метода — чистая культура, то есть популяция одного вида. Материал выбирают по патогенезу: мокрота при кашле, гной из раны, испражнения при диарее, кровь при бактериемии.'},
+  {t:'cols', title:'Питательные среды', cmin:215, cols:[
+    {h:'Основные', items:['Питательный бульон и агар на основе гидролизатов — для большинства неприхотливых бактерий']},
+    {h:'Дифференциально-диагностические', c:'saf', items:['Основа + индикаторный углевод + цветной индикатор','Среда Эндо: лактозоположительные колонии малиновые, лактозоотрицательные бесцветные']},
+    {h:'Элективные', c:'mg', items:['Подавляют постороннюю флору: желточно-солевой агар для стафилококка (повышенный NaCl), щелочная пептонная вода для холерного вибриона']},
+    {h:'Специальные', c:'zn', items:['Кровяной агар — гемолиз','Среда Китта—Тароцци и анаэростат — для строгих анаэробов','Среда Сабуро — для грибов']}]},
+  {t:'list', title:'Индикация и идентификация', items:[
+    '<b>Индикация</b> — установление самого факта присутствия микроорганизма в материале',
+    '<b>Идентификация</b> — определение рода и вида. Ищут: белки (MALDI-TOF масс-спектрометрия), нуклеиновые кислоты (ПЦР, ДНК-зонды, секвенирование), липиды (ГЖХ), антигены и антитела (иммунологические методы)',
+    'MALDI-TOF сегодня вытеснил «пёстрый ряд» как рутинный метод видовой идентификации в клинической лаборатории']},
+
+  {t:'h', text:'Стерилизация, дезинфекция, асептика'},
+  {t:'cols', title:'Разграничение понятий', cmin:225, cols:[
+    {h:'Асептика', items:['Меры, предупреждающие попадание микроорганизмов в макроорганизм и в рану']},
+    {h:'Антисептика', c:'saf', items:['Меры по уничтожению микроорганизмов, которые уже попали в макроорганизм или на кожу и слизистые']},
+    {h:'Стерилизация', c:'zn', items:['Полное уничтожение всех форм, включая споры','Автоклавирование паром под давлением (132 °C / 2,0 атм; 120 °C / 1,1 атм), сухой жар, химическая и радиационная стерилизация','Контроль: химические индикаторы и биологические тесты со спорами']},
+    {h:'Дезинфекция', c:'mg', items:['Уничтожение вегетативных форм на объектах внешней среды','Кипячение, УФ, химические дезинфектанты; споры сохраняются']}]},
+  {t:'warn', title:'Частая ошибка', text:'«Автоклавирование при 200 °C» — так в конспектах пишут по невнимательности. Паровой стерилизатор работает при 110–135 °C; 160–200 °C — это сухожаровой шкаф.'},
+
+  {t:'todo', title:'Что добавить в тему', items:[
+    'Биохимическая идентификация: «пёстрый ряд», ключевые тесты (каталаза, оксидаза, коагулаза, уреаза) — таблицей',
+    'Фазы роста периодической культуры и практический смысл каждой',
+    'Режимы автоклавирования и сухожарового шкафа по действующему СанПиН',
+    'Физиология микробных сообществ: чувство кворума, конкретные сигнальные молекулы (AHL, AI-2, пептиды у Гр+)']}
+]});
+
+const MICRO_CATALOG = {"demo":["g1","g2"],"topics":[{"id":"g1","blk":"gen","no":1,"title":"Морфология микроорганизмов","short":"Систематика, формы, строение клетки, клеточная стенка, поверхностные структуры, споры, особые группы"},{"id":"g2","blk":"gen","no":2,"title":"Физиология микроорганизмов","short":"Питание, энергия, кислород, температура, транспорт, адаптация, культивирование, стерилизация"},{"id":"g3","blk":"gen","no":3,"title":"Морфология и физиология грибов","short":"Строение клетки гриба, классификация, размножение, культивирование, микозы по глубине поражения"},{"id":"g4","blk":"gen","no":4,"title":"Неживые участники регуляции жизни","short":"Вирусы: строение, типы геномов, типы вирусных инфекций, бактериофаги, дефектные вирусы, прионы"},{"id":"g5","blk":"gen","no":5,"title":"Генетика микроорганизмов","short":"Геном бактерий, мобильные элементы, мутации, репарация, рекомбинация, трансформация, трансдукция, конъюгация"},{"id":"g6","blk":"gen","no":6,"title":"Экология микроорганизмов. Микробиота человека","short":"Почва, вода, воздух и их санитарные показатели; источники и пути передачи; нормальная микробиота и её функции"},{"id":"g7","blk":"gen","no":7,"title":"Микробиота полости рта","short":"Биотопы рта, резиденты и транзиторная флора, факторы регуляции, пелликула и зубная бляшка, бактериемия"},{"id":"g8","blk":"gen","no":8,"title":"Противомикробные препараты","short":"Мишени и эффект антибиотиков, все группы по механизму, устойчивость и её преодоление, методы чувствительности, антимикотики, противовирусные, антисептики"},{"id":"g9","blk":"gen","no":9,"title":"Патогенность и вирулентность","short":"Определения, гены патогенности, этапы взаимодействия паразита и хозяина, адгезины, инвазия, иммунопротекция, токсины, факторы вирулентности вирусов и грибов"},{"id":"g10","blk":"gen","no":10,"title":"Повреждающее действие факторов иммунной системы","short":"Опосредованное повреждение: распознавание PAMP, цитокины, септический и токсический шок, иммунопатология; формы инфекции"},{"id":"p1","blk":"prv","no":1,"title":"Принципы диагностики инфекционных заболеваний","short":"Методы лабораторной диагностики, правила взятия материала, серологические реакции, молекулярные методы; вакцины и пассивная иммунизация"},{"id":"p2","blk":"prv","no":2,"title":"Аэробные возбудители гнойно-воспалительных и раневых инфекций","short":"Стафилококки, стрептококки, энтерококки, аэрококки, коринебактерии, эшерихии, псевдомонады, вибрионы, возбудители инфекций после укусов, агрегатибактер"},{"id":"p3","blk":"prv","no":3,"title":"Анаэробные возбудители гнойно-воспалительных и раневых инфекций","short":"Клостридии газовой гангрены и столбняка; неспорообразующие анаэробы — бактероиды, превотеллы, порфиромонады, фузобактерии, вейлонеллы, пептострептококки, кутибактерии"},{"id":"p4","blk":"prv","no":4,"title":"Возбудители кариеса, заболеваний эндодонта и пародонта","short":"Кариесогенная флора и её свойства, инфекции корневых каналов, комплексы Сокранского, пародонтопатогены, галитоз, болезни слизистой рта, связь с соматическими заболеваниями"},{"id":"p5","blk":"prv","no":5,"title":"Возбудители бактериальных респираторных инфекций","short":"Пневмококк, гемофилы, коринебактерии дифтерии, нейссерии, бордетеллы, микоплазмы, хламидофилы, легионеллы, микобактерии, актиномицеты и нокардии"},{"id":"p6","blk":"prv","no":6,"title":"Возбудители бактериальных кишечных инфекций","short":"Эшерихиозы, сальмонеллёзы, брюшной тиф, шигеллёз, холера, иерсиниозы, кампилобактериоз, хеликобактер, клостридиоз, пищевые токсикоинфекции и интоксикации, ботулизм"},{"id":"p7","blk":"prv","no":7,"title":"Возбудители урогенитальных инфекций","short":"Сифилис, гонорея, хламидиоз, микоплазмы и уреаплазмы, трихомоноз, бактериальный вагиноз, урогенитальный кандидоз, вирусы; инфекции мочевых путей"},{"id":"p8","blk":"prv","no":8,"title":"Возбудители микозов","short":"Дрожжеподобные грибы и кандидоз полости рта, оппортунистические микозы, дерматомикозы, поверхностные, подкожные и глубокие микозы"},{"id":"p9","blk":"prv","no":9,"title":"Возбудители зооантропонозов","short":"Сибирская язва, чума, туляремия, бруцеллёз, лептоспироз, листериоз, Ку-лихорадка, орнитоз, бешенство"},{"id":"p10","blk":"prv","no":10,"title":"Возбудители трансмиссивных инфекций","short":"Риккетсиозы, боррелиозы, анаплазмоз и эрлихиоз, чума; арбовирусы — клещевой энцефалит, лихорадки денге и Западного Нила, Крымская геморрагическая; малярия"},{"id":"p11","blk":"prv","no":11,"title":"Особенности диагностики вирусных инфекций","short":"Вирусологический метод, индикация и идентификация вирусов, экспресс-методы, серодиагностика, молекулярные методы"},{"id":"p12","blk":"prv","no":12,"title":"Вирусы — возбудители заболеваний человека","short":"Респираторные, кишечные, гепатотропные, герпесвирусы, ВИЧ, онковирусы, бешенство, оспа, прионы — по семействам"}],"pathogens":103,"questions":205};
+MICRO_CATALOG.topics.filter(t=>!MICRO_CATALOG.demo.includes(t.id)).forEach(t=>T({...t,locked:true,blocks:[]}));
+</script>
+<script id="micro-app" type="text/plain">/* ===== Атлас: интерфейс =====
+   Один лист на экране. Маршруты: #g1…#g10, #p1…#p12, #pathogens, #questions, #learn.
+   Данные берутся из TH, PG, QS (см. core.js). */
+
+const BLOCKS = [
+  {id:'gen', rom:'I',  title:'Общая микробиология',  short:'Строение, физиология, генетика и экология микроорганизмов; препараты и механизмы повреждения'},
+  {id:'prv', rom:'II', title:'Частная микробиология', short:'Возбудители по группам заболеваний и принципы их лабораторной диагностики'}
+];
+
+const TMAP = {}, PMAP = {};
+TH.forEach(t => TMAP[t.id] = t);
+PG.forEach(p => PMAP[p.id] = p);
+
+const TOPICS   = BLOCKS.map(b => TH.filter(t => t.blk === b.id).sort((a,b2) => a.no - b2.no));
+const TORDER   = TOPICS[0].concat(TOPICS[1]);
+const QBLK     = {gen: QS.filter(q => q.blk === 'gen'), prv: QS.filter(q => q.blk === 'prv')};
+const QBYTOPIC = {};
+QS.forEach(q => q.th.forEach(id => (QBYTOPIC[id] = QBYTOPIC[id] || []).push(q)));
+const QBYPG    = {};
+QS.forEach(q => q.pg.forEach(id => (QBYPG[id] = QBYPG[id] || []).push(q)));
+
+/* ---------- память браузера: только мелкие удобства, всё в try/catch ---------- */
+const LS = {
+  get(k){ try { return localStorage.getItem('micro.' + k); } catch (e) { return null; } },
+  set(k, v){ try { localStorage.setItem('micro.' + k, v); } catch (e) {} },
+  json(k, d){ try { return JSON.parse(localStorage.getItem('micro.' + k)) || d; } catch (e) { return d; } }
+};
+
+/* ---------- расположение клеток в мазке: схема ---------- */
+const FV = {
+  'clusters':    ['гроздья', '<circle cx="12" cy="13" r="4.2"/><circle cx="19.5" cy="7.4" r="4.2"/><circle cx="20" cy="18.6" r="4.2"/><circle cx="27" cy="13" r="4.2"/><circle cx="34.5" cy="7.8" r="4.2"/><circle cx="35" cy="18.4" r="4.2"/><circle cx="41.5" cy="13" r="4.2"/>'],
+  'chains':      ['цепочки', '<circle cx="8" cy="13" r="4.3"/><circle cx="16.5" cy="13" r="4.3"/><circle cx="25" cy="13" r="4.3"/><circle cx="33.5" cy="13" r="4.3"/><circle cx="42" cy="13" r="4.3"/>'],
+  'long-chains': ['длинные извитые цепочки', '<circle cx="6" cy="16" r="3.2"/><circle cx="12.4" cy="13" r="3.2"/><circle cx="18.8" cy="11" r="3.2"/><circle cx="25.2" cy="11.6" r="3.2"/><circle cx="31.6" cy="14" r="3.2"/><circle cx="38" cy="16" r="3.2"/><circle cx="44" cy="15" r="3.2"/>'],
+  'pairs':       ['пары', '<circle cx="14" cy="13" r="4.6"/><circle cx="23.4" cy="13" r="4.6"/><circle cx="32.6" cy="13" r="4.6" opacity=".35"/>'],
+  'lancet':      ['ланцетовидные диплококки в капсуле', '<ellipse cx="19" cy="13" rx="5.6" ry="4.3"/><ellipse cx="29" cy="13" rx="5.6" ry="4.3"/><rect x="11.5" y="5.4" width="25" height="15.2" rx="7.6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2.5 2.5" opacity=".6"/>'],
+  'cocci-small': ['мелкие кокки поодиночке', '<circle cx="11" cy="9" r="2.7"/><circle cx="21" cy="17" r="2.7"/><circle cx="30" cy="8.5" r="2.7"/><circle cx="38" cy="16" r="2.7"/><circle cx="25" cy="7" r="2.7" opacity=".45"/>'],
+  'tetrads':     ['тетрады', '<circle cx="19" cy="8.6" r="4.1"/><circle cx="27.6" cy="8.6" r="4.1"/><circle cx="19" cy="17.4" r="4.1"/><circle cx="27.6" cy="17.4" r="4.1"/>'],
+  'coryne':      ['V- и L-формы, «китайские иероглифы»', '<rect x="8" y="11.4" width="15" height="3.4" rx="1.7" transform="rotate(-34 15.5 13)"/><rect x="14" y="11.4" width="15" height="3.4" rx="1.7" transform="rotate(34 21.5 13)"/><rect x="30" y="11.4" width="14" height="3.4" rx="1.7"/><rect x="30" y="5" width="3.4" height="9" rx="1.7"/>'],
+  'short-rods':  ['короткие палочки', '<rect x="7" y="11" width="11" height="4.4" rx="2.2"/><rect x="21" y="11" width="11" height="4.4" rx="2.2"/><rect x="35" y="11" width="11" height="4.4" rx="2.2"/>'],
+  'thick-rods':  ['крупные палочки с обрубленными концами', '<rect x="6" y="9" width="12.5" height="8" rx="1"/><rect x="20" y="9" width="12.5" height="8" rx="1"/><rect x="34" y="9" width="12.5" height="8" rx="1"/>'],
+  'chain-box':   ['стрептобациллы: цепочка палочек', '<rect x="5" y="10" width="9.5" height="6" rx="1.4"/><rect x="15.5" y="10" width="9.5" height="6" rx="1.4"/><rect x="26" y="10" width="9.5" height="6" rx="1.4"/><rect x="36.5" y="10" width="9.5" height="6" rx="1.4"/>'],
+  'spore-sub':   ['спора субтерминально', '<rect x="9" y="9.6" width="30" height="7" rx="3.5"/><ellipse cx="32" cy="13.1" rx="4.6" ry="3.4" fill="var(--sheet)"/><ellipse cx="32" cy="13.1" rx="4.6" ry="3.4" fill="none" stroke="currentColor" stroke-width="1.1"/>'],
+  'spore-term':  ['спора терминально, «барабанная палочка»', '<rect x="7" y="10.4" width="26" height="5.4" rx="2.7"/><circle cx="37" cy="13" r="6.2" fill="var(--sheet)"/><circle cx="37" cy="13" r="6.2" fill="none" stroke="currentColor" stroke-width="1.3"/>'],
+  'branch':      ['ветвящиеся нити (псевдомицелий)', '<path d="M5 20 C14 20 16 9 25 9 C32 9 36 6 44 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M16 15 C20 15 23 20 30 21" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M28 9 C33 11 36 17 42 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'],
+  'druse':       ['друзы с радиальными «колбами»', '<circle cx="24" cy="13" r="5.4"/><g stroke="currentColor" stroke-width="1.6"><path d="M24 7.6V3"/><path d="M24 18.4V23"/><path d="M18.6 13H14"/><path d="M29.4 13H34"/><path d="M20.2 9.2 17 6"/><path d="M27.8 16.8 31 20"/><path d="M27.8 9.2 31 6"/><path d="M20.2 16.8 17 20"/></g><g><circle cx="24" cy="2.4" r="1.9"/><circle cx="24" cy="23.6" r="1.9"/><circle cx="12.8" cy="13" r="1.9"/><circle cx="35.2" cy="13" r="1.9"/><circle cx="16" cy="5.2" r="1.9"/><circle cx="32" cy="20.8" r="1.9"/><circle cx="32" cy="5.2" r="1.9"/><circle cx="16" cy="20.8" r="1.9"/></g>'],
+  'bifid':       ['раздвоенные концы, Y-формы', '<path d="M8 19 L18 13 M18 13 L26 8 M18 13 L26 17" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M30 20 L38 15 M38 15 L45 11 M38 15 L45 19" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>']
+};
+const ST = {ziehl:'по Цилю—Нильсену', neisser:'по Нейссеру', romanowsky:'по Романовскому—Гимзе', silver:'импрегнация серебром'};
+
+/* ---------- мелкие помощники разметки ---------- */
+function isLat(s){ return /^[A-Za-z]/.test(String(s || '')); }
+function pname(p){ return isLat(p.n) ? '<i>' + esc(p.n) + '</i>' : esc(p.n); }
+function gtag(p){
+  const g = GRAM[p.gr];
+  return g ? '<span class="tag ' + g[1] + '">' + g[0] + '</span>' : '';
+}
+function tagRow(p){
+  let h = gtag(p);
+  (p.tags || []).forEach(t => { if (PTAGS[t]) h += '<span class="tag">' + PTAGS[t] + '</span>'; });
+  return h;
+}
+function fieldHtml(v){
+  if (Array.isArray(v)) return '<ul>' + v.map(x => '<li>' + lat(x) + '</li>').join('') + '</ul>';
+  return '<p>' + lat(v) + '</p>';
+}
+
+/* ---------- содержимое листа темы ---------- */
+function figHead(title, no){
+  return '<div class="fig-head"><h4>' + lat(title) + '</h4>' + (no ? '<span class="blk-no">' + no + '</span>' : '') + '</div>';
+}
+function blocksHtml(t){
+  let fig = 0;
+  return t.blocks.map(b => {
+    switch (b.t){
+
+      case 'h':
+        return '<h2 class="sec">' + lat(b.text) + '</h2>';
+
+      case 'list':
+        return '<div class="klist">' + (b.title ? '<h3>' + lat(b.title) + '</h3>' : '') +
+          '<' + (b.ord ? 'ol' : 'ul') + '>' + b.items.map(x => '<li>' + lat(x) + '</li>').join('') +
+          '</' + (b.ord ? 'ol' : 'ul') + '></div>';
+
+      case 'table':
+        fig++;
+        return '<div class="fig">' + figHead(b.title, t.no + '.' + fig) +
+          '<div class="tbl"><table><thead><tr>' + b.head.map(h => '<th>' + lat(h) + '</th>').join('') +
+          '</tr></thead><tbody>' + b.rows.map(r => '<tr>' + r.map(c => '<td>' + lat(c) + '</td>').join('') + '</tr>').join('') +
+          '</tbody></table></div>' + (b.cap ? '<p class="fig-cap">' + lat(b.cap) + '</p>' : '') + '</div>';
+
+      case 'cols':
+        fig++;
+        return '<div class="fig">' + figHead(b.title, t.no + '.' + fig) +
+          '<div class="kcols"' + (b.cmin ? ' style="--cmin:' + b.cmin + 'px"' : '') + '>' +
+          b.cols.map(c => '<div class="kcol' + (c.c ? ' c-' + c.c : '') + '"><h5>' + lat(c.h) + '</h5>' +
+            (c.s ? '<small>' + lat(c.s) + '</small>' : '') +
+            '<ul>' + (c.items || []).map(x => '<li>' + lat(x) + '</li>').join('') + '</ul></div>').join('') +
+          '</div>' + (b.cap ? '<p class="fig-cap">' + lat(b.cap) + '</p>' : '') + '</div>';
+
+      case 'flow':
+        fig++;
+        return '<div class="fig">' + figHead(b.title, t.no + '.' + fig) +
+          '<div class="kfl">' + b.rows.map(r => {
+            const st = r.s.map((x, i) => (i === r.s.length - 1 ? '<b>' + lat(x) + '</b>' : '<span>' + lat(x) + '</span>'));
+            return '<div class="kfr">' + (r.h ? '<h5>' + lat(r.h) + '</h5>' : '') +
+              '<div class="cf">' + st.join('<i>→</i>') + '</div></div>';
+          }).join('') + '</div>' +
+          (b.cap ? '<p class="fig-cap">' + lat(b.cap) + '</p>' : '') + '</div>';
+
+      case 'warn':
+        return '<div class="kwarn' + (b.k ? ' ' + b.k : '') + '"><b>' + esc(b.title || 'Важно') + '</b><p>' + lat(b.text) + '</p></div>';
+
+      case 'todo':
+        return '<div class="todo"><b>' + esc(b.title || 'Что добавить') + '</b><ul>' +
+          b.items.map(x => '<li>' + lat(x) + '</li>').join('') + '</ul></div>';
+
+      case 'pg': {
+        const rows = (b.ids || []).filter(id => PMAP[id]);
+        if (!rows.length) return '<div class="kwarn"><b>' + esc(b.title || 'Досье возбудителей') + '</b><p>Подробные досье относятся к полной версии микробиологии.</p></div>';
+        return '<h2 class="sec">' + esc(b.title || 'Возбудители темы') + '</h2>' +
+          '<p class="cnt">' + rows.length + ' ' + plural(rows.length, 'карточка', 'карточки', 'карточек') + ' — нажмите, чтобы открыть досье</p>' +
+          '<div class="pglist">' + rows.map(id => pgRow(PMAP[id])).join('') + '</div>';
+      }
+
+      default: return '';
+    }
+  }).join('');
+}
+
+function pgRow(p){
+  return '<button class="pgrow" data-pg="' + p.id + '">' +
+    '<b>' + pname(p) + (p.ru && p.ru !== p.n ? '<em>' + esc(p.ru) + '</em>' : '') + '</b>' +
+    '<span class="d">' + lat(p.sum || '') + '</span>' +
+    '<span class="m">' + gtag(p) + '</span></button>';
+}
+
+function lockedPage(title){
+  return '<p class="eyebrow">Полная микробиология</p><h1 class="title">' + esc(title) + '</h1>' +
+    '<div class="kwarn"><b>Этот материал входит в подписку «Микробиология»</b><p>Продажи подписок ещё не открыты. Пока доступны два базовых конспекта; регистрация не открывает остальные материалы.</p></div>' +
+    '<div class="acts"><a class="btn pri" href="#g1">Морфология микроорганизмов</a><a class="btn" href="#g2">Физиология микроорганизмов</a><a class="btn" href="../#atlases">Все предметы</a></div>';
+}
+function syncProgress(r){
+  if (!window.MAP) return;
+  const done = LS.json('read', {});
+  MAP.sections('micro', TH.map(t=>({id:t.id,n:t.title,sub:'Микробиология',total:1,learned:!t.locked&&done[t.id]?1:0,seen:!t.locked&&done[t.id]?1:0,locked:!!t.locked})));
+  if (r.v === 'topic' && !r.t.locked) MAP.last({atlas:'micro',title:r.t.title,sub:'Микробиология',url:new URL('#'+r.t.id, location.href).href});
+}
+
+/* ---------- лист темы ---------- */
+function topicPage(t){
+  if (t.locked) return lockedPage(t.title);
+  const blk = BLOCKS.find(b => b.id === t.blk);
+  const i = TORDER.indexOf(t);
+  const prev = TORDER[i - 1], next = TORDER[i + 1];
+  const qs = QBYTOPIC[t.id] || [];
+
+  let h = '<p class="eyebrow">Блок <span class="roman">' + blk.rom + '</span> · ' + esc(blk.title) + ' · лист ' + t.no + '</p>' +
+    '<h1 class="title">' + lat(t.title) + '</h1>' +
+    (t.lead ? '<p class="lede">' + lat(t.lead) + '</p>' : '') +
+    (t.short ? '<p class="ksrc">' + lat(t.short) + '</p>' : '');
+
+  if (qs.length) h += '<div class="acts"><a class="btn" href="#questions/' + t.id + '">' +
+    qs.length + ' ' + plural(qs.length, 'вопрос', 'вопроса', 'вопросов') + ' экзамена по листу</a></div>';
+
+  h += blocksHtml(t);
+  h += '<div class="acts"><button class="btn pri" data-read="' + t.id + '">' + (LS.json('read', {})[t.id] ? 'Изучено · снять отметку' : 'Отметить конспект изученным') + '</button></div>';
+
+  h += '<nav class="pager">' +
+    (prev ? '<a href="#' + prev.id + '"><small>Предыдущий лист</small><b>' + lat(prev.title) + '</b></a>' : '<span></span>') +
+    (next ? '<a class="nx" href="#' + next.id + '"><small>Следующий лист</small><b>' + lat(next.title) + '</b></a>' : '') +
+    '</nav>';
+  return h;
+}
+
+/* ---------- главная ---------- */
+function homePage(){
+  const filled = PG.filter(p => PCORE.every(k => p[k] && p[k].length)).length;
+  const learned = (() => {
+    const st = LS.json('srs', {});
+    return Object.keys(st).filter(id => (st[id].b || 0) >= 3).length;
+  })();
+
+  let h = '<section class="hero"><h1>Атлас <em>микробиологии</em></h1>' +
+    '<p>Конспекты по общей и частной микробиологии, досье возбудителей и вопросы для подготовки к экзамену.</p></section>';
+
+  if (!window.MICRO_FULL) h += '<div class="kwarn"><b>Пробная версия · два базовых конспекта</b><p>Морфология и физиология микроорганизмов доступны без подписки. Остальные темы, досье и тренажёр входят в полную версию; продажи подписок ещё не открыты.</p></div>';
+  if (window.MICRO_LOAD_ERROR) h += '<p class="kwarn" role="status">Не удалось проверить полный доступ. Пробные конспекты доступны. <button class="btn" data-reload>Повторить</button></p>';
+  h += '<div class="stats">' +
+    stat(TH.length, 'листа атласа') +
+    stat(MICRO_CATALOG.pathogens, 'досье в полной версии', PG.length ? filled / PG.length : null, window.MICRO_FULL ? filled + ' заполнено по всем основным полям' : 'Доступ по подписке') +
+    stat(MICRO_CATALOG.questions, 'вопросов в полной версии', null, window.MICRO_FULL ? QBLK.gen.length + ' общая · ' + QBLK.prv.length + ' частная' : 'Доступ по подписке') +
+    stat(learned, 'выучено в тренажёре', PG.length ? learned / PG.length : null) +
+    '</div>';
+
+  BLOCKS.forEach((b, bi) => {
+    h += '<h2 class="sec">Блок ' + b.rom + ' · ' + esc(b.title) + '</h2>' +
+      '<p class="par">' + esc(b.short) + '</p><div class="cards2">' +
+      TOPICS[bi].map(t => {
+        const q = (QBYTOPIC[t.id] || []).length;
+        return '<a class="hcard" href="#' + t.id + '"><b>' + t.no + '. ' + lat(t.title) + '</b>' +
+          '<span>' + lat(t.short || '') + '</span>' +
+          '<small>' + (t.locked ? 'По подписке' : window.MICRO_FULL ? q + ' ' + plural(q, 'вопрос', 'вопроса', 'вопросов') : 'Бесплатный конспект') + '</small></a>';
+      }).join('') + '</div>';
+  });
+
+  h += '<h2 class="sec">Как устроен атлас</h2>' +
+    '<div class="klist"><h3>Четыре входа в содержание</h3><ul>' +
+    '<li><b>Листы</b> — теория по темам программы. Таблицы и схемы пронумерованы (например, <span class="blk-no">8.3</span>), поэтому на них удобно ссылаться, когда просите что-то дополнить или исправить.</li>' +
+    '<li><b>Возбудители</b> — 103 досье по одной схеме: морфология, физиология, культивирование, экология, эпидемиология, факторы вирулентности, заболевания, диагностика, лечение, роль в полости рта, на что ловят.</li>' +
+    '<li><b>Вопросы</b> — все билеты с привязкой к листам и возбудителям: видно, что именно читать под конкретный вопрос.</li>' +
+    '<li><b>Учить</b> — карточки по возбудителям с интервальным повторением; прогресс хранится в этом браузере.</li></ul></div>' +
+    '<div class="kwarn"><b>Чего в атласе пока нет</b><p>Это костяк. Рисунки из методичек не воспроизведены, часть полей досье пуста, в конце каждого листа перечислено, что стоит добавить. Места, где в конспекте-источнике есть ошибки, помечены как «Неточность в конспекте» — их стоит перепроверить перед экзаменом.</p></div>';
+  return h;
+}
+function stat(n, label, frac, note){
+  return '<div class="stat"><b>' + n + '</b><span>' + esc(label) + '</span>' +
+    (frac != null ? '<div class="bar"><i style="width:' + Math.round(frac * 100) + '%"></i></div>' : '') +
+    (note ? '<span style="margin-top:6px;display:block">' + esc(note) + '</span>' : '') + '</div>';
+}
+
+/* ---------- каталог возбудителей ---------- */
+const CAT = {q:'', grp:'', tag:''};
+function catalogPage(){
+  if (!window.MICRO_FULL) return lockedPage('Досье возбудителей');
+  const q = CAT.q.trim().toLowerCase();
+  const list = PG.filter(p => {
+    if (CAT.grp && p.grp !== CAT.grp) return false;
+    if (CAT.tag && !(p.tags || []).includes(CAT.tag)) return false;
+    if (!q) return true;
+    return [p.n, p.ru, p.syn, p.sum, p.sp, p.tax].some(v => v && String(v).toLowerCase().includes(q));
+  });
+
+  let h = '<p class="eyebrow">Справочник</p><h1 class="title">Возбудители</h1>' +
+    '<p class="lede">Досье построены по схеме экзаменационного ответа. Пустые поля помечены — их можно заполнить позже.</p>' +
+    '<div class="search" style="max-width:420px;margin:16px 0 4px">' + searchSvg() +
+    '<input id="catq" type="search" placeholder="Название, синоним, болезнь" value="' + esc(CAT.q) + '"></div>';
+
+  h += '<div class="chips">' + chip('Все группы', !CAT.grp, 'grp', '', PG.length) +
+    PGROUPS.map(g => {
+      const n = PG.filter(p => p.grp === g[0]).length;
+      return n ? chip(g[1], CAT.grp === g[0], 'grp', g[0], n) : '';
+    }).join('') + '</div>';
+
+  h += '<div class="chips">' + chip('Без фильтра', !CAT.tag, 'tag', '', null) +
+    Object.keys(PTAGS).map(k => {
+      const n = PG.filter(p => (p.tags || []).includes(k)).length;
+      return n ? chip(PTAGS[k], CAT.tag === k, 'tag', k, n) : '';
+    }).join('') + '</div>';
+
+  h += '<p class="cnt">' + (list.length ? list.length + ' ' + plural(list.length, 'досье', 'досье', 'досье') : 'Ничего не найдено — измените фильтр') + '</p>';
+
+  PGROUPS.forEach(g => {
+    const part = list.filter(p => p.grp === g[0]);
+    if (!part.length) return;
+    h += '<h3 class="az">' + esc(g[1]) + '</h3><div class="pglist">' + part.map(pgRow).join('') + '</div>';
+  });
+  return h;
+}
+function chip(label, on, kind, val, n){
+  return '<button class="chip' + (on ? ' on' : '') + '" data-f="' + kind + '" data-v="' + val + '">' + esc(label) +
+    (n != null ? '<span class="c">' + n + '</span>' : '') + '</button>';
+}
+function searchSvg(){
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+}
+
+/* ---------- досье ---------- */
+let dzOpen = null, dzReturn = null;
+function dossierHtml(p){
+  const isV = p.gr === 'вирус' || p.gr === 'прион';
+  let h = '<div class="dz-body"><h2>' + pname(p) + '</h2>';
+  if (p.ru && p.ru !== p.n) h += '<p class="dz-ru">' + esc(p.ru) + '</p>';
+  if (p.sp) h += '<p class="dz-ru">Вид по ICTV: ' + lat(p.sp) + '</p>';
+  if (p.syn) h += '<p class="dz-ru">Прежние и синонимичные названия: ' + lat(p.syn) + '</p>';
+  if (p.tax) h += '<p class="dz-tax">' + lat(p.tax) + '</p>';
+
+  h += '<div class="chips" style="margin:14px 0 0">' + tagRow(p) +
+    (p.o2 && p.o2 !== '—' ? '<span class="tag">' + esc(p.o2) + '</span>' : '') +
+    (p.st && ST[p.st] ? '<span class="tag">окраска ' + esc(ST[p.st]) + '</span>' : '') + '</div>';
+
+  if (p.sum) h += '<p class="dz-sum">' + lat(p.sum) + '</p>';
+
+  if (p.fv && FV[p.fv]){
+    const g = GRAM[p.gr];
+    h += '<figure class="fvg' + (g ? ' ' + g[1] : '') + '"><svg viewBox="0 0 52 26" aria-hidden="true">' + FV[p.fv][1] + '</svg>' +
+      '<figcaption>В мазке: ' + esc(FV[p.fv][0]) + '</figcaption></figure>';
+  }
+
+  PFIELDS.forEach(f => {
+    const key = f[0], v = p[key];
+    const has = v && v.length;
+    if (!has && PCORE.indexOf(key) < 0) return;
+    const label = (isV && PFIELDS_V[key]) ? PFIELDS_V[key] : f[1];
+    h += '<section class="dz-sec"><h3>' + esc(label) + '</h3>' +
+      (has ? fieldHtml(v) : '<p class="empty">Поле не заполнено. Подсказка: ' + esc(f[2]) + '</p>') + '</section>';
+  });
+
+  const qs = QBYPG[p.id] || [];
+  if (qs.length){
+    h += '<section class="dz-sec"><h3>Вопросы экзамена</h3><ul>' +
+      qs.map(q => '<li><b>' + (q.blk === 'gen' ? 'Общая' : 'Частная') + ' ' + q.no + '.</b> ' + lat(q.text) + '</li>').join('') +
+      '</ul></section>';
+  }
+  const ts = TH.filter(t => (t.blocks || []).some(b => b.t === 'pg' && (b.ids || []).includes(p.id)));
+  if (ts.length){
+    h += '<section class="dz-sec"><h3>Листы атласа</h3><div class="chips">' +
+      ts.map(t => '<a class="chip" href="#' + t.id + '" data-close="1">' + lat(t.title) + '</a>').join('') + '</div></section>';
+  }
+  return h + '</div>';
+}
+function openDossier(id, keepReturn){
+  const p = PMAP[id];
+  if (!p) return;
+  const host = document.getElementById('dz');
+  host.innerHTML = '<div class="dz"><div class="dz-scrim" data-x="1"></div>' +
+    '<div class="dz-panel" role="dialog" aria-modal="true" aria-label="Досье: ' + esc(p.n) + '" tabindex="-1">' +
+    '<div class="dz-top"><button class="dz-x" data-x="1" aria-label="Закрыть досье">&times;</button></div>' +
+    dossierHtml(p) + '</div></div>';
+  dzOpen = id;
+  document.documentElement.style.overflow = 'hidden';
+  const panel = host.querySelector('.dz-panel');
+  if (panel) panel.focus();
+  if (!keepReturn) dzReturn = location.hash || '#';
+  try { history.replaceState(null, '', '#pathogens/' + id); } catch (e) {}
+}
+function closeDossier(){
+  document.getElementById('dz').innerHTML = '';
+  document.documentElement.style.overflow = '';
+  dzOpen = null;
+  const back = dzReturn; dzReturn = null;
+  if (back && back !== location.hash) location.hash = back;
+  else try { history.replaceState(null, '', '#pathogens'); } catch (e) {}
+}
+
+/* ---------- вопросы ---------- */
+const QF = {q:'', blk:'', topic:''};
+function questionsPage(){
+  if (!window.MICRO_FULL) return lockedPage('Вопросы экзамена');
+  const q = QF.q.trim().toLowerCase();
+  const list = QS.filter(x => {
+    if (QF.blk && x.blk !== QF.blk) return false;
+    if (QF.topic && !x.th.includes(QF.topic)) return false;
+    return !q || x.text.toLowerCase().includes(q);
+  });
+  const t = QF.topic ? TMAP[QF.topic] : null;
+
+  let h = '<p class="eyebrow">Справочник</p><h1 class="title">Вопросы экзамена</h1>' +
+    '<p class="lede">205 вопросов из файла с ответами. У каждого — лист атласа, с которого стоит начать, и возбудители, которых обычно просят разобрать в ответе.</p>' +
+    '<div class="search" style="max-width:420px;margin:16px 0 4px">' + searchSvg() +
+    '<input id="qq" type="search" placeholder="Поиск по формулировке" value="' + esc(QF.q) + '"></div>' +
+    '<div class="chips">' + chip('Все', !QF.blk, 'qblk', '', QS.length) +
+    chip('Общая', QF.blk === 'gen', 'qblk', 'gen', QBLK.gen.length) +
+    chip('Частная', QF.blk === 'prv', 'qblk', 'prv', QBLK.prv.length) +
+    (t ? '<button class="chip on" data-f="qtopic" data-v="">Лист: ' + lat(t.title) + ' ×</button>' : '') +
+    '</div><p class="cnt">' + list.length + ' ' + plural(list.length, 'вопрос', 'вопроса', 'вопросов') + '</p>';
+
+  let cur = '';
+  h += '<div class="pglist">';
+  list.forEach(x => {
+    if (x.blk !== cur){
+      cur = x.blk;
+      h += '<div class="qhead">' + (cur === 'gen' ? 'Общая микробиология' : 'Частная микробиология') + '</div>';
+    }
+    const ths = x.th.map(id => TMAP[id]).filter(Boolean);
+    h += '<button class="qrow" data-q="' + x.blk + x.no + '" aria-expanded="false">' +
+      '<span class="n">' + x.no + '</span><span class="t">' + lat(x.text) + '</span>' +
+      '<span class="w">' + (ths.length ? 'лист ' + ths.map(o => o.no).join(', ') : '—') + '</span></button>' +
+      '<div class="qdet" id="d' + x.blk + x.no + '" hidden><div class="chips">' +
+      ths.map(o => '<a class="chip" href="#' + o.id + '">' + o.no + '. ' + lat(o.title) + '</a>').join('') +
+      x.pg.filter(id => PMAP[id]).map(id => '<button class="chip" data-pg="' + id + '">' + pname(PMAP[id]) + '</button>').join('') +
+      '</div></div>';
+  });
+  return h + '</div>';
+}
+
+/* ---------- учить ---------- */
+const BOX = [0, 1, 3, 7, 21, 60];
+const today = () => Math.floor(Date.now() / 86400000);
+let learnCard = null, learnShown = false;
+function srs(){ return LS.json('srs', {}); }
+function dueList(){
+  const st = srs(), d = today();
+  return PG.filter(p => { const s = st[p.id]; return !s || (s.d || 0) <= d; });
+}
+function learnPage(){
+  if (!window.MICRO_FULL) return lockedPage('Учить возбудителей');
+  const st = srs(), due = dueList();
+  const known = PG.filter(p => (st[p.id] || {}).b >= 3).length;
+
+  let h = '<p class="eyebrow">Тренажёр</p><h1 class="title">Учить возбудителей</h1>' +
+    '<p class="lede">Название на карточке — что должно всплывать в памяти. Ответ: ключевая роль, заболевания и факторы вирулентности. Интервалы повторения растут: 1 → 3 → 7 → 21 → 60 дней.</p>' +
+    '<div class="stats"><div class="stat"><b>' + due.length + '</b><span>к повторению сегодня</span></div>' +
+    '<div class="stat"><b>' + known + '</b><span>в долгих интервалах</span><div class="bar"><i style="width:' +
+    Math.round(known / PG.length * 100) + '%"></i></div></div></div>';
+
+  if (!due.length){
+    h += '<div class="card"><div class="q">На сегодня всё</div><div class="a">Карточки вернутся по расписанию. Можно пройти колоду ещё раз, не меняя интервалы.</div></div>' +
+      '<div class="acts"><button class="btn" data-l="again">Пройти заново</button><button class="btn" data-l="reset">Сбросить прогресс</button></div>';
+    return h;
+  }
+  if (!learnCard || !due.some(p => p.id === learnCard)) learnCard = due[Math.floor(Math.random() * due.length)].id;
+  const p = PMAP[learnCard];
+  const box = (st[p.id] || {}).b || 0;
+
+  h += '<div class="card"><div class="meta">' + (GRAM[p.gr] ? GRAM[p.gr][0] : '') + ' · ' +
+    (box ? 'интервал ' + BOX[Math.min(box, 5)] + ' дн.' : 'новая карточка') + '</div>' +
+    '<div class="q">' + pname(p) + '</div>';
+  if (learnShown){
+    const extra = p.nb ? '<br><br>На чём ловят: ' + lat(p.nb)
+      : (p.dis && p.dis.length ? '<br><br>' + lat(Array.isArray(p.dis) ? p.dis[0] : p.dis) : '');
+    h += '<div class="a">' + (p.ru && p.ru !== p.n ? '<b>' + esc(p.ru) + '</b><br>' : '') +
+      lat(p.sum || '') + extra + '</div>' +
+      '<div class="acts"><button class="btn" data-l="0">Не помню</button><button class="btn" data-l="1">Почти</button>' +
+      '<button class="btn pri" data-l="2">Знаю</button></div>' +
+      '<button class="btn" data-pg="' + p.id + '" style="margin-top:4px">Открыть досье</button>';
+  } else {
+    h += '<div class="acts"><button class="btn pri" data-l="show">Показать ответ</button>' +
+      '<button class="btn" data-l="skip">Другая карточка</button></div>';
+  }
+  return h + '</div>';
+}
+function grade(g){
+  if (!window.MICRO_FULL || !PMAP[learnCard]) return;
+  const st = srs(), cur = st[learnCard] || {b:0};
+  if (window.MAP) MAP.card({atlas:'micro', ok:g === 2});
+  let b = cur.b || 0, d = today();
+  if (g === 0) b = 0;                                 /* не помню — вернётся сегодня же */
+  else if (g === 1) d += Math.max(1, BOX[b]);         /* почти — тот же интервал */
+  else { b = Math.min(5, b + 1); d += BOX[b]; }       /* знаю — интервал растёт */
+  st[learnCard] = {b, d};
+  LS.set('srs', JSON.stringify(st));
+  learnCard = null; learnShown = false;
+  render();
+}
+
+/* ---------- поиск по всему атласу ---------- */
+function searchAll(raw){
+  const q = raw.trim().toLowerCase();
+  if (q.length < 2) return [];
+  const out = [];
+  TH.forEach(t => {
+    if ((t.title + ' ' + (t.short || '')).toLowerCase().includes(q))
+      out.push({h:'#' + t.id, t:t.title, s:'Лист ' + t.no + ' · ' + (t.blk === 'gen' ? 'общая' : 'частная')});
+  });
+  PG.forEach(p => {
+    if ([p.n, p.ru, p.syn, p.sum].some(v => v && String(v).toLowerCase().includes(q)))
+      out.push({pg:p.id, t:p.n, s:'Возбудитель' + (p.ru ? ' · ' + p.ru : '')});
+  });
+  QS.forEach(x => {
+    if (x.text.toLowerCase().includes(q))
+      out.push({h:'#' + (x.th[0] || 'questions'), t:x.text, s:(x.blk === 'gen' ? 'Общая' : 'Частная') + ', вопрос ' + x.no});
+  });
+  return out.slice(0, 30);
+}
+function renderResults(raw){
+  const box = document.getElementById('results');
+  const r = searchAll(raw);
+  if (!raw.trim()){ box.innerHTML = ''; return; }
+  if (!r.length){ box.innerHTML = '<p class="none">Ничего не найдено</p>'; return; }
+  box.innerHTML = r.map(x =>
+    '<button ' + (x.pg ? 'data-pg="' + x.pg + '"' : 'data-go="' + x.h + '"') + '><b>' + lat(x.t) + '</b><small>' + esc(x.s) + '</small></button>'
+  ).join('');
+}
+
+/* ---------- навигация ---------- */
+function rail(){
+  let h = '<div class="site-links"><a href="../">← Все предметы</a><a href="../cabinet/">Личный кабинет</a><span data-ma-acct></span></div>' +
+    '<a class="brand" href="#"><b>Атлас микробиологии</b><span>' + (window.MICRO_FULL ? 'Полный доступ' : 'Два базовых конспекта бесплатно') + '</span></a>' +
+    '<div class="search">' + searchSvg() + '<input id="sq" type="search" placeholder="Поиск по атласу" autocomplete="off"></div>' +
+    '<div class="results" id="results"></div><nav class="nav">';
+  BLOCKS.forEach((b, i) => {
+    h += '<section><h6>' + esc(b.title) + '</h6>' + TOPICS[i].map(t => {
+      const q = (QBYTOPIC[t.id] || []).length;
+      return '<a href="#' + t.id + '" data-id="' + t.id + '"><span class="n">' + t.no + '</span><span>' + lat(t.title) + '</span>' +
+        (t.locked ? '<span class="fill" aria-label="По подписке">🔒</span>' : q ? '<span class="fill">' + q + '</span>' : '') + '</a>';
+    }).join('') + '</section>';
+  });
+  h += '<section><h6>Справочники</h6>' +
+    '<a href="#pathogens" data-id="pathogens"><span class="n">А—Я</span><span>Возбудители</span><span class="fill">' + (window.MICRO_FULL ? PG.length : '🔒') + '</span></a>' +
+    '<a href="#questions" data-id="questions"><span class="n">№</span><span>Вопросы экзамена</span><span class="fill">' + (window.MICRO_FULL ? QS.length : '🔒') + '</span></a>' +
+    '<a href="#learn" data-id="learn"><span class="n">↻</span><span>Учить</span></a>' +
+    '</section></nav>' +
+    '<div class="acts" style="margin-top:auto"><button class="btn" id="theme">Сменить тему</button></div>';
+  return h;
+}
+
+function route(){
+  const raw = (location.hash || '').replace(/^#/, '');
+  const [head, arg] = raw.split('/');
+  if (TMAP[head]) return {v:'topic', t:TMAP[head]};
+  if (head === 'pathogens') return {v:'cat', arg};
+  if (head === 'questions') return {v:'q', arg};
+  if (head === 'learn') return {v:'learn'};
+  return {v:'home'};
+}
+
+function render(){
+  const r = route();
+  const main = document.getElementById('main');
+  let h = '';
+  if (r.v === 'topic') h = topicPage(r.t);
+  else if (r.v === 'cat') h = catalogPage();
+  else if (r.v === 'q'){ if (r.arg && TMAP[r.arg]) QF.topic = r.arg; h = questionsPage(); }
+  else if (r.v === 'learn') h = learnPage();
+  else h = homePage();
+  main.innerHTML = '<article class="page">' + h + '</article>';
+  syncProgress(r);
+
+  const id = r.v === 'topic' ? r.t.id : (r.v === 'cat' ? 'pathogens' : r.v === 'q' ? 'questions' : r.v === 'learn' ? 'learn' : '');
+  document.querySelectorAll('.nav a').forEach(a => {
+    if (a.dataset.id === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  document.title = (r.v === 'topic' ? r.t.title + ' — ' : '') + 'Атлас микробиологии';
+  if (r.v === 'cat' && r.arg && PMAP[r.arg] && dzOpen !== r.arg) openDossier(r.arg, true);
+}
+
+/* ---------- старт ---------- */
+(function init(){
+  const saved = LS.get('theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+
+  document.getElementById('railbox').innerHTML = rail();
+
+  const si = document.getElementById('sq');
+  si.addEventListener('input', () => renderResults(si.value));
+
+  document.getElementById('theme').addEventListener('click', () => {
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const cur = document.documentElement.getAttribute('data-theme') || (dark ? 'dark' : 'light');
+    const nxt = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nxt);
+    LS.set('theme', nxt);
+  });
+
+  /* мобильная шторка */
+  const railEl = document.querySelector('.rail'), scrim = document.getElementById('scrim');
+  function drawer(on){ railEl.classList.toggle('open', on); scrim.classList.toggle('on', on); document.getElementById('burger').setAttribute('aria-expanded', String(on)); }
+  document.getElementById('burger').addEventListener('click', () => drawer(!railEl.classList.contains('open')));
+  scrim.addEventListener('click', () => drawer(false));
+
+  /* один обработчик на всё */
+  document.addEventListener('click', e => {
+    const t = e.target;
+    if (t.closest('[data-reload]')) { location.reload(); return; }
+    const read = t.closest('[data-read]');
+    if (read && TMAP[read.dataset.read] && !TMAP[read.dataset.read].locked) {
+      const done = LS.json('read', {});
+      done[read.dataset.read] = !done[read.dataset.read];
+      LS.set('read', JSON.stringify(done)); render(); return;
+    }
+    const pg = t.closest('[data-pg]');
+    if (pg){ e.preventDefault(); openDossier(pg.dataset.pg, !!dzOpen); si.value = ''; renderResults(''); drawer(false); return; }
+    if (t.closest('[data-x]')){ closeDossier(); return; }
+    const go = t.closest('[data-go]');
+    if (go){ location.hash = go.dataset.go; si.value = ''; renderResults(''); drawer(false); return; }
+    const f = t.closest('[data-f]');
+    if (f){
+      const v = f.dataset.v;
+      if (f.dataset.f === 'grp') CAT.grp = v;
+      if (f.dataset.f === 'tag') CAT.tag = v;
+      if (f.dataset.f === 'qblk') QF.blk = v;
+      if (f.dataset.f === 'qtopic') QF.topic = v;
+      render(); return;
+    }
+    const q = t.closest('[data-q]');
+    if (q){
+      const d = document.getElementById('d' + q.dataset.q);
+      if (d){ const open = !d.hidden; d.hidden = open; q.setAttribute('aria-expanded', String(!open)); }
+      return;
+    }
+    const l = t.closest('[data-l]');
+    if (l){
+      const v = l.dataset.l;
+      if (v === 'show'){ learnShown = true; render(); }
+      else if (v === 'skip'){ learnCard = null; learnShown = false; render(); }
+      else if (v === 'again'){ LS.set('srs', JSON.stringify({})); learnCard = null; learnShown = false; render(); }
+      else if (v === 'reset'){ LS.set('srs', JSON.stringify({})); learnCard = null; learnShown = false; render(); }
+      else grade(Number(v));
+      return;
+    }
+    const a = t.closest('a[href^="#"]');
+    if (a){ if (dzOpen && a.dataset.close) { dzReturn = null; closeDossier(); } drawer(false); }
+  });
+
+  /* поля ввода на страницах */
+  document.addEventListener('input', e => {
+    if (e.target.id === 'catq'){ CAT.q = e.target.value; const v = e.target.value, pos = e.target.selectionStart; render();
+      const el = document.getElementById('catq'); if (el){ el.focus(); el.value = v; try { el.setSelectionRange(pos, pos); } catch (_) {} } }
+    if (e.target.id === 'qq'){ QF.q = e.target.value; const v = e.target.value, pos = e.target.selectionStart; render();
+      const el = document.getElementById('qq'); if (el){ el.focus(); el.value = v; try { el.setSelectionRange(pos, pos); } catch (_) {} } }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){ if (dzOpen) closeDossier(); else drawer(false); }
+    if (e.key === '/' && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){ e.preventDefault(); si.focus(); }
+  });
+
+  addEventListener('hashchange', () => {
+    const r = route();
+    if (dzOpen && !(r.v === 'cat' && r.arg === dzOpen)){ document.getElementById('dz').innerHTML = ''; document.documentElement.style.overflow = ''; dzOpen = null; }
+    render();
+    if (!(r.v === 'cat' && r.arg)) scrollTo({top:0});
+  });
+
+  render();
+})();
+</script>
+<script>(function () {
+  'use strict';
+  var MA = window.MA, started = false, timer;
+  var owner = MA && MA.user() ? MA.user().id : null;
+  function run(code) {
+    var script = document.createElement('script');
+    script.textContent = code;
+    document.body.appendChild(script);
+  }
+  function start(code) {
+    if (started) return;
+    started = true;
+    clearTimeout(timer);
+    if (code) run(code);
+    run(document.getElementById('micro-app').textContent);
+    if (MA) MA.mount(document.querySelectorAll('[data-ma-acct]'));
+  }
+  // No persistent cache: the server authorizes every full-content load.
+  if (!MA || !MA.signedIn()) { start(); return; }
+  timer = setTimeout(function () { window.MICRO_LOAD_ERROR = true; start(); }, 8000);
+  MA.api('/content/micro', { raw: true }).then(function (res) { return res.text(); }).then(function (code) {
+    var user = MA.user();
+    if (!user || user.id !== owner) { start(); return; }
+    start(code);
+  }).catch(function (e) {
+    if (![401, 403, 404].includes(e.status)) window.MICRO_LOAD_ERROR = true;
+    start();
+  });
+  MA.onChange(function (user) {
+    if (window.MICRO_FULL && (!user || user.id !== owner)) location.reload();
+  });
+  addEventListener('pageshow', function (e) { if (e.persisted && window.MICRO_FULL) location.reload(); });
+})();
+</script>
+</body>
+</html>

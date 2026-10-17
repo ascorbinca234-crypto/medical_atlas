@@ -161,7 +161,7 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
   };
   V.login = function (q) {
     label('01', 'Вход');
-    view.innerHTML = tabs('login') + '<h1>Вход</h1><p class="sub" data-msg>После входа откроются все темы атласов.</p>' + msg('ok', q.get('ok')) +
+    view.innerHTML = tabs('login') + '<h1>Вход</h1><p class="sub" data-msg>Войдите, чтобы сохранять прогресс и продолжать занятия.</p>' + msg('ok', q.get('ok')) +
       '<form id="f" novalidate><label class="f" for="email">Почта</label><input id="email" type="email" autocomplete="email" required inputmode="email">' + pwField('pw', 'Пароль', 'current-password') +
       '<button class="btn pri" type="submit">Войти</button></form>' + providers +
       '<div class="links"><a href="#forgot">Забыли пароль?</a><a href="#register">Создать аккаунт</a></div>';
@@ -181,7 +181,7 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
   };
   V.register = function () {
     label('02', 'Регистрация');
-    view.innerHTML = tabs('register') + '<h1>Регистрация</h1><p class="sub" data-msg>Аккаунт бесплатный. Он нужен, чтобы открыть все темы атласов.</p>' +
+    view.innerHTML = tabs('register') + '<h1>Регистрация</h1><p class="sub" data-msg>Аккаунт бесплатный. Сохраняйте прогресс и продолжайте занятия на других устройствах.</p>' +
       '<form id="f" novalidate><label class="f" for="name">Как к вам обращаться</label><input id="name" type="text" autocomplete="name" maxlength="60">' +
       '<label class="f" for="email">Почта</label><input id="email" type="email" autocomplete="email" required inputmode="email">' + pwField('pw', 'Пароль', 'new-password', 'не короче 8 символов') +
       '<label class="check"><input id="consent" type="checkbox"><span>Соглашаюсь на обработку персональных данных по <a href="../privacy.html" target="_blank" rel="noopener">политике конфиденциальности</a></span></label>' +
