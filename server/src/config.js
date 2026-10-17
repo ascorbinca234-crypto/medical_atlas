@@ -22,6 +22,7 @@ function config(e = process.env) {
     },
     vk: {
       clientId: e.VK_CLIENT_ID || '',
+      scope: e.VK_SCOPE || 'vkid.personal_info email',
       authUrl: e.VK_AUTH_URL || 'https://id.vk.ru/authorize',
       tokenUrl: e.VK_TOKEN_URL || 'https://id.vk.ru/oauth2/auth',
       infoUrl: e.VK_INFO_URL || 'https://id.vk.ru/oauth2/user_info',
