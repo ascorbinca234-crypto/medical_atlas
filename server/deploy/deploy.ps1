@@ -276,7 +276,7 @@ elseif ($h) { Write-Host ('Сервер отвечает, но не всё на�
 else { Write-Host 'Сервер пока не ответил. Напиши в чат — я посмотрю.' -ForegroundColor Yellow }
 Write-Host "Адрес сервера (API_URL): $ApiUrl"
 Write-Host "Redirect URI для Яндекс ID: $ApiUrl/auth/yandex/callback"
-Write-Host "Базовый домен для VK ID: $($gw.domain)"
+Write-Host "Базовые домены для VK ID: ascorbinca234-crypto.github.io и $($gw.domain)"
 Write-Host "Redirect URL для VK ID: $ApiUrl/auth/vk/callback"
 Write-Host 'Напиши в чат «готово» — остальное я увижу сам.'
 #==BODY-END==
