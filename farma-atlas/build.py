@@ -134,6 +134,7 @@ body{{margin:0}}
 <div class="dz" id="dz" lang="ru" hidden><div class="dz-scrim" data-close></div><aside class="dz-panel" role="dialog" aria-modal="true" aria-labelledby="dz-title" tabindex="-1"><div class="dz-top"><button type="button" class="dz-back" hidden>← Назад</button><button type="button" class="dz-x" data-close aria-label="Закрыть досье">×</button></div><div class="dz-body" id="dzBody"></div></aside></div>
 <script src="../auth/config.js"></script>
 <script src="../auth/auth.js"></script>
+<script src="../progress/progress.js"></script>
 <script>
 {data_js}
 </script>

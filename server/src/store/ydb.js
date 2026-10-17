@@ -84,6 +84,19 @@ function ydbStore(o, fetchImpl = fetch) {
         return true;
       } catch (e) { if (isCond(e)) return false; throw e; }
     },
+    // Документы с версией (прогресс, ординаторская) лежат в таблице users под ключом doc:<имя>.
+    // putDoc пишет, только если версия в базе равна v (0 — документа ещё нет), и возвращает false при конфликте.
+    async getDoc(k) {
+      const r = await run('GetItem', { TableName: T.users, Key: { id: { S: 'doc:' + k } }, ConsistentRead: true });
+      return r.Item && r.Item.d ? { d: JSON.parse(r.Item.d.S), v: Number(r.Item.v ? r.Item.v.N : 0) } : null;
+    },
+    async putDoc(k, d, v) {
+      const b = { TableName: T.users, Item: { id: { S: 'doc:' + k }, d: { S: JSON.stringify(d) }, v: { N: String(v + 1) } } };
+      if (v === 0) b.ConditionExpression = 'attribute_not_exists(id)';
+      else Object.assign(b, { ConditionExpression: '#v = :v', ExpressionAttributeNames: { '#v': 'v' }, ExpressionAttributeValues: { ':v': { N: String(v) } } });
+      try { await run('PutItem', b); return true; } catch (e) { if (isCond(e)) return false; throw e; }
+    },
+    async deleteDoc(k) { await run('DeleteItem', { TableName: T.users, Key: { id: { S: 'doc:' + k } } }); },
   };
 }
 

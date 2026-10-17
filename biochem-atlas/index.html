@@ -1485,6 +1485,7 @@ let curId = null, navList = DB, lastFocus = null, closeTimer = null;
 function openDetail(id, list) {
   const e = BY[id]; if (!e) return;
   curId = id;
+  try { if (window.MAP) window.MAP.last({atlas: "biochem", title: e.n, sub: "Биохимия, " + SEC[e.s].n.toLowerCase(), url: location.href.split("#")[0] + "#s=" + id}); } catch (err) {}
   navList = (list && list.some(x => x.id === id)) ? list : DB;
   const s = SEC[e.s];
   sheet.style.setProperty("--sc", s.c);
@@ -1943,6 +1944,22 @@ function srsGrade(ok) {
     if (ses.rq[c.key] <= 2) ses.q.splice(Math.min(3, ses.q.length), 0, c);
   }
   progChanged();
+  try { if (window.MAP) { window.MAP.card({atlas: "biochem", ok: !!ok}); bxPublish(); } } catch (e) {}
+}
+/* личный кабинет: освоение по разделам (вещество закреплено — карточка дошла до 3-й коробки) */
+let bxPubT = 0;
+function bxPublish() { clearTimeout(bxPubT); bxPubT = setTimeout(bxPublishNow, 400); }
+function bxPublishNow() {
+  try {
+    if (!window.MAP) return;
+    const lockedBy = (LK && LK.bySec) || {};
+    window.MAP.sections("biochem", SECS.map(s => {
+      const list = DB.filter(e => e.s === s.id);
+      const learned = list.filter(e => levelOf(e.id) >= 3).length;
+      const seen = list.filter(e => PROG.c["sn:" + e.id] || PROG.c["ns:" + e.id]).length;
+      return {id: s.id, n: s.n, sub: "Биохимия", total: list.length + (lockedBy[s.id] || 0), learned, seen, locked: !list.length && !!lockedBy[s.id]};
+    }));
+  } catch (e) {}
 }
 function distrIds(e, n) {
   const own = TX[e.id] && fstyle === "tx" ? vkey(TX[e.id][0]) : null;
@@ -2432,9 +2449,22 @@ $("themeBtn").addEventListener("click", () => {
 const mq = window.matchMedia("(prefers-color-scheme: dark)");
 const onScheme = () => { if (mode === "auto") repaintAll(); };
 if (mq.addEventListener) mq.addEventListener("change", onScheme); else if (mq.addListener) mq.addListener(onScheme);
+
+/* ссылки из личного кабинета: #s=<вещество> открывает карточку, #study — раздел «Учёба» */
+(function () {
+  function fromHash() {
+    const h = location.hash, m = /^#s=([\w-]+)$/.exec(h);
+    if (m && BY[m[1]]) { if (curId !== m[1]) openDetail(m[1]); }
+    else if (h === "#study") setView("study");
+  }
+  fromHash();
+  window.addEventListener("hashchange", fromHash);
+  bxPublish();
+})();
 </script>
 <script src="../auth/config.js"></script>
 <script src="../auth/auth.js"></script>
+<script src="../progress/progress.js"></script>
 <script>
 (function () {
   var LOCKED_HASH = '11ad736bf838a8be';

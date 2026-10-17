@@ -151,7 +151,7 @@
       var ava = u.avatar ? '<img src="' + esc(u.avatar) + '" alt="" referrerpolicy="no-referrer">' : initials(u);
       el.innerHTML = '<div class="ma-user"><button type="button" class="ma-chip" aria-haspopup="menu" aria-expanded="false" title="' + esc(u.name || u.email || 'Аккаунт') + '">' +
         '<span class="ma-ava" aria-hidden="true">' + ava + '</span><span class="ma-name">' + esc(u.name || u.email || 'Аккаунт') + '</span></button>' +
-        '<div class="ma-menu" role="menu" hidden><a role="menuitem" href="' + esc(AUTH_URL + '#account') + '">Аккаунт</a><button type="button" role="menuitem" data-ma-out>Выйти</button></div></div>';
+        '<div class="ma-menu" role="menu" hidden><a role="menuitem" href="' + esc(SITE_URL + 'cabinet/') + '">Личный кабинет</a><a role="menuitem" href="' + esc(AUTH_URL + '#account') + '">Аккаунт</a><button type="button" role="menuitem" data-ma-out>Выйти</button></div></div>';
       var btn = el.querySelector('.ma-chip'), menu = el.querySelector('.ma-menu');
       btn.addEventListener('click', function (ev) { ev.stopPropagation(); var open = menu.hidden; closeMenus(); menu.hidden = !open; btn.setAttribute('aria-expanded', String(open)); });
       el.querySelector('[data-ma-out]').addEventListener('click', function () { logout(false).then(function () { location.reload(); }); });

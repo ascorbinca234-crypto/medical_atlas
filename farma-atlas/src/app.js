@@ -919,6 +919,7 @@ function route(){
   if(pending) requestAnimationFrame(focusPending); else window.scrollTo(0,0);
   if(pendingDossier){ const n=pendingDossier; pendingDossier=null; openDossier(n); }
   if(typeof FX!=='undefined') FX.page(kind);
+  if(kind==='plate' && p && !p.locked && window.MAP){ try{ window.MAP.last({atlas:'farma', title:p.title, sub:'Фармакология, '+(p.lec||('лист '+(p.roman||''))), url:location.href}); }catch(e){} }
   const due=$('#nav .due'); if(due && typeof lDueCount==='function'){ const n=lDueCount(A); due.textContent=n; due.hidden=!n; }
 }
 window.addEventListener('hashchange',route);

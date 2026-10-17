@@ -1,10 +1,12 @@
 'use strict';
-// HTTP-обработчик API: регистрация и вход, OAuth, профиль, выдача закрытых частей атласов.
+// HTTP-обработчик API: регистрация и вход, OAuth, профиль, выдача закрытых частей атласов,
+// прогресс и ординаторская (src/social.js).
 const fs = require('fs'), path = require('path'), zlib = require('zlib'), crypto = require('crypto');
 const { keys, jwtSign, jwtVerify, seal, open, randomId, now } = require('./tokens');
 const { hashPassword, verifyPassword } = require('./passwords');
 const { providers, pkce } = require('./oauth');
 const emails = require('./emails');
+const { createSocial } = require('./social');
 
 class HttpError extends Error { constructor(status, code, message, extra) { super(message); this.status = status; this.code = code; this.extra = extra; } }
 const bad = (code, message) => new HttpError(400, code, message);
@@ -318,10 +320,14 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   }
   async function deleteMe(req) {
     const u = await authUser(req);
+    await social.onDelete(u.id);
     for (const k of u.ids || []) await store.deleteIdentity(k);
     await store.deleteUser(u.id);
     return json(200, { ok: true });
   }
+
+  // ---------- прогресс и ординаторская ----------
+  const social = createSocial({ store, cfg, HttpError, authUser, limit, json, body, randomId });
 
   // ---------- закрытые части атласов ----------
   function loadContent(atlas) {
@@ -367,6 +373,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     ['DELETE', /^\/me$/, deleteMe],
     ['GET', /^\/content\/([^/]+)$/, (req, m) => content(req, m[1])],
     ['POST', /^\/lead$/, lead],
+    ...social.routes,
   ];
 
   async function handle(req) {

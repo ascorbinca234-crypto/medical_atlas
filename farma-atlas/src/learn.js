@@ -69,7 +69,7 @@ function lDeck(A){
       add(p,nm,{hl:mark?'y':'', rx:{tn:lClean(r[1]||''), form:lClean(r[L>=5?3:2]||''), dose:lClean(r[L-1]||''), ind:L>=5?lClean(r[2]):'', mark}}); }); }
   }));
   items.forEach(it=>{ it.d=A.kFindDrug(it.n); it.hasBody = typeof VIT!=='undefined' && !!(VIT[it.n] || (it.d && VIT[it.d.n])); });
-  LDECK=items; return items;
+  LDECK=items; lPublish(); return items;
 }
 function lPrefs(){ try{ return Object.assign({lec:[], set:'all', mode:'cards', dir:'fwd', nnew:15}, JSON.parse(localStorage.getItem(L_PREF)||'{}')); }catch(e){ return {lec:[], set:'all', mode:'cards', dir:'fwd', nnew:15}; } }
 function lPrefSave(pr){ try{ localStorage.setItem(L_PREF, JSON.stringify(pr)); }catch(e){} }
@@ -82,6 +82,18 @@ function lRate(id,grade){ // 0 — не помню, 1 — с трудом, 2 —
   else { r[0]=Math.min(5,r[0]+1); r[1]=today+L_INT[r[0]]; }
   r[2]=(r[2]||0)+1; r[4]=Date.now(); LST.items[id]=r;
   LST.days[today]=(LST.days[today]||0)+1; lSave();
+  try{ if(window.MAP){ window.MAP.card({atlas:'farma', ok:grade===2}); lPublish(); } }catch(e){}
+}
+/* личный кабинет: освоение по лекциям (закреплено — карточка дошла до 3-й коробки, интервал от 4 дней) */
+let lPubT=0;
+function lPublish(){ clearTimeout(lPubT); lPubT=setTimeout(lPublishNow,400); }
+function lPublishNow(){
+  try{
+    if(!window.MAP||!LDECK||typeof KP==='undefined') return;
+    const by={};
+    LDECK.forEach(it=>{ const s=by[it.p]||(by[it.p]={total:0,learned:0,seen:0}); s.total++; const r=LST.items[it.id]; if(r&&r[2]) s.seen++; if(r&&r[0]>=3) s.learned++; });
+    window.MAP.sections('farma', KP.map(p=>{ const s=by[p.id]||{total:0,learned:0,seen:0}; return {id:p.id, n:p.title, sub:p.lec||p.roman||'', total:s.total, learned:s.learned, seen:s.seen, locked:!!p.locked}; }));
+  }catch(e){}
 }
 function lDueCount(A){ const items=lDeck(A); const t=lToday(); let n=0; items.forEach(it=>{ const r=lRec(it.id); if(r[0]&&r[1]<=t) n++; const x=lRec('rx:'+it.id); if(x[0]&&x[1]<=t) n++; }); return n; }
 function lStreak(){ const t=lToday(); let n=0, d=LST.days[t]?t:t-1; while(LST.days[d]){ n++; d--; } return n; }

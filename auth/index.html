@@ -326,7 +326,7 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
         '<div class="who"><span class="ava" aria-hidden="true">' + ava + '</span><div><b>' + esc(u.name || 'Без имени') + '</b><span>' + esc(u.email || 'почта не указана') + '</span></div></div>' +
         '<dl class="props"><dt>Вход</dt><dd>' + esc(ways.join(', ') || '—') + '</dd><dt>С нами с</dt><dd>' + esc(new Date(u.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })) + '</dd></dl>' +
         '<form id="fn" novalidate><label class="f" for="name">Имя</label><div class="row"><input id="name" type="text" maxlength="60" value="' + esc(u.name) + '"><button class="btn" type="submit">Сохранить</button></div></form>' +
-        '<div class="stack" style="margin-top:22px"><a class="btn pri" href="' + esc(next()) + '">К атласам</a><button class="btn" id="out" type="button">Выйти</button><button class="btn" id="outAll" type="button">Выйти на всех устройствах</button>' +
+        '<div class="stack" style="margin-top:22px"><a class="btn pri" href="' + esc(next()) + '">К атласам</a><a class="btn" href="../cabinet/">Личный кабинет</a><button class="btn" id="out" type="button">Выйти</button><button class="btn" id="outAll" type="button">Выйти на всех устройствах</button>' +
         (u.email && !u.hasPassword ? '<a class="btn" href="#forgot">Задать пароль для входа по почте</a>' : '') +
         '<button class="btn danger" id="del" type="button">Удалить аккаунт</button></div>';
       var fn = document.getElementById('fn');
