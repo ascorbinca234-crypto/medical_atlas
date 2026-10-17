@@ -205,6 +205,23 @@ test('код из письма подтверждает почту и даёт �
   assert.strictEqual(r.status, 200);
 });
 
+test('VK ID: права доступа через пробел (%20), а не через «+»', async () => {
+  const { call } = setup();
+  const r = await call('GET', '/auth/vk/start');
+  const loc = r.headers.Location;
+  assert.match(loc, /[?&]scope=vkid\.personal_info%20email(&|$)/, loc);
+  assert.strictEqual(new URL(loc).searchParams.get('redirect_uri'), 'https://api.example/auth/vk/callback');
+});
+
+test('VK ID: ошибка провайдера показывает описание', async () => {
+  const ctx = setup();
+  const start = await ctx.call('GET', '/auth/vk/start');
+  const cookie = /ma_oauth=([^;]+)/.exec(start.headers['Set-Cookie'])[1];
+  const state = new URL(start.headers.Location).searchParams.get('state');
+  const cb = await ctx.call('GET', '/auth/vk/callback', null, { cookie: 'ma_oauth=' + cookie }, { error: 'invalid_scope', error_description: 'scope is not allowed', state });
+  assert.match(decodeURIComponent(cb.headers.Location), /invalid_scope: scope is not allowed/);
+});
+
 test('OAuth: state короткий и подходит под требования VK', async () => {
   const { call } = setup();
   const s = await call('GET', '/auth/vk/start');

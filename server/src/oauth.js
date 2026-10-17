@@ -3,6 +3,10 @@
 const crypto = require('crypto');
 const { b64u } = require('./tokens');
 
+// URLSearchParams кодирует пробел как «+», а VK ID читает «+» буквально: права доступа склеиваются в одно
+const query = o => new URLSearchParams(o).toString().replace(/\+/g, '%20');
+const providerError = q => [q.error, q.error_description || q.error_reason].filter(Boolean).join(': ');
+
 const pkce = () => { const verifier = b64u(crypto.randomBytes(48)); return { verifier, challenge: b64u(crypto.createHash('sha256').update(verifier).digest()) }; };
 
 async function readJson(res, what) {
@@ -23,7 +27,7 @@ function providers(cfg, fetchImpl = fetch) {
         return cfg.yandex.authUrl + '?' + q;
       },
       async profile(query, st) {
-        if (query.error) throw Object.assign(new Error(query.error), { userCancel: query.error === 'access_denied' });
+        if (query.error) throw Object.assign(new Error(providerError(query)), { userCancel: query.error === 'access_denied' });
         const tok = await readJson(await fetchImpl(cfg.yandex.tokenUrl, {
           method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ grant_type: 'authorization_code', code: query.code || '', client_id: cfg.yandex.clientId, client_secret: cfg.yandex.clientSecret, code_verifier: st.v }),
@@ -40,14 +44,14 @@ function providers(cfg, fetchImpl = fetch) {
     vk: {
       enabled: !!cfg.vk.clientId,
       authorizeUrl({ state, challenge }) {
-        const q = new URLSearchParams({ response_type: 'code', client_id: cfg.vk.clientId, redirect_uri: redirect('vk'), state, code_challenge: challenge, code_challenge_method: 'S256', scope: 'vkid.personal_info email' });
-        return cfg.vk.authUrl + '?' + q;
+        return cfg.vk.authUrl + '?' + query({ response_type: 'code', client_id: cfg.vk.clientId, redirect_uri: redirect('vk'), state, code_challenge: challenge, code_challenge_method: 'S256', scope: cfg.vk.scope });
       },
       async profile(query, st) {
         // VK ID может прислать параметры по отдельности или одним JSON в payload
         let q = Object.assign({}, query);
         if (q.payload) { try { q = Object.assign(q, JSON.parse(q.payload)); } catch (e) { /* оставим как есть */ } }
-        if (q.error) throw Object.assign(new Error(q.error), { userCancel: /denied|cancel/i.test(q.error) });
+        if (q.error) throw Object.assign(new Error(providerError(q)), { userCancel: /denied|cancel/i.test(q.error) });
+        if (!q.code) throw new Error('VK ID не прислал код (параметры: ' + Object.keys(q).join(', ') + ')');
         const tok = await readJson(await fetchImpl(cfg.vk.tokenUrl, {
           method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ grant_type: 'authorization_code', code: q.code || '', code_verifier: st.v, client_id: cfg.vk.clientId, device_id: q.device_id || '', redirect_uri: redirect('vk'), state: q.state || '' }),
