@@ -7,6 +7,7 @@ const { hashPassword, verifyPassword } = require('./passwords');
 const { providers, pkce } = require('./oauth');
 const emails = require('./emails');
 const { createSocial } = require('./social');
+const { SUBJECTS, POLICY, grantFor } = require('./access');
 
 class HttpError extends Error { constructor(status, code, message, extra) { super(message); this.status = status; this.code = code; this.extra = extra; } }
 const bad = (code, message) => new HttpError(400, code, message);
@@ -27,7 +28,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   const toAuth = (hash, headers) => redirect(cfg.authPage + '#' + hash, headers);
   function cors(origin) {
     if (!origin || !cfg.origins.includes(origin)) return {};
-    return { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization', 'Access-Control-Expose-Headers': 'X-Content-Hash', 'Access-Control-Max-Age': '600' };
+    return { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization', 'Access-Control-Expose-Headers': 'X-Content-Hash, X-Access-Policy, X-Access-Expires', 'Access-Control-Max-Age': '600' };
   }
   function body(req) {
     if (!req.body) return {};
@@ -62,8 +63,20 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const p = m && jwtVerify(m[1], K.jwt);
     if (!p || p.typ !== 'a') throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
     const u = await store.getUser(p.sub);
-    if (!u || u.tv !== p.tv) throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
+    if (!u || u.deleted || u.tv !== p.tv) throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
     return u;
+  }
+  async function changeUser(id, fn) {
+    const u = await store.updateUser(id, fn);
+    if (!u) throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
+    return u;
+  }
+  async function changeAuthenticated(req, fn) {
+    const snapshot = await authUser(req);
+    return changeUser(snapshot.id, u => {
+      if (u.tv !== snapshot.tv) throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
+      fn(u);
+    });
   }
   const newUser = o => Object.assign({ id: randomId(12), email: null, emailVerified: false, name: '', avatar: null, pw: null, tv: 0, ids: [], createdAt: new Date().toISOString() }, o);
   const link = (hash) => cfg.authPage + '#' + hash;
@@ -93,9 +106,11 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   // каждое письмо — новый код: у письма новая тема, и почтовик не склеивает его со старым
   async function sendVerify(u) {
     const t = now(), code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
-    u.vcodes = [{ h: codeHash(u, code), exp: t + CODE_TTL }, ...(u.vcodes || []).filter(c => c && c.exp > t)].slice(0, CODE_KEEP);
-    u.vsentAt = t;
-    await store.putUser(u);
+    u = await changeUser(u.id, current => {
+      if (current.emailVerified) throw bad('already_verified', verifiedMsg(current));
+      current.vcodes = [{ h: codeHash(current, code), exp: t + CODE_TTL }, ...(current.vcodes || []).filter(c => c && c.exp > t)].slice(0, CODE_KEEP);
+      current.vsentAt = t;
+    });
     const token = seal({ t: 'verify', u: u.id, e: u.email, j: randomId(), exp: t + CODE_TTL }, K.seal);
     const m = emails.verifyEmail(u.name, link('verify?token=' + token + '&email=' + encodeURIComponent(u.email)), code, new Date(t * 1000));
     await deliver(Object.assign({ to: u.email }, m));
@@ -122,8 +137,11 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
       throw new HttpError(409, 'email_taken', 'Аккаунт с этой почтой уже есть. Войдите или восстановите пароль.');
     }
     if (u) {                                    // регистрировался, но почту не подтвердил — обновляем данные и шлём письмо снова
-      Object.assign(u, { pw: await hashPassword(pw), name: name || u.name, consentAt: new Date().toISOString() });
-      await store.putUser(u);
+      const hashed = await hashPassword(pw);
+      u = await changeUser(u.id, current => {
+        if (current.emailVerified || current.ids.some(k => !k.startsWith('email:'))) throw new HttpError(409, 'email_taken', 'Аккаунт уже подтверждён. Войдите или восстановите пароль.');
+        Object.assign(current, { pw: hashed, name: name || current.name, tv: (current.tv || 0) + 1, consentAt: new Date().toISOString() });
+      });
     } else {
       u = newUser({ email, name, pw: await hashPassword(pw), ids: ['email:' + email], consentAt: new Date().toISOString() });
       await store.putUser(u);
@@ -141,10 +159,12 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const u = await store.getUser(t.u);
     if (!u || u.email !== t.e) throw bad('bad_token', 'Ссылка устарела или уже использована. Войдите, и мы пришлём новую.');
     if (!(await store.once('used:' + t.j, 2 * 24 * 3600))) throw bad('bad_token', 'Эта ссылка уже использована. Войдите с почтой и паролем.');
-    u.emailVerified = true;
-    delete u.vcodes; delete u.vsentAt;
-    await store.putUser(u);
-    return json(200, session(u));
+    const verified = await changeUser(u.id, current => {
+      if (current.email !== t.e) throw bad('bad_token', 'Ссылка устарела.');
+      current.emailVerified = true;
+      delete current.vcodes; delete current.vsentAt;
+    });
+    return json(200, session(verified));
   }
 
   async function verifyCode(req) {
@@ -155,10 +175,12 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const u = await userByEmail(email);
     if (u && u.emailVerified) throw bad('already_verified', verifiedMsg(u));
     if (!u || !codeOk(u, code)) throw bad('bad_code', 'Неверный или устаревший код. Проверьте последнее письмо или отправьте новое.');
-    u.emailVerified = true;
-    delete u.vcodes; delete u.vsentAt;
-    await store.putUser(u);
-    return json(200, session(u));
+    const verified = await changeUser(u.id, current => {
+      if (current.emailVerified || !codeOk(current, code)) throw bad('bad_code', 'Код устарел или уже использован.');
+      current.emailVerified = true;
+      delete current.vcodes; delete current.vsentAt;
+    });
+    return json(200, session(verified));
   }
   const verifiedMsg = u => u.pw ? 'Почта уже подтверждена. Войдите с почтой и паролем.'
     : 'Почта уже подтверждена: вы входили через VK ID или Яндекс ID. Войдите тем же способом или задайте пароль через «Забыли пароль?».';
@@ -204,9 +226,12 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     if (!t || t.t !== 'reset') throw bad('bad_token', 'Ссылка устарела. Запросите восстановление ещё раз.');
     const u = await store.getUser(t.u);
     if (!u || fp(u.pw) !== t.f) throw bad('bad_token', 'Ссылка устарела или уже использована. Запросите восстановление ещё раз.');
-    Object.assign(u, { pw: await hashPassword(pw), emailVerified: true, tv: (u.tv || 0) + 1 });
-    await store.putUser(u);
-    return json(200, session(u));
+    const hashed = await hashPassword(pw);
+    const updated = await changeUser(u.id, current => {
+      if (fp(current.pw) !== t.f) throw bad('bad_token', 'Ссылка уже использована.');
+      Object.assign(current, { pw: hashed, emailVerified: true, tv: (current.tv || 0) + 1 });
+    });
+    return json(200, session(updated));
   }
 
   // ---------- Яндекс ID и VK ID ----------
@@ -228,12 +253,20 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
       if (prof.email) {
         u = await userByEmail(prof.email);
         // пароль, который никто не подтвердил, не должен открывать аккаунт владельца почты
-        if (u && !u.emailVerified) Object.assign(u, { emailVerified: true, pw: null, tv: (u.tv || 0) + 1 });
+        // Confirmation/password changes are applied atomically below.
       }
       if (!u) {
         u = newUser({ email: prof.email, emailVerified: !!prof.email });
         await store.putUser(u);
-        if (prof.email && (await store.createIdentity('email:' + prof.email, u.id))) u.ids.push('email:' + prof.email);
+        if (prof.email) {
+          if (await store.createIdentity('email:' + prof.email, u.id)) u.ids.push('email:' + prof.email);
+          else {
+            const other = await userByEmail(prof.email);
+            await store.deleteUser(u.id);
+            if (!other || other.deleted) throw bad('account_changed', 'Аккаунт изменился. Повторите вход.');
+            u = other;
+          }
+        }
       }
       if (!(await store.createIdentity(ik, u.id))) {          // кто-то успел привязать этот аккаунт параллельно
         const other = await store.getUser(await store.getIdentity(ik));
@@ -241,11 +274,16 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
       }
       if (!u.ids.includes(ik)) u.ids.push(ik);
     }
-    if (!u.name && prof.name) u.name = cleanName(prof.name);
-    if (!u.avatar && prof.avatar) u.avatar = prof.avatar;
-    u.lastLoginAt = new Date().toISOString();
-    await store.putUser(u);
-    return u;
+    const ids = u.ids || [];
+    return changeUser(u.id, current => {
+      if (prof.email && current.email === prof.email && !current.emailVerified) {
+        Object.assign(current, { emailVerified: true, pw: null, tv: (current.tv || 0) + 1 });
+      }
+      current.ids = [...new Set([...(current.ids || []), ...ids, ik])];
+      if (!current.name && prof.name) current.name = cleanName(prof.name);
+      if (!current.avatar && prof.avatar) current.avatar = prof.avatar;
+      current.lastLoginAt = new Date().toISOString();
+    });
   }
 
   async function oauthCallback(req, p) {
@@ -282,7 +320,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const p = jwtVerify(body(req).refreshToken, K.jwt);
     if (!p || p.typ !== 'r') throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
     const u = await store.getUser(p.sub);
-    if (!u || u.tv !== p.tv) throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
+    if (!u || u.deleted || u.tv !== p.tv) throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
     return json(200, session(u));
   }
 
@@ -307,20 +345,18 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   // ---------- профиль ----------
   async function me(req) { return json(200, { user: view(await authUser(req)) }); }
   async function updateMe(req) {
-    const u = await authUser(req), b = body(req);
-    if (b.name !== undefined) u.name = cleanName(b.name);
-    await store.putUser(u);
+    const b = body(req);
+    const u = await changeAuthenticated(req, current => { if (b.name !== undefined) current.name = cleanName(b.name); });
     return json(200, { user: view(u) });
   }
   async function logoutAll(req) {
-    const u = await authUser(req);
-    u.tv = (u.tv || 0) + 1;
-    await store.putUser(u);
+    await changeAuthenticated(req, u => { u.tv = (u.tv || 0) + 1; });
     return json(200, { ok: true });
   }
   async function deleteMe(req) {
-    const u = await authUser(req);
+    const u = await changeAuthenticated(req, current => { current.deleted = true; current.tv = (current.tv || 0) + 1; });
     await social.onDelete(u.id);
+    await store.deleteDoc('access:' + u.id);
     for (const k of u.ids || []) await store.deleteIdentity(k);
     await store.deleteUser(u.id);
     return json(200, { ok: true });
@@ -341,29 +377,35 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   }
   async function content(req, atlas) {
     const user = await authUser(req);
-    if (!/^[a-z0-9-]{1,40}$/.test(atlas)) throw new HttpError(404, 'not_found', 'Нет такого атласа.');
-    // Microbiology launches with two public topics. Registration is not a paid grant.
-    // Access documents are server-owned; profile/progress endpoints cannot write them.
-    if (atlas === 'micro') {
-      const record = await store.getDoc('access:' + user.id);
-      const grant = record && record.d && record.d.micro;
-      if (!grant || grant.revoked || !Number.isFinite(grant.expiresAt) || grant.expiresAt <= Date.now()) {
-        throw new HttpError(403, 'subscription_required', 'Для полной микробиологии нужна действующая подписка.');
-      }
-    }
+    if (!SUBJECTS.some(s => s.id === atlas)) throw new HttpError(404, 'not_found', 'Нет такого атласа.');
+    const record = await store.getDoc('access:' + user.id);
+    const grant = grantFor(record && record.d, atlas);
+    if (!grant) throw new HttpError(403, 'subscription_required', 'Для этого предмета нужна действующая подписка.');
     const c = loadContent(atlas);
     if (!c) throw new HttpError(404, 'not_found', 'Нет такого атласа.');
-    const headers = { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Content-Hash': c.hash };
+    const headers = { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Content-Hash': c.hash, 'X-Access-Policy': POLICY, 'X-Access-Expires': String(grant.expiresAt) };
     if (cfg.gzip && /\bgzip\b/.test(req.headers['accept-encoding'] || '')) return { status: 200, headers: Object.assign(headers, { 'Content-Encoding': 'gzip' }), body: c.gz.toString('base64'), base64: true };
     return { status: 200, headers, body: c.raw.toString('utf8') };
   }
 
   // ---------- маршруты ----------
   const routes = [
+    ['GET', /^\/live$/, async () => json(200, { ok: true })],
     ['GET', /^\/health$/, async () => {
-      let tables = 'ok';
-      if (store.ensure && cfg.missing.length === 0) { try { await store.ensure(); } catch (e) { tables = 'ошибка: ' + e.message; } }
-      return json(200, { ok: cfg.missing.length === 0 && tables === 'ok', missing: cfg.missing, store: store.kind, tables, providers: { yandex: prov.yandex.enabled, vk: prov.vk.enabled } });
+      let database = false;
+      if (!cfg.missing.length) { try { await store.ready(); database = true; } catch (e) { log.error('readiness: database unavailable'); } }
+      const content = {};
+      for (const id of cfg.requiredContent || []) {
+        try { const c = loadContent(id); content[id] = !!(c && c.raw.length); } catch (e) { content[id] = false; }
+      }
+      const ok = !cfg.missing.length && database && Object.values(content).every(Boolean);
+      return json(ok ? 200 : 503, { ok, missing: cfg.missing, store: store.kind, database, content, policy: POLICY,
+        providers: { yandex: prov.yandex.enabled, vk: prov.vk.enabled } });
+    }],
+    ['GET', /^\/access$/, async req => {
+      const u = await authUser(req), record = await store.getDoc('access:' + u.id), grants = {};
+      for (const subject of SUBJECTS) { const g = grantFor(record && record.d, subject.id); if (g) grants[subject.id] = { expiresAt: g.expiresAt }; }
+      return json(200, { policy: POLICY, subjects: SUBJECTS, grants });
     }],
     ['POST', /^\/auth\/register$/, register],
     ['POST', /^\/auth\/verify$/, verify],
@@ -380,6 +422,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     ['GET', /^\/me$/, me],
     ['PATCH', /^\/me$/, updateMe],
     ['DELETE', /^\/me$/, deleteMe],
+    ['GET', /^\/content-v2\/([^/]+)$/, (req, m) => content(req, m[1])],
     ['GET', /^\/content\/([^/]+)$/, (req, m) => content(req, m[1])],
     ['POST', /^\/lead$/, lead],
     ...social.routes,
@@ -390,7 +433,8 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     if (req.method === 'OPTIONS') return { status: 204, headers: h, body: '' };
     try {
       const pathName = (req.path || '/').replace(/\/+$/, '') || '/';
-      if (cfg.missing.length && pathName !== '/health') throw new HttpError(503, 'misconfigured', 'Сервер не настроен: ' + cfg.missing.join(', '));
+      if (Buffer.byteLength(req.body || '', 'utf8') > 256 * 1024) throw new HttpError(413, 'body_too_large', 'Запрос слишком большой.');
+      if (cfg.missing.length && !['/health', '/live'].includes(pathName)) throw new HttpError(503, 'misconfigured', 'Сервер не настроен: ' + cfg.missing.join(', '));
       for (const [method, re, fn] of routes) {
         const m = re.exec(pathName);
         if (m && method === req.method) { const res = await fn(req, m); res.headers = Object.assign({}, h, res.headers); return res; }

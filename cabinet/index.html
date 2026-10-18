@@ -1267,7 +1267,7 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#masBody').innerHTML = '<ul class="sys-list compact">' + list.map(x => {
       const pct = x.total ? Math.round(x.learned / x.total * 100) : 0, ok = pct >= 80;
       const right = x.locked
-        ? '<span class="sys-lock"><i data-lucide="lock"></i>' + (masAtlas === 'micro' ? 'по подписке' : 'после входа') + '</span>'
+        ? '<span class="sys-lock"><i data-lucide="lock"></i>' + 'по подписке' + '</span>'
         : '<b class="sys-pct num"><small>' + x.learned + '/' + x.total + '</small>' + pct + '%</b>';
       return '<li class="sys-row' + (ok ? ' ok' : '') + (x.locked ? ' locked' : '') + '"><div><div class="sys-top"><span class="sys-name">' + esc(x.n) + (x.sub && masAtlas === 'farma' ? '<small>' + esc(x.sub) + '</small>' : '') + '</span>' + right + '</div>' +
         '<div class="bar' + (ok ? ' ok' : '') + '" role="progressbar" aria-label="' + esc(x.n) + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '"><span data-w="' + pct + '%" style="--w:0%"></span></div></div></li>';

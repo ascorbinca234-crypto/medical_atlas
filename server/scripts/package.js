@@ -3,6 +3,9 @@
 // Перед этим соберите атласы (python3 build.py в папках атласов), чтобы content/ был свежим.
 const fs = require('fs'), path = require('path'), zlib = require('zlib');
 const root = path.join(__dirname, '..');
+const { execFileSync } = require('child_process');
+// Rebuild everything: never package a partial or stale content directory.
+execFileSync('python3', [path.join(root, '..', 'build.py'), '--full'], { stdio: 'inherit' });
 const CRC = new Int32Array(256).map((_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c; });
 const crc32 = buf => { let c = -1; for (const b of buf) c = CRC[(c ^ b) & 0xff] ^ (c >>> 8); return (c ^ -1) >>> 0; };
 
@@ -10,11 +13,11 @@ function files() {
   const out = ['index.js', 'package.json'];
   const walk = d => fs.readdirSync(path.join(root, d)).forEach(f => { const p = d + '/' + f; fs.statSync(path.join(root, p)).isDirectory() ? walk(p) : out.push(p); });
   walk('src');
-  if (fs.existsSync(path.join(root, 'content'))) fs.readdirSync(path.join(root, 'content')).filter(f => f.endsWith('.js')).forEach(f => out.push('content/' + f));
+  if (fs.existsSync(path.join(root, 'content'))) fs.readdirSync(path.join(root, 'content')).filter(f => f.endsWith('.js') || f === 'manifest.json').forEach(f => out.push('content/' + f));
   return out;
 }
 const list = files();
-if (!list.some(f => f.startsWith('content/'))) console.warn('Внимание: в content/ нет закрытых частей — сначала соберите атласы.');
+for (const id of ['farma','biochem','micro']) { if (!list.includes('content/' + id + '.js')) throw new Error('Missing content: ' + id); }
 const parts = [], central = [];
 let offset = 0;
 for (const name of list) {

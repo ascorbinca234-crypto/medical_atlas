@@ -147,6 +147,7 @@ test('закрытая часть: только с токеном, gzip, хэш'
   let r = await ctx.call('GET', '/content/farma');
   assert.strictEqual(r.status, 401);
   const a = await oauthLogin(ctx, 'yandex', st => ({ code: 'c', state: st }));
+  await ctx.store.putDoc('access:' + a.user.id, { farma: { expiresAt: Date.now() + 60000 } }, 0);
   r = await ctx.call('GET', '/content/farma', null, { authorization: 'Bearer ' + a.accessToken });
   assert.strictEqual(r.status, 200); assert.strictEqual(r.body, 'window.LOCKED_OK = true;'); assert.match(r.headers['X-Content-Hash'], /^[0-9a-f]{16}$/);
   r = await ctx.call('GET', '/content/farma', null, { authorization: 'Bearer ' + a.accessToken, 'accept-encoding': 'gzip, br' });
@@ -186,7 +187,7 @@ test('без настроек сервер отвечает 503 и подска�
   const r = await app.handle({ method: 'POST', path: '/auth/login', query: {}, headers: {}, body: '{}', ip: '1' });
   assert.strictEqual(r.status, 503); assert.match(JSON.parse(r.body).message, /SITE_URL/);
   const h = await app.handle({ method: 'GET', path: '/health', query: {}, headers: {}, body: '', ip: '1' });
-  assert.strictEqual(h.status, 200); assert.strictEqual(JSON.parse(h.body).ok, false);
+  assert.strictEqual(h.status, 503); assert.strictEqual(JSON.parse(h.body).ok, false);
 });
 
 test('код из письма подтверждает почту и даёт вход', async () => {

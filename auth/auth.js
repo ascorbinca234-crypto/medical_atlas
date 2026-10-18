@@ -1,7 +1,7 @@
 /* ===== Медицинский атлас: клиент входа =====
    Подключается на всех страницах: <script src="…/auth/config.js"></script><script src="…/auth/auth.js"></script>
    Хранит сессию в localStorage, обновляет токены, рисует кнопку «Войти» / меню аккаунта
-   и загружает закрытые части атласов (с кэшем в IndexedDB). */
+   и загружает закрытые части атласов (после серверной проверки подписки). */
 (function () {
   'use strict';
   var CFG = window.MA_CONFIG || {};
@@ -36,21 +36,25 @@
     var headers = { 'Accept': 'application/json' };
     if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
     if (opts.token) headers.Authorization = 'Bearer ' + opts.token;
-    return fetch(API + path, { method: opts.method || (opts.body !== undefined ? 'POST' : 'GET'), headers: headers, body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined })
-      .catch(function () { throw fail('network', 'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.'); })
+    var controller = new AbortController(), timer;
+    var operation = fetch(API + path, { method: opts.method || (opts.body !== undefined ? 'POST' : 'GET'), headers: headers,
+      body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined, signal: controller.signal, cache: 'no-store' })
       .then(function (res) {
-        if (opts.raw && res.ok) return res;
         return res.text().then(function (t) {
+          if (opts.raw && res.ok) return { ok: true, status: res.status, headers: res.headers, text: function () { return Promise.resolve(t); } };
           var j = {}; try { j = t ? JSON.parse(t) : {}; } catch (e) { j = {}; }
           if (!res.ok) {
-            var err = fail(j.error || 'http_' + res.status, j.message || 'Ошибка сервера (' + res.status + '). Попробуйте ещё раз через минуту.', res.status);
-            err.data = j;   // доп. поля ответа: wait, detail
-            throw err;
+            var err = fail(j.error || 'http_' + res.status, j.message || 'Ошибка сервера (' + res.status + ').', res.status);
+            err.data = j; throw err;
           }
           return j;
         });
       });
+    return Promise.race([operation, new Promise(function (_, reject) {
+      timer = setTimeout(function () { controller.abort(); reject(fail('timeout', 'Сервер не ответил. Попробуйте ещё раз.')); }, 8000);
+    })]).finally(function () { clearTimeout(timer); });
   }
+
   /** Запрос без входа: регистрация, вход по паролю, подтверждение почты. */
   function call(path, body) { return request(path, { body: body }); }
 
@@ -60,8 +64,12 @@
     var s = load();
     if (!s || !s.refresh) return Promise.reject(fail('signed-out', 'Нужно войти.'));
     refreshing = request('/auth/refresh', { body: { refreshToken: s.refresh } })
-      .then(function (r) { setSession(r); return load(); }, function (e) {
-        if (e.status === 401) { signOutLocal(); throw fail('signed-out', 'Нужно войти заново.'); }
+      .then(function (r) {
+        var current = load();
+        if (!current || current.refresh !== s.refresh) throw fail('session-changed', 'Аккаунт изменился.');
+        setSession(r); return load();
+      }, function (e) {
+        if (e.status === 401 && load() && load().refresh === s.refresh) { signOutLocal(); throw fail('signed-out', 'Нужно войти заново.'); }
         throw e;
       });
     var done = function () { refreshing = null; };
@@ -84,47 +92,67 @@
     });
   }
 
-  // ---------- кэш закрытых частей ----------
-  function idb(fn) {
-    return new Promise(function (ok) {
-      try {
-        var req = indexedDB.open('ma-content', 1);
-        req.onupgradeneeded = function () { req.result.createObjectStore('b'); };
-        req.onsuccess = function () { try { fn(req.result, ok); } catch (e) { ok(null); } };
-        req.onerror = function () { ok(null); };
-      } catch (e) { ok(null); }
-    });
-  }
-  function cacheGet(k) { return idb(function (db, ok) { var r = db.transaction('b').objectStore('b').get(k); r.onsuccess = function () { ok(r.result || null); }; r.onerror = function () { ok(null); }; }); }
-  function cachePut(atlas, k, v) {
-    return idb(function (db, ok) {
-      var tx = db.transaction('b', 'readwrite'), st = tx.objectStore('b');
-      var cur = st.openCursor();
-      cur.onsuccess = function () { var c = cur.result; if (c) { if (String(c.key).indexOf(atlas + ':') === 0) c.delete(); c.continue(); } else st.put(v, k); };
-      tx.oncomplete = function () { ok(true); }; tx.onerror = function () { ok(false); };
-    });
-  }
-  function cacheClear() { return idb(function (db, ok) { var tx = db.transaction('b', 'readwrite'); tx.objectStore('b').clear(); tx.oncomplete = function () { ok(true); }; tx.onerror = function () { ok(false); }; }); }
-
-  /** Закрытая часть атласа: {status: 'ok'|'signed-out'|'error', code}. */
-  function loadLocked(atlas, hash) {
-    if (!signedIn()) return Promise.resolve({ status: 'signed-out', code: null });
-    return cacheGet(atlas + ':' + hash).then(function (cached) {
-      if (cached) {
-        refresh().catch(function (e) { if (e.code === 'signed-out') cacheClear(); });   // проверим сессию в фоне
-        return { status: 'ok', code: cached };
-      }
-      return access().then(function (tok) {
-        return fetch(API + '/content/' + encodeURIComponent(atlas), { headers: { Authorization: 'Bearer ' + tok } }).then(function (res) {
-          if (res.status === 401) return refresh().then(function (x) { return fetch(API + '/content/' + encodeURIComponent(atlas), { headers: { Authorization: 'Bearer ' + x.access } }); });
-          return res;
-        });
-      }).then(function (res) {
-        if (!res.ok) throw fail('http_' + res.status, 'Не удалось загрузить закрытую часть.', res.status);
-        var h = res.headers.get('X-Content-Hash') || hash;
-        return res.text().then(function (code) { cachePut(atlas, atlas + ':' + h, code); return { status: 'ok', code: code }; });
+  // Never read old persistent content, even offline. Remove the previous cache.
+  function cacheClear() { try { indexedDB.deleteDatabase('ma-content'); } catch (e) {} }
+  cacheClear();
+  var POLICY = 'subject-subscription-v1';
+  function loadLocked(atlas) {
+    var owner = user(), timer;
+    if (!owner) return Promise.resolve({ status: 'signed-out', code: null });
+    var operation = api('/content-v2/' + encodeURIComponent(atlas), { raw: true }).then(function (res) {
+      if (res.headers.get('X-Access-Policy') !== POLICY) throw fail('policy', 'Сервер ещё не обновлён.');
+      var expiresAt = Number(res.headers.get('X-Access-Expires'));
+      if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) throw fail('subscription_required', 'Подписка истекла.');
+      return res.text().then(function (code) {
+        if (!user() || user().id !== owner.id) throw fail('signed-out', 'Аккаунт изменился.');
+        return { status: 'ok', code: code, expiresAt: expiresAt, owner: owner.id };
       });
-    }).catch(function (e) { return { status: e.code === 'signed-out' ? 'signed-out' : 'error', code: null }; });
+    });
+    return Promise.race([operation, new Promise(function (_, reject) {
+      timer = setTimeout(function () { reject(fail('timeout')); }, 10000);
+    })]).catch(function (e) {
+      return { status: e.status === 403 || e.code === 'subscription_required' ? 'subscription-required' :
+        e.code === 'signed-out' ? 'signed-out' : 'error', code: null };
+    }).finally(function () { clearTimeout(timer); });
+  }
+  // One loader for every atlas. Public content still starts if the API is unavailable.
+  function bootAtlas(atlas, appId) {
+    var owner = user(), started = false, full = false, expiresAt = 0;
+    window.MA_STATE = { auth: 'none' };
+    function run(code) { var el = document.createElement('script'); el.textContent = code; document.body.appendChild(el); }
+    function reload() { location.reload(); }
+    function stillOwner() { var current = user(); return !!(current && owner && current.id === owner.id); }
+    function check() {
+      if (!full) return;
+      if (!stillOwner() || Date.now() >= expiresAt) { reload(); return; }
+      api('/access').then(function (r) {
+        var grant = r.grants && r.grants[atlas];
+        if (r.policy !== POLICY || !grant || grant.expiresAt <= Date.now() || !stillOwner()) reload();
+      }).catch(reload);
+    }
+    function start(r) {
+      if (started) return; started = true;
+      var allowed = r.status === 'ok' && stillOwner() && r.expiresAt > Date.now();
+      window.MA_STATE.auth = allowed ? 'ok' : r.status;
+      if (atlas === 'micro' && r.status === 'error') window.MICRO_LOAD_ERROR = true;
+      if (allowed) { full = true; expiresAt = r.expiresAt; run(r.code); }
+      if (appId) run(document.getElementById(appId).textContent);
+      mount(document.querySelectorAll('[data-ma-acct]'));
+      var status = document.querySelector('[data-access-status]');
+      if (status) status.textContent = allowed ? 'Подписка активна' : r.status === 'error' ?
+        'Полная версия временно недоступна. Два пробных конспекта открыты.' : 'Пробная версия · два конспекта';
+      if (full) {
+        setTimeout(reload, Math.min(expiresAt - Date.now(), 2147483647));
+        setInterval(check, 60000);
+      }
+    }
+    listeners.push(function (current) {
+      if ((current && current.id) !== (owner && owner.id)) reload();
+    });
+    window.addEventListener('pageshow', function (e) { if (e.persisted && full) reload(); });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
+    mount(document.querySelectorAll('[data-ma-acct]'));
+    loadLocked(atlas).then(start);
   }
 
   // ---------- вход и выход ----------
@@ -165,7 +193,7 @@
 
   window.MA = {
     enabled: enabled, signedIn: signedIn, user: user, loginUrl: loginUrl, AUTH_URL: AUTH_URL, SITE_URL: SITE_URL, API: API,
-    mount: mount, onChange: function (f) { listeners.push(f); }, loadLocked: loadLocked,
+    mount: mount, bootAtlas: bootAtlas, onChange: function (f) { listeners.push(f); }, loadLocked: loadLocked,
     call: call, api: api, setSession: setSession, logout: logout, refresh: refresh,
   };
 })();

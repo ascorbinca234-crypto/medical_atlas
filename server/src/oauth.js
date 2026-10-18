@@ -1,6 +1,7 @@
 'use strict';
 // Вход через Яндекс ID и VK ID: authorization code + PKCE (S256).
 const crypto = require('crypto');
+const { fetchText } = require('./http');
 const { b64u } = require('./tokens');
 
 // URLSearchParams кодирует пробел как «+», а VK ID читает «+» буквально: права доступа склеиваются в одно
@@ -18,6 +19,7 @@ async function readJson(res, what) {
 }
 
 function providers(cfg, fetchImpl = fetch) {
+  const request = (url, options) => fetchText(fetchImpl, url, options, cfg.requestTimeoutMs);
   const redirect = p => cfg.apiUrl + '/auth/' + p + '/callback';
   return {
     yandex: {
@@ -28,11 +30,11 @@ function providers(cfg, fetchImpl = fetch) {
       },
       async profile(query, st) {
         if (query.error) throw Object.assign(new Error(providerError(query)), { userCancel: query.error === 'access_denied' });
-        const tok = await readJson(await fetchImpl(cfg.yandex.tokenUrl, {
+        const tok = await readJson(await request(cfg.yandex.tokenUrl, {
           method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ grant_type: 'authorization_code', code: query.code || '', client_id: cfg.yandex.clientId, client_secret: cfg.yandex.clientSecret, code_verifier: st.v }),
         }), 'Яндекс, обмен кода');
-        const info = await readJson(await fetchImpl(cfg.yandex.infoUrl + '?format=json', { headers: { Authorization: 'OAuth ' + tok.access_token } }), 'Яндекс, профиль');
+        const info = await readJson(await request(cfg.yandex.infoUrl + '?format=json', { headers: { Authorization: 'OAuth ' + tok.access_token } }), 'Яндекс, профиль');
         const name = info.display_name || [info.first_name, info.last_name].filter(Boolean).join(' ') || info.login || '';
         return {
           id: String(info.id), name,
@@ -52,11 +54,11 @@ function providers(cfg, fetchImpl = fetch) {
         if (q.payload) { try { q = Object.assign(q, JSON.parse(q.payload)); } catch (e) { /* оставим как есть */ } }
         if (q.error) throw Object.assign(new Error(providerError(q)), { userCancel: /denied|cancel/i.test(q.error) });
         if (!q.code) throw new Error('VK ID не прислал код (параметры: ' + Object.keys(q).join(', ') + ')');
-        const tok = await readJson(await fetchImpl(cfg.vk.tokenUrl, {
+        const tok = await readJson(await request(cfg.vk.tokenUrl, {
           method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ grant_type: 'authorization_code', code: q.code || '', code_verifier: st.v, client_id: cfg.vk.clientId, device_id: q.device_id || '', redirect_uri: redirect('vk'), state: q.state || '' }),
         }), 'VK ID, обмен кода');
-        const info = await readJson(await fetchImpl(cfg.vk.infoUrl, {
+        const info = await readJson(await request(cfg.vk.infoUrl, {
           method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ client_id: cfg.vk.clientId, access_token: tok.access_token }),
         }), 'VK ID, профиль');

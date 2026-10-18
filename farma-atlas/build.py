@@ -1,22 +1,21 @@
 """Сборка атласа фармакологии.
 
-Публичная часть: index.html — код атласа и бесплатные темы (лекции 1–3, листы I–VI).
+Публичная часть: index.html — код атласа и бесплатные темы (два базовых конспекта).
 Закрытая часть: ../server/content/farma.js — остальные темы. Её отдаёт сервер только
-вошедшим пользователям, в публичный репозиторий она не попадает.
+пользователям с действующей подпиской, в публичный репозиторий она не попадает.
 
-Запуск:  python3 build.py
+Запуск: python3 build.py [--full]
 Закрытые исходники берутся из ../../medical_atlas_private/farma-atlas/src
-или из папки, указанной в переменной окружения ATLAS_PRIVATE (корень закрытого репозитория).
+или из папки, указанной в переменной окружения ATLAS_PRIVATE (корень закрытой папки).
 Без закрытой папки собирается только публичная часть.
 """
 from pathlib import Path
-import glob, hashlib, json, os, re, sys
+import json, os, sys
 
 root = Path(__file__).resolve().parent
 repo = root.parent
 src = root / 'src'
 priv_root = Path(os.environ.get('ATLAS_PRIVATE') or repo.parent / 'medical_atlas_private')
-psrc = priv_root / 'farma-atlas' / 'src'
 content_out = repo / 'server' / 'content' / 'farma.js'
 
 
@@ -24,80 +23,57 @@ def read(p):
     return Path(p).read_text(encoding='utf-8')
 
 
-# ---------- закрытая часть ----------
-locked_js, locked_hash = '', ''
-if psrc.is_dir():
-    lfiles = (['data.locked.js']
-              + sorted(Path(p).name for p in glob.glob(str(psrc / 'k_*.js')))
-              + sorted(Path(p).name for p in glob.glob(str(psrc / 'rx_*.locked.js')))
-              + ['drugs.locked.js', 'body.locked.js'])
-    missing = [f for f in lfiles if not (psrc / f).exists()]
-    if missing:
-        sys.exit('В закрытой папке нет файлов: ' + ', '.join(missing))
-    locked_js = '\n'.join(read(psrc / f) for f in lfiles)
-    locked_hash = hashlib.sha256(locked_js.encode('utf-8')).hexdigest()[:16]
+# A full build must have all sources, including the formerly public material.
+# Public builds use a committed title-only catalog and never disable subscriptions.
+import argparse, subprocess
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--full', action='store_true')
+args = parser.parse_args()
+locked_js = ''
+if args.full:
+    base = priv_root / 'farma-atlas' / 'base' / 'src'
+    for name in ['k_00_gen.js','k_01_aff.js']:
+        if (base / name).read_bytes() != (src / name).read_bytes(): sys.exit('Demo differs from private source: ' + name)
+    manifest = json.loads((priv_root / 'farma-atlas' / 'manifest.json').read_text())
+    source = '\n'.join(read(priv_root / 'farma-atlas' / f) for f in manifest)
+    source += '\nconsole.log(JSON.stringify({P,KP,KALIAS,RXD,RXAL,DRUGS,ANTIDOTES,DRUGS_ORDER,VIT_LOCKED,VIT_ORDER}));'
+    result = subprocess.run(['node', '-'], input=source, text=True, capture_output=True, timeout=30, check=True)
+    data = json.loads(result.stdout)
+    if len(data['KP']) != 13 or len(data['P']) != 16:
+        sys.exit('Неожиданное число конспектов или листов в полной фармакологии')
+    demo = {'k-gen', 'k-aff'}
+    for key in ['KP', 'P']:
+        if len({x['id'] for x in data[key]}) != len(data[key]): sys.exit('Повторяющиеся ID: ' + key)
+    encode = lambda value: json.dumps(value, ensure_ascii=False, separators=(',', ':')).replace('<', '\\u003c')
+    locked_js = '\n'.join(key + '.length=0;' + key + '.push(...' + encode(data[key]) + ');' for key in ['P','KP','RXAL','ANTIDOTES'])
+    locked_js += '\n' + '\n'.join('Object.keys('+key+').forEach(k=>delete '+key+'[k]);Object.assign('+key+','+encode(data[key])+');' for key in ['KALIAS','RXD','DRUGS'])
+    locked_js += '\nconst DRUGS_ORDER=' + encode(data['DRUGS_ORDER']) + ';\nconst VIT_LOCKED=' + encode(data['VIT_LOCKED']) + ';\nconst VIT_ORDER=' + encode(data['VIT_ORDER']) + ';\n'
+    locked_js += read(base / 'body.js') + '\n' + read(base / 'learn.js')
     content_out.parent.mkdir(parents=True, exist_ok=True)
     content_out.write_text(locked_js, encoding='utf-8')
-
-    # заглушки закрытых тем: id, номер, название и краткое описание
-    def field(chunk, name):
-        m = re.search(r"\b" + name + r":'((?:[^'\\]|\\.)*)'", chunk)
-        return m.group(1).replace("\\'", "'") if m else None
-
-    stubs_k, stubs_p = [], []
-    for f in sorted(glob.glob(str(psrc / 'k_*.js'))):
-        t = read(f)
-        i = t.find("{id:'")
-        chunk = t[i:i + 3000]
-        s = {k: field(chunk, k) for k in ('id', 'roman', 'lec', 'title', 'sum')}
-        if not s['id'] or not s['title']:
-            sys.exit(f'{Path(f).name}: не нашёл id или title лекции')
-        stubs_k.append({**s, 'mod': 'kon', 'locked': True, 'blocks': [], 'rel': []})
-    for chunk in read(psrc / 'data.locked.js').split('P.push(')[1:]:
-        chunk = chunk[:3000]
-        s = {k: field(chunk, k) for k in ('id', 'roman', 'mod', 'title', 'sum')}
-        if not s['id'] or not s['title']:
-            sys.exit('data.locked.js: не нашёл id или title листа')
-        stubs_p.append({**s, 'locked': True, 'blocks': []})
-    j = lambda o: json.dumps({k: v for k, v in o.items() if v is not None}, ensure_ascii=False)
-    (src / 'locked_stubs.js').write_text(
-        '/* ===== Заглушки закрытых тем: название и краткое описание. Содержимое приходит с сервера после входа.\n'
-        '   Файл пересобирается build.py из закрытого репозитория. ===== */\n'
-        + '\n'.join(f'KP.push({j(s)});' for s in stubs_k) + '\n'
-        + '\n'.join(f'P.push({j(s)});' for s in stubs_p) + '\n', encoding='utf-8')
-else:
-    print(f'Закрытая папка не найдена ({psrc}) — собираю только публичную часть.')
+    stubs=[]
+    for key in ['KP','P']:
+        for item in data[key]:
+            if item['id'] in demo: continue
+            stub={k:item[k] for k in ['id','roman','lec','title','sum','mod'] if k in item}
+            stub.update(locked=True,blocks=[],rel=[])
+            stubs.append(key+'.push('+encode(stub)+');')
+    (src / 'locked_stubs.js').write_text('/* Title-only catalog. Generated by --full. */\n'+'\n'.join(stubs)+'\n')
 
 # ---------- публичная часть ----------
 css = read(src / 'style.css')
-data_files = (['data.js', 'k0.js']
-              + sorted(Path(p).name for p in glob.glob(str(src / 'k_*.js')))
-              + ['locked_stubs.js']
-              + sorted(Path(p).name for p in glob.glob(str(src / 'rx_*.js')))
-              + ['drugs.js'])
-code_files = ['fixup.js', 'body.js', 'learn.js', 'fx.js', 'app.js']
+data_files = ['data.js', 'k0.js', 'k_00_gen.js', 'k_01_aff.js', 'locked_stubs.js', 'drugs.js']
+code_files = ['fixup.js', 'fx.js', 'app.js']
 data_js = '\n'.join(read(src / f) for f in data_files)
 code_js = '\n'.join(read(src / f) for f in code_files)
 for name, text in (('data', data_js), ('code', code_js)):
     if '</script' in text.lower():
         sys.exit(f'В {name}-части встретилось «</script» — экранируйте его.')
 
-boot = '''(function(){
-  var LOCKED_HASH = '%s';
-  var page = document.getElementById('page');
-  function run(code){ var s = document.createElement('script'); s.textContent = code; document.body.appendChild(s); }
-  function start(code){ if (code) run(code); run(document.getElementById('ma-app').textContent); }
-  var MA = window.MA;
-  window.MA_STATE = {auth: 'none'};
-  if (MA) MA.mount(document.querySelectorAll('[data-ma-acct]'));
-  if (!MA || !MA.signedIn() || !LOCKED_HASH) { start(null); return; }
-  window.MA_STATE.auth = 'loading';
-  page.innerHTML = '<div class="boot">Загружаю закрытые темы…</div>';
-  MA.loadLocked('farma', LOCKED_HASH).then(function(r){
-    window.MA_STATE.auth = r.status === 'ok' ? 'ok' : (r.status === 'signed-out' ? 'none' : 'error');
-    page.innerHTML = ''; start(r.code);
-  });
-})();''' % locked_hash
+boot = """(function(){
+  if (window.MA) { window.MA.bootAtlas('farma', 'ma-app'); return; }
+  var s=document.createElement('script'); s.textContent=document.getElementById('ma-app').textContent; document.body.appendChild(s);
+})();"""
 
 html = f'''<!doctype html>
 <html lang="ru">
@@ -150,4 +126,4 @@ body{{margin:0}}
 (root / 'index.html').write_text(html, encoding='utf-8')
 print('index.html', len(html.encode('utf-8')) // 1024, 'KB')
 if locked_js:
-    print('закрытая часть', len(locked_js.encode('utf-8')) // 1024, 'KB →', content_out.relative_to(repo), 'hash', locked_hash)
+    print('закрытая часть', len(locked_js.encode('utf-8')) // 1024, 'KB →', content_out.relative_to(repo))

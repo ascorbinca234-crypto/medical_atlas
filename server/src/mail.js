@@ -40,7 +40,8 @@ function smtpSend(o, to, message) {
     const sock = o.secure ? tls.connect({ host: o.host, port: o.port, servername: o.host }) : net.connect({ host: o.host, port: o.port });
     sock.setEncoding('utf8');
     let buf = '', step = 0, done = false;
-    sock.setTimeout(12000, () => { if (!done) { done = true; sock.destroy(); reject(new Error('SMTP: сервер не ответил за 12 с')); } });
+    const deadline = setTimeout(() => fail('истекло время отправки'), o.timeoutMs || 20000);
+    sock.setTimeout(o.idleTimeoutMs || 12000, () => fail('сервер не отвечает'));
     const data = message.replace(/\r\n\./g, '\r\n..');
     const steps = [
       [220, () => 'EHLO ' + (os.hostname() || 'localhost')],
@@ -54,13 +55,17 @@ function smtpSend(o, to, message) {
       [250, () => 'QUIT'],
       [221, null],
     ];
-    const fail = msg => { if (!done) { done = true; sock.destroy(); reject(new Error('SMTP: ' + msg)); } };
+    const fail = msg => { if (!done) { done = true; clearTimeout(deadline); sock.destroy(); reject(new Error('SMTP: ' + msg)); } };
     sock.on('error', e => fail(e.message));
+    sock.on('end', () => fail('соединение закрыто до подтверждения письма'));
+    sock.on('close', () => fail('соединение закрыто до подтверждения письма'));
     sock.on('data', chunk => {
+      if (done) return;
       buf += chunk;
+      if (buf.length > 65536) return fail('слишком большой ответ');
       while (true) {
         const lines = buf.split('\r\n');
-        const endIdx = lines.findIndex(l => /^\d{3} /.test(l));
+        const endIdx = lines.findIndex((l, i) => i < lines.length - 1 && /^\d{3} /.test(l));
         if (endIdx < 0) return;                              // ответ ещё не дочитан
         const code = Number(lines[endIdx].slice(0, 3));
         const text = lines.slice(0, endIdx + 1).join(' | ');
@@ -72,7 +77,15 @@ function smtpSend(o, to, message) {
           return fail(`${hint}; ответ «${text.slice(0, 200)}»`);
         }
         step++;
-        if (!next) { done = true; sock.end(); return resolve(); }
+        // 250 after DATA confirms delivery. QUIT is cleanup, not another delivery acknowledgement.
+        if (step === 9) {
+          done = true; clearTimeout(deadline);
+          // Give the peer time to acknowledge QUIT, but never keep an accepted message pending.
+          const cleanup = setTimeout(() => sock.destroy(), 1000);
+          sock.once('close', () => clearTimeout(cleanup));
+          sock.end('QUIT\r\n'); return resolve();
+        }
+        if (!next) { done = true; clearTimeout(deadline); sock.end(); return resolve(); }
         sock.write(next() + '\r\n');
       }
     });

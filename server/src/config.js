@@ -46,6 +46,8 @@ function config(e = process.env) {
       outbox: e.MAIL_OUTBOX || '',
       leadTo: e.LEAD_TO || e.SMTP_USER || '',
     },
+    requestTimeoutMs: 8000,
+    requiredContent: ['farma', 'biochem', 'micro'],
     contentDir: e.CONTENT_DIR || path.join(__dirname, '..', 'content'),
     gzip: e.GZIP !== '0',
     accessTtl: Number(e.ACCESS_TTL || 15 * 60),

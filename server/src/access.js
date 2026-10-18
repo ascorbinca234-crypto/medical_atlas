@@ -1,0 +1,16 @@
+'use strict';
+const POLICY = 'subject-subscription-v1';
+const SUBJECTS = Object.freeze([
+  { id: 'farma', title: 'Фармакология', available: true },
+  { id: 'biochem', title: 'Биохимия', available: true },
+  { id: 'micro', title: 'Микробиология', available: true },
+  { id: 'pathophys', title: 'Патологическая физиология', available: false },
+  { id: 'biology', title: 'Биология', available: false },
+]);
+// Only server-owned documents confer access. A bundle writes one grant per subject,
+// preserving the purchased subject list; future subjects are never unlocked implicitly.
+function grantFor(doc, subject, at = Date.now()) {
+  const g = doc && Object.hasOwn(doc, subject) && doc[subject];
+  return g && g.revoked !== true && Number.isFinite(g.expiresAt) && g.expiresAt > at ? g : null;
+}
+module.exports = { SUBJECTS, POLICY, grantFor };

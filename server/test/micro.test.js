@@ -35,29 +35,8 @@ test('публичные исходники микробиологии не со
   assert.ok(!names.some(x=>/^p\d|^pathogens_|^questions/.test(x)));
   assert.ok(!fs.existsSync(path.join(root, 'dist')));
 });
-async function boot(response, timeout) {
-  const executed = [], timers = [];
-  const user = {id:'student'};
-  const ctx = vm.createContext({ window: {}, document: {
-    createElement: () => ({}), body: {appendChild: x=>executed.push(x.textContent)},
-    getElementById: () => ({textContent:'startDemo()'}), querySelectorAll: () => []
-  }, location: {reload() {}}, addEventListener() {}, clearTimeout() {}, setTimeout: f=>{timers.push(f);return 1;} });
-  ctx.window.MA = {user:()=>user, signedIn:()=>true, mount() {}, onChange() {}, api:()=>response};
-  vm.runInContext(fs.readFileSync(path.join(root, 'src/boot.js'), 'utf8'), ctx);
-  if (timeout) timers[0]();
-  await new Promise(resolve=>setImmediate(resolve));
-  return executed;
-}
-test('отказ в доступе оставляет пробную версию; успешная проверка позволяет полную загрузку', async () => {
-  assert.deepEqual(await boot(Promise.reject({status:403})), ['startDemo()']);
-  assert.deepEqual(await boot(Promise.resolve({text:()=>Promise.resolve('authorizedContent()')})), ['authorizedContent()', 'startDemo()']);
-});
-test('медленный сервер не блокирует пробную версию и не исполняет запоздалый ответ', async () => {
-  let done;
-  const pending = new Promise(resolve=>{done=resolve;});
-  const executed = await boot(pending, true);
-  assert.deepEqual(executed, ['startDemo()']);
-  done({text:()=>Promise.resolve('lateContent()')});
-  await new Promise(resolve=>setImmediate(resolve));
-  assert.deepEqual(executed, ['startDemo()']);
+test('микробиология использует единый загрузчик подписок', () => {
+  const calls = [];
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'src/boot.js'), 'utf8'), {window:{MA:{bootAtlas:(...args)=>calls.push(args)}}});
+  assert.deepEqual(calls, [['micro', 'micro-app']]);
 });

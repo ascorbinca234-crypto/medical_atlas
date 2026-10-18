@@ -2,14 +2,15 @@
 // Хранилище в YDB Serverless через Document API (протокол DynamoDB). Данные лежат в России, в Яндекс Облаке.
 // Таблицы: <prefix>users (id), <prefix>identities (k), <prefix>kv (k). Создаются scripts/create-tables.js.
 const { sign } = require('../sigv4');
+const { fetchText } = require('../http');
 
 function ydbStore(o, fetchImpl = fetch) {
   const T = { users: o.prefix + 'users', identities: o.prefix + 'identities', kv: o.prefix + 'kv' };
-  async function call(op, body) {
+  async function call(op, body, timeoutMs = o.timeoutMs) {
     const payload = JSON.stringify(body);
     const headers = sign({ method: 'POST', url: o.endpoint, headers: { 'Content-Type': 'application/x-amz-json-1.0', 'X-Amz-Target': 'DynamoDB_20120810.' + op }, body: payload },
       { accessKeyId: o.accessKeyId, secretAccessKey: o.secretAccessKey, region: 'ru-central1', service: 'dynamodb' });
-    const res = await fetchImpl(o.endpoint, { method: 'POST', headers, body: payload });
+    const res = await fetchText(fetchImpl, o.endpoint, { method: 'POST', headers, body: payload }, timeoutMs);
     const text = await res.text();
     let j = {};
     try { j = text ? JSON.parse(text) : {}; } catch (e) { j = { message: text }; }
@@ -30,16 +31,24 @@ function ydbStore(o, fetchImpl = fetch) {
   function ensure() {
     if (ensured) return ensured;
     ensured = (async () => {
+      const deadline = Date.now() + (o.setupTimeoutMs || 20000);
+      const setupCall = (op, body) => {
+        const remaining = deadline - Date.now();
+        if (remaining <= 0) throw new Error('YDB setup timed out');
+        return call(op, body, Math.min(o.timeoutMs || 8000, remaining));
+      };
       for (const [name, key] of [[T.users, 'id'], [T.identities, 'k'], [T.kv, 'k']]) {
         let exists = true;
-        try { await call('DescribeTable', { TableName: name }); } catch (e) { if (isMissing(e)) exists = false; else throw e; }
+        try { await setupCall('DescribeTable', { TableName: name }); } catch (e) { if (isMissing(e)) exists = false; else throw e; }
         if (exists) continue;
-        try { await call('CreateTable', { TableName: name, AttributeDefinitions: [{ AttributeName: key, AttributeType: 'S' }], KeySchema: [{ AttributeName: key, KeyType: 'HASH' }] }); }
+        try { await setupCall('CreateTable', { TableName: name, AttributeDefinitions: [{ AttributeName: key, AttributeType: 'S' }], KeySchema: [{ AttributeName: key, KeyType: 'HASH' }] }); }
         catch (e) { if (!/ResourceInUse|already exists/i.test(e.message)) throw e; }
+        let active = false;
         for (let i = 0; i < 40; i++) {
-          try { const d = await call('DescribeTable', { TableName: name }); if (!d.Table || !d.Table.TableStatus || d.Table.TableStatus === 'ACTIVE') break; } catch (e) { if (!isMissing(e)) throw e; }
+          try { const d = await setupCall('DescribeTable', { TableName: name }); if (d.Table && d.Table.TableStatus === 'ACTIVE') { active = true; break; } } catch (e) { if (!isMissing(e)) throw e; }
           await sleep(500);
         }
+        if (!active) throw new Error('YDB table activation timed out');
       }
     })();
     ensured.catch(() => { ensured = null; });
@@ -49,6 +58,30 @@ function ydbStore(o, fetchImpl = fetch) {
   const run = async (op, body) => { try { return await call(op, body); } catch (e) { if (!isMissing(e)) throw e; await ensure(); return call(op, body); } };
   return {
     kind: 'ydb', call, tables: T, ensure,
+    async ready() {
+      // Always checks the service; ensure() is deliberately cached, readiness is not.
+      await Promise.all(Object.values(T).map(async TableName => {
+        const r = await call('DescribeTable', { TableName });
+        if (!r.Table || r.Table.TableStatus !== 'ACTIVE') throw new Error('YDB not ready');
+      }));
+    },
+    async updateUser(id, mutate) {
+      for (let attempt = 0; attempt < 8; attempt++) {
+        const r = await run('GetItem', { TableName: T.users, Key: { id: { S: id } }, ConsistentRead: true });
+        if (!r.Item || !r.Item.d) return null;
+        const previous = r.Item.d.S, u = JSON.parse(previous);
+        if (u.deleted) return null;
+        mutate(u); // synchronous; must have no side effects (may be retried)
+        if (u.id !== id) throw new Error('User id cannot change');
+        try {
+          await run('PutItem', { TableName: T.users, Item: { id: { S: id }, d: { S: JSON.stringify(u) } },
+            ConditionExpression: '#d = :previous', ExpressionAttributeNames: { '#d': 'd' },
+            ExpressionAttributeValues: { ':previous': { S: previous } } });
+          return u;
+        } catch (e) { if (!isCond(e)) throw e; }
+      }
+      throw new Error('Concurrent user update; retry request');
+    },
     async getUser(id) {
       const r = await run('GetItem', { TableName: T.users, Key: { id: { S: id } }, ConsistentRead: true });
       return r.Item && r.Item.d ? JSON.parse(r.Item.d.S) : null;
