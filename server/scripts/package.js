@@ -1,7 +1,7 @@
 'use strict';
 // Собирает dist/function.zip для загрузки в Cloud Functions: код + закрытые части атласов из content/.
 // Перед этим соберите атласы (python3 build.py в папках атласов), чтобы content/ был свежим.
-const fs = require('fs'), path = require('path'), zlib = require('zlib');
+const fs = require('fs'), path = require('path'), zlib = require('zlib'), crypto = require('crypto');
 const root = path.join(__dirname, '..');
 const { execFileSync } = require('child_process');
 // Rebuild everything: never package a partial or stale content directory.
@@ -13,11 +13,23 @@ function files() {
   const out = ['index.js', 'package.json'];
   const walk = d => fs.readdirSync(path.join(root, d)).forEach(f => { const p = d + '/' + f; fs.statSync(path.join(root, p)).isDirectory() ? walk(p) : out.push(p); });
   walk('src');
-  if (fs.existsSync(path.join(root, 'content'))) fs.readdirSync(path.join(root, 'content')).filter(f => f.endsWith('.js') || f === 'manifest.json').forEach(f => out.push('content/' + f));
+  for (const atlas of ['farma', 'biochem', 'micro']) {
+    const dir = 'content/topics/' + atlas, mp = dir + '/manifest.json';
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, mp), 'utf8'));
+    if (manifest.policy !== 'topic-delivery-v1' || !Object.keys(manifest.topics || {}).length) throw new Error('Invalid topic manifest: ' + atlas);
+    out.push(mp);
+    for (const [topic, meta] of Object.entries(manifest.topics)) {
+      if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(topic)) throw new Error('Invalid topic id');
+      const file = dir + '/' + topic + '.js';
+      const raw = fs.readFileSync(path.join(root, file));
+      if (crypto.createHash('sha256').update(raw).digest('hex') !== meta.sha256) throw new Error('Topic hash mismatch: ' + file);
+      out.push(file);
+    }
+  }
   return out;
 }
 const list = files();
-for (const id of ['farma','biochem','micro']) { if (!list.includes('content/' + id + '.js')) throw new Error('Missing content: ' + id); }
+for (const id of ['farma','biochem','micro']) { if (!list.includes('content/topics/' + id + '/manifest.json')) throw new Error('Missing content: ' + id); }
 const parts = [], central = [];
 let offset = 0;
 for (const name of list) {

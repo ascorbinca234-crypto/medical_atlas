@@ -1,7 +1,8 @@
 'use strict';
 // HTTP-обработчик API: регистрация и вход, OAuth, профиль, выдача закрытых частей атласов,
 // прогресс и ординаторская (src/social.js).
-const fs = require('fs'), path = require('path'), zlib = require('zlib'), crypto = require('crypto');
+const crypto = require('crypto');
+const { createContent, DELIVERY } = require('./content');
 const { keys, jwtSign, jwtVerify, seal, open, randomId, now } = require('./tokens');
 const { hashPassword, verifyPassword } = require('./passwords');
 const { providers, pkce } = require('./oauth');
@@ -20,7 +21,6 @@ const DUMMY_HASH = 's1$AAAAAAAAAAAAAAAAAAAAAA==$' + Buffer.alloc(64).toString('b
 function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   const K = keys(cfg.secret || 'x'.repeat(32));
   const prov = providers(cfg, fetchImpl);
-  const contentCache = new Map();
 
   // ---------- helpers ----------
   const json = (status, obj, headers) => ({ status, headers: Object.assign({ 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }, headers), body: JSON.stringify(obj) });
@@ -28,7 +28,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   const toAuth = (hash, headers) => redirect(cfg.authPage + '#' + hash, headers);
   function cors(origin) {
     if (!origin || !cfg.origins.includes(origin)) return {};
-    return { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization', 'Access-Control-Expose-Headers': 'X-Content-Hash, X-Access-Policy, X-Access-Expires', 'Access-Control-Max-Age': '600' };
+    return { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization', 'Access-Control-Expose-Headers': 'X-Content-Hash, X-Access-Policy, X-Access-Expires, X-Content-Policy, X-Content-Receipt, Retry-After', 'Access-Control-Max-Age': '600' };
   }
   function body(req) {
     if (!req.body) return {};
@@ -357,6 +357,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const u = await changeAuthenticated(req, current => { current.deleted = true; current.tv = (current.tv || 0) + 1; });
     await social.onDelete(u.id);
     await store.deleteDoc('access:' + u.id);
+    await content.onDelete(u.id);
     for (const k of u.ids || []) await store.deleteIdentity(k);
     await store.deleteUser(u.id);
     return json(200, { ok: true });
@@ -366,27 +367,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   const social = createSocial({ store, cfg, HttpError, authUser, limit, json, body, randomId });
 
   // ---------- закрытые части атласов ----------
-  function loadContent(atlas) {
-    if (contentCache.has(atlas)) return contentCache.get(atlas);
-    const file = path.join(cfg.contentDir, atlas + '.js');
-    if (!fs.existsSync(file)) return null;
-    const raw = fs.readFileSync(file);
-    const c = { raw, gz: zlib.gzipSync(raw, { level: 9 }), hash: crypto.createHash('sha256').update(raw).digest('hex').slice(0, 16) };
-    contentCache.set(atlas, c);
-    return c;
-  }
-  async function content(req, atlas) {
-    const user = await authUser(req);
-    if (!SUBJECTS.some(s => s.id === atlas)) throw new HttpError(404, 'not_found', 'Нет такого атласа.');
-    const record = await store.getDoc('access:' + user.id);
-    const grant = grantFor(record && record.d, atlas);
-    if (!grant) throw new HttpError(403, 'subscription_required', 'Для этого предмета нужна действующая подписка.');
-    const c = loadContent(atlas);
-    if (!c) throw new HttpError(404, 'not_found', 'Нет такого атласа.');
-    const headers = { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'private, no-store', 'X-Content-Hash': c.hash, 'X-Access-Policy': POLICY, 'X-Access-Expires': String(grant.expiresAt) };
-    if (cfg.gzip && /\bgzip\b/.test(req.headers['accept-encoding'] || '')) return { status: 200, headers: Object.assign(headers, { 'Content-Encoding': 'gzip' }), body: c.gz.toString('base64'), base64: true };
-    return { status: 200, headers, body: c.raw.toString('utf8') };
-  }
+  const content = createContent({ cfg, store, authUser, HttpError, json });
 
   // ---------- маршруты ----------
   const routes = [
@@ -394,12 +375,12 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     ['GET', /^\/health$/, async () => {
       let database = false;
       if (!cfg.missing.length) { try { await store.ready(); database = true; } catch (e) { log.error('readiness: database unavailable'); } }
-      const content = {};
+      const contentStatus = {};
       for (const id of cfg.requiredContent || []) {
-        try { const c = loadContent(id); content[id] = !!(c && c.raw.length); } catch (e) { content[id] = false; }
+        contentStatus[id] = content.ready(id);
       }
-      const ok = !cfg.missing.length && database && Object.values(content).every(Boolean);
-      return json(ok ? 200 : 503, { ok, missing: cfg.missing, store: store.kind, database, content, policy: POLICY,
+      const ok = !cfg.missing.length && database && Object.values(contentStatus).every(Boolean);
+      return json(ok ? 200 : 503, { ok, missing: cfg.missing, store: store.kind, database, content: contentStatus, policy: POLICY, delivery: DELIVERY,
         providers: { yandex: prov.yandex.enabled, vk: prov.vk.enabled } });
     }],
     ['GET', /^\/access$/, async req => {
@@ -422,8 +403,9 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     ['GET', /^\/me$/, me],
     ['PATCH', /^\/me$/, updateMe],
     ['DELETE', /^\/me$/, deleteMe],
-    ['GET', /^\/content-v2\/([^/]+)$/, (req, m) => content(req, m[1])],
-    ['GET', /^\/content\/([^/]+)$/, (req, m) => content(req, m[1])],
+    ['GET', /^\/content-v3\/([^/]+)\/([^/]+)$/, (req, m) => content.topic(req, m[1], m[2])],
+    ['GET', /^\/content-v2\/([^/]+)$/, (req, m) => content.retired(req, m[1])],
+    ['GET', /^\/content\/([^/]+)$/, (req, m) => content.retired(req, m[1])],
     ['POST', /^\/lead$/, lead],
     ...social.routes,
   ];
@@ -441,7 +423,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
       }
       throw new HttpError(404, 'not_found', 'Нет такого адреса.');
     } catch (e) {
-      if (e instanceof HttpError) return json(e.status, Object.assign({ error: e.code, message: e.message }, e.extra), h);
+      if (e instanceof HttpError) return json(e.status, Object.assign({ error: e.code, message: e.message }, e.extra), e.extra && e.extra.retryAfter ? { ...h, 'Retry-After': String(e.extra.retryAfter) } : h);
       log.error('server error', e && e.stack || e);
       return json(500, { error: 'server', message: 'На сервере ошибка. Попробуйте ещё раз через минуту.' }, h);
     }

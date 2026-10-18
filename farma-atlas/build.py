@@ -10,6 +10,9 @@
 Без закрытой папки собирается только публичная часть.
 """
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import topic_build
 import json, os, sys
 
 root = Path(__file__).resolve().parent
@@ -51,6 +54,7 @@ if args.full:
     locked_js += read(base / 'body.js') + '\n' + read(base / 'learn.js')
     content_out.parent.mkdir(parents=True, exist_ok=True)
     content_out.write_text(locked_js, encoding='utf-8')
+    topic_build.farma(data, read(base / 'body.js'), read(base / 'learn.js'))
     stubs=[]
     for key in ['KP','P']:
         for item in data[key]:
@@ -108,9 +112,10 @@ body{{margin:0}}
   <main class="main"><div class="page" id="page"></div></main>
 </div>
 <div class="dz" id="dz" lang="ru" hidden><div class="dz-scrim" data-close></div><aside class="dz-panel" role="dialog" aria-modal="true" aria-labelledby="dz-title" tabindex="-1"><div class="dz-top"><button type="button" class="dz-back" hidden>← Назад</button><button type="button" class="dz-x" data-close aria-label="Закрыть досье">×</button></div><div class="dz-body" id="dzBody"></div></aside></div>
+<script>window.MA_TOPICS={read(root / "topics.json")};</script>
 <script src="../auth/config.js"></script>
-<script src="../auth/auth.js"></script>
-<script src="../progress/progress.js"></script>
+<script src="../auth/auth.js?v=topic-delivery-v1"></script>
+<script src="../progress/progress.js?v=topic-delivery-v1"></script>
 <script>
 {data_js}
 </script>

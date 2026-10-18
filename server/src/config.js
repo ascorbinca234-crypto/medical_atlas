@@ -50,6 +50,7 @@ function config(e = process.env) {
     requiredContent: ['farma', 'biochem', 'micro'],
     contentDir: e.CONTENT_DIR || path.join(__dirname, '..', 'content'),
     gzip: e.GZIP !== '0',
+    contentLimits: { minute: 12, hour: 80, day: 250, bytesDay: 32 * 1024 * 1024 },
     accessTtl: Number(e.ACCESS_TTL || 15 * 60),
     refreshTtl: Number(e.REFRESH_TTL || 30 * 24 * 3600),
   };

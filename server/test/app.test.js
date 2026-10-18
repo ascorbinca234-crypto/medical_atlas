@@ -1,4 +1,5 @@
 'use strict';
+const {topicFixture}=require('./topic-fixture');
 const test = require('node:test'), assert = require('node:assert');
 const fs = require('fs'), os = require('os'), path = require('path'), zlib = require('zlib');
 const { config } = require('../src/config');
@@ -8,7 +9,7 @@ const { memoryStore } = require('../src/store/memory');
 const SITE = 'https://ma.example/medical_atlas', API = 'https://api.example';
 function setup(extra = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ma-'));
-  fs.writeFileSync(path.join(dir, 'farma.js'), 'window.LOCKED_OK = true;');
+  topicFixture(dir,'farma','window.LOCKED_OK = true;');
   const cfg = config(Object.assign({ SITE_URL: SITE, API_URL: API, SECRET: 's'.repeat(40), STORE: 'memory', MAIL_TRANSPORT: 'log', CONTENT_DIR: dir,
     YANDEX_CLIENT_ID: 'yid', YANDEX_CLIENT_SECRET: 'ysec', VK_CLIENT_ID: 'vkid' }, extra));
   const sent = [], store = memoryStore();
@@ -144,17 +145,17 @@ test('OAuth без cookie или с чужим state отклоняется', as
 
 test('закрытая часть: только с токеном, gzip, хэш', async () => {
   const ctx = setup();
-  let r = await ctx.call('GET', '/content/farma');
+  let r = await ctx.call('GET', '/content-v3/farma/test-topic');
   assert.strictEqual(r.status, 401);
   const a = await oauthLogin(ctx, 'yandex', st => ({ code: 'c', state: st }));
   await ctx.store.putDoc('access:' + a.user.id, { farma: { expiresAt: Date.now() + 60000 } }, 0);
-  r = await ctx.call('GET', '/content/farma', null, { authorization: 'Bearer ' + a.accessToken });
-  assert.strictEqual(r.status, 200); assert.strictEqual(r.body, 'window.LOCKED_OK = true;'); assert.match(r.headers['X-Content-Hash'], /^[0-9a-f]{16}$/);
-  r = await ctx.call('GET', '/content/farma', null, { authorization: 'Bearer ' + a.accessToken, 'accept-encoding': 'gzip, br' });
-  assert.strictEqual(r.headers['Content-Encoding'], 'gzip'); assert.strictEqual(zlib.gunzipSync(Buffer.from(r.body, 'base64')).toString(), 'window.LOCKED_OK = true;');
+  r = await ctx.call('GET', '/content-v3/farma/test-topic', null, { authorization: 'Bearer ' + a.accessToken });
+  assert.strictEqual(r.status, 200); assert.match(r.body, /window.LOCKED_OK = true;/); assert.match(r.headers['X-Content-Hash'], /^[0-9a-f]{64}$/);
+  r = await ctx.call('GET', '/content-v3/farma/test-topic', null, { authorization: 'Bearer ' + a.accessToken, 'accept-encoding': 'gzip, br' });
+  assert.strictEqual(r.headers['Content-Encoding'], 'gzip'); assert.match(zlib.gunzipSync(Buffer.from(r.body, 'base64')).toString(), /window.LOCKED_OK = true;/);
   r = await ctx.call('GET', '/content/..%2Fx', null, { authorization: 'Bearer ' + a.accessToken });
   assert.strictEqual(r.status, 404);
-  r = await ctx.call('GET', '/content/nope', null, { authorization: 'Bearer ' + a.accessToken });
+  r = await ctx.call('GET', '/content-v3/nope/test-topic', null, { authorization: 'Bearer ' + a.accessToken });
   assert.strictEqual(r.status, 404);
 });
 
@@ -300,26 +301,26 @@ test('сбой почты: регистрация ведёт на экран к�
 
 test('микробиология: регистрация не открывает платный материал; право проверяется при каждом запросе', async () => {
   const { call, J, sent, tokenFrom, store, cfg } = setup();
-  fs.writeFileSync(path.join(cfg.contentDir, 'micro.js'), 'window.MICRO_FULL = true;');
-  assert.strictEqual((await call('GET', '/content/micro')).status, 401);
+  topicFixture(cfg.contentDir,'micro','window.MICRO_FULL = true;');
+  assert.strictEqual((await call('GET', '/content-v3/micro/test-topic')).status, 401);
   await call('POST', '/auth/register', { email: 'micro@example.com', password: 'secret-123', consent: true });
   const session = J(await call('POST', '/auth/verify', { token: tokenFrom(sent[0], 'verify') }));
   const headers = { authorization: 'Bearer ' + session.accessToken };
-  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403);
+  assert.strictEqual((await call('GET', '/content-v3/micro/test-topic', null, headers)).status, 403);
   await call('PATCH', '/me', { name: 'Student', micro: { expiresAt: Date.now() + 86400000 }, entitlements: { micro: true } }, headers);
-  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'профиль не может выдать платный доступ');
+  assert.strictEqual((await call('GET', '/content-v3/micro/test-topic', null, headers)).status, 403, 'профиль не может выдать платный доступ');
   const key = 'access:' + session.user.id;
   await store.putDoc('access:someone-else', { micro: { expiresAt: Date.now() + 86400000 } }, 0);
-  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'чужая покупка не открывает доступ');
+  assert.strictEqual((await call('GET', '/content-v3/micro/test-topic', null, headers)).status, 403, 'чужая покупка не открывает доступ');
   await store.putDoc(key, { biochem: { expiresAt: Date.now() + 86400000 } }, 0);
-  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'другой предмет не открывает микробиологию');
+  assert.strictEqual((await call('GET', '/content-v3/micro/test-topic', null, headers)).status, 403, 'другой предмет не открывает микробиологию');
   await store.putDoc(key, { micro: { expiresAt: Date.now() + 86400000 } }, 1);
-  const allowed = await call('GET', '/content/micro', null, headers);
+  const allowed = await call('GET', '/content-v3/micro/test-topic', null, headers);
   assert.strictEqual(allowed.status, 200);
   assert.match(allowed.headers['Cache-Control'], /no-store/);
   assert.match(allowed.body, /MICRO_FULL/);
   await store.putDoc(key, { micro: { expiresAt: Date.now() - 1 } }, 2);
-  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'истечение права проверяется даже при серверном кэше');
+  assert.strictEqual((await call('GET', '/content-v3/micro/test-topic', null, headers)).status, 403, 'истечение права проверяется даже при серверном кэше');
   await store.putDoc(key, { micro: { expiresAt: Date.now() + 86400000, revoked: true } }, 3);
-  assert.strictEqual((await call('GET', '/content/micro', null, headers)).status, 403, 'отзыв права применяется сразу');
+  assert.strictEqual((await call('GET', '/content-v3/micro/test-topic', null, headers)).status, 403, 'отзыв права применяется сразу');
 });

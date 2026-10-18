@@ -1,4 +1,5 @@
 'use strict';
+const {topicFixture}=require('./topic-fixture');
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('fs'), os = require('os'), path = require('path'), crypto = require('crypto'), net = require('net');
 const { memoryStore } = require('../src/store/memory');
@@ -14,7 +15,7 @@ async function fixture(t) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ma-stability-'));
   t.after(() => fs.rmSync(dir, {recursive:true,force:true}));
   const cfg = config({ SITE_URL:'https://site.invalid', API_URL:'https://api.invalid', SECRET:'s'.repeat(40), STORE:'memory', MAIL_TRANSPORT:'log', CONTENT_DIR:dir });
-  for (const id of cfg.requiredContent) fs.writeFileSync(path.join(dir,id+'.js'), 'window.SUBJECT='+JSON.stringify(id)+';');
+  for (const id of cfg.requiredContent) topicFixture(dir,id,'window.SUBJECT='+JSON.stringify(id)+';');
   const store = memoryStore();
   await store.putUser({id:'u1',tv:0,pw:'old-hash',name:'Student',email:'s@example.test',emailVerified:true,ids:[]});
   const app = createApp({cfg,store,mail:{async send(){}},log:{error(){}}});
@@ -45,28 +46,28 @@ for (const action of ['logout', 'reset', 'delete']) test('запоздавший
   if(action==='delete') assert.equal(u,null); else {assert.equal(u.tv,1);assert.notEqual(u.name,'Late');}
 });
 
-test('права предметов независимы; обе версии URL проверяют срок и отзыв; профиль не выдаёт доступ', async t=>{
+test('права предметов независимы; выдача темы проверяет срок и отзыв; профиль не выдаёт доступ', async t=>{
   const {store,call}=await fixture(t);
   for(const id of ['farma','biochem','micro','pathophys','biology']) {
-    for(const endpoint of ['content','content-v2']) assert.equal((await call('GET','/'+endpoint+'/'+id)).status,403);
+    assert.equal((await call('GET','/content-v3/'+id+'/test-topic')).status,403);
   }
   assert.equal((await call('PATCH','/me',{name:'Student',access:{farma:{expiresAt:Date.now()+60000}},tv:10})).status,200);
-  assert.equal((await call('GET','/content/farma')).status,403);
+  assert.equal((await call('GET','/content-v3/farma/test-topic')).status,403);
   let version=0;
   for(const id of ['farma','biochem','micro']) {
     await store.putDoc('access:u1',{[id]:{expiresAt:Date.now()+60000}},version++);
-    for(const other of ['farma','biochem','micro']) assert.equal((await call('GET','/content-v2/'+other)).status,other===id?200:403);
-    const r=await call('GET','/content/'+id);assert.equal(r.status,200);assert.equal(r.headers['X-Access-Policy'],'subject-subscription-v1');
+    for(const other of ['farma','biochem','micro']) assert.equal((await call('GET','/content-v3/'+other+'/test-topic')).status,other===id?200:403);
+    const r=await call('GET','/content-v3/'+id+'/test-topic');assert.equal(r.status,200);assert.equal(r.headers['X-Access-Policy'],'subject-subscription-v1');
     await store.putDoc('access:u1',{[id]:{expiresAt:Date.now()-1}},version++);
-    assert.equal((await call('GET','/content/'+id)).status,403);
+    assert.equal((await call('GET','/content-v3/'+id+'/test-topic')).status,403);
     await store.putDoc('access:u1',{[id]:{expiresAt:Date.now()+60000,revoked:true}},version++);
-    assert.equal((await call('GET','/content-v2/'+id)).status,403);
+    assert.equal((await call('GET','/content-v3/'+id+'/test-topic')).status,403);
   }
   await store.putDoc('access:someone-else',{farma:{expiresAt:Date.now()+60000}},0);
-  assert.equal((await call('GET','/content/farma')).status,403);
+  assert.equal((await call('GET','/content-v3/farma/test-topic')).status,403);
   const status=JSON.parse((await call('GET','/access')).body);
   assert.equal(status.subjects.length,5);assert.deepEqual(status.grants,{});
-  assert.equal((await call('GET','/content-v2/unknown')).status,404);
+  assert.equal((await call('GET','/content-v3/unknown/test-topic')).status,404);
 });
 
 test('readiness проверяет БД каждый раз; liveness независим; отсутствующий контент даёт 503', async t=>{
@@ -76,7 +77,7 @@ test('readiness проверяет БД каждый раз; liveness незав
   assert.equal((await call('GET','/health')).status,503);
   assert.equal((await call('GET','/live')).status,200);
   store.ready=async()=>{};
-  fs.unlinkSync(path.join(dir,'micro.js'));
+  fs.unlinkSync(path.join(dir,'topics/micro/test-topic.js'));
   const app=createApp({cfg,store,mail:{},log:{error(){}}});
   assert.equal((await app.handle({method:'GET',path:'/health',headers:{}})).status,503);
   assert.equal((await call('PATCH','/me',{name:'x'.repeat(270000)})).status,413);
@@ -150,10 +151,10 @@ test('комплект хранит пять отдельных сроков; и
   await store.putDoc('access:u1',grants,0);
   assert.deepEqual(Object.keys(JSON.parse((await call('GET','/access')).body).grants),ids);
   grants.farma.expiresAt=Date.now()-1;await store.putDoc('access:u1',grants,1);
-  assert.equal((await call('GET','/content/farma')).status,403);
-  assert.equal((await call('GET','/content/biochem')).status,200);
-  assert.equal((await call('GET','/content/micro')).status,200);
-  assert.equal((await call('GET','/content/biology')).status,404,'право не создаёт отсутствующие материалы');
+  assert.equal((await call('GET','/content-v3/farma/test-topic')).status,403);
+  assert.equal((await call('GET','/content-v3/biochem/test-topic')).status,200);
+  assert.equal((await call('GET','/content-v3/micro/test-topic')).status,200);
+  assert.equal((await call('GET','/content-v3/biology/test-topic')).status,503,'право не создаёт отсутствующие материалы');
 });
 test('YDB readiness не использует успешный прошлый ensure()',async()=>{
   let online=true;

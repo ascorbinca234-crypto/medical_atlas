@@ -2,6 +2,9 @@
 """Public: two basic notes. --full: validate and package the complete private atlas."""
 import argparse, json, os, re, sys
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import topic_build
 ROOT = Path(__file__).resolve().parent
 PRIV = Path(os.environ.get('ATLAS_PRIVATE') or ROOT.parent.parent / 'medical_atlas_private') / 'biochem-atlas'
 NAMES = ['substances.json','reactions.json','formulas.json','mnemonics.json','pairs.json','cheatsheets.json']
@@ -87,8 +90,10 @@ def main():
         code += app + '\nwindow.MA.mount(document.querySelectorAll("[data-ma-acct]"));\n'
         out = ROOT.parent / 'server/content/biochem.js'
         out.parent.mkdir(parents=True, exist_ok=True); out.write_text(code)
+        topic_build.biochem(data, style, markup, app, (PRIV / 'src/locked.js').read_text())
         print('Полная биохимия:', len(data['substances.json']), 'веществ,', len(data['reactions.json']), 'реакций')
     template = (ROOT / 'src/template.html').read_text()
+    template = template.replace('<script src="../auth/config.js"></script>', '<script>window.MA_TOPICS=' + encode(json.loads((ROOT / 'topics.json').read_text())) + ';</script>\n<script src="../auth/config.js"></script>')
     demo = json.loads((ROOT / 'data/demo.json').read_text())
     if [x['id'] for x in demo] != ['amino-acids', 'monosaccharides']: sys.exit('Нужны ровно два базовых конспекта')
     if '<script' in str(demo).lower(): sys.exit('Недопустимая разметка конспекта')

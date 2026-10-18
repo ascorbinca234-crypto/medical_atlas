@@ -12,7 +12,7 @@ function browser(fetchImpl, signedIn=true){
   vm.runInNewContext(fs.readFileSync(path.join(root,'auth/auth.js'),'utf8'),ctx);
   return {MA:ctx.window.MA,cache:()=>({reads,deleted}),change:()=>{session=null;}};
 }
-const response=(status,policy='subject-subscription-v1',expires=Date.now()+60000)=>({ok:status===200,status,headers:{get:n=>n==='X-Access-Policy'?policy:String(expires)},text:async()=>status===200?'paidContent()':'{}'});
+const response=(status,policy='subject-subscription-v1',expires=Date.now()+60000)=>({ok:status===200,status,headers:{get:n=>n==='X-Access-Policy'?policy:n==='X-Content-Policy'?'topic-delivery-v1':String(expires)},text:async()=>status===200?'paidContent()':'{}'});
 test('старый кэш не используется при 401/403/404 или старом API без политики',async()=>{
   for(const [status,policy] of [[401,''],[403,''],[404,''],[200,'']]){
     const b=browser(async()=>response(status,policy));const r=await b.MA.loadLocked('farma','old-hash');
@@ -21,16 +21,16 @@ test('старый кэш не используется при 401/403/404 ил�
 });
 test('только подтверждённый доступ текущего аккаунта даёт код; истёкшее право отвергается',async()=>{
   let url;
-  const b=browser(async u=>{url=u;return response(200);});assert.equal((await b.MA.loadLocked('farma')).code,'paidContent()');assert.match(url,/\/content-v2\/farma$/);
-  assert.equal((await browser(async()=>response(200,undefined,Date.now()-1)).MA.loadLocked('micro')).code,null);
+  const b=browser(async u=>{url=u;return response(200);});assert.equal((await b.MA.loadLocked('farma','test-topic')).code,'paidContent()');assert.match(url,/\/content-v3\/farma\/test-topic$/);
+  assert.equal((await browser(async()=>response(200,undefined,Date.now()-1)).MA.loadLocked('micro','test-topic')).code,null);
   let finish;
-  const delayed=browser(()=>new Promise(r=>finish=r));const load=delayed.MA.loadLocked('biochem');
+  const delayed=browser(()=>new Promise(r=>finish=r));const load=delayed.MA.loadLocked('biochem','test-topic');
   await new Promise(r=>setImmediate(r));delayed.change();finish(response(200));assert.equal((await load).code,null);
 });
 test('без входа запросов нет; зависший сервер завершает загрузку пробной версии',async()=>{
   let calls=0;
-  const anon=browser(async()=>{calls++;},false);assert.equal((await anon.MA.loadLocked('micro')).status,'signed-out');assert.equal(calls,0);
-  const b=browser(()=>new Promise(()=>{}));assert.equal((await b.MA.loadLocked('micro')).status,'error');
+  const anon=browser(async()=>{calls++;},false);assert.equal((await anon.MA.loadLocked('micro','test-topic')).status,'signed-out');assert.equal(calls,0);
+  const b=browser(()=>new Promise(()=>{}));assert.equal((await b.MA.loadLocked('micro','test-topic')).status,'error');
 });
 test('запоздалое обновление токена не возвращает пользователя после выхода',async()=>{
   let finish;

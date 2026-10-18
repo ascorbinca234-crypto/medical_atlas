@@ -5,6 +5,9 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import topic_build
 import subprocess
 
 ROOT = Path(__file__).resolve().parent
@@ -61,6 +64,7 @@ def main():
         out = ROOT.parent / 'server' / 'content' / 'micro.js'
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(locked)
+        topic_build.micro(data)
         print(f'Закрытая часть: {len(data["topics"])} тем, {catalog["pathogens"]} досье, {catalog["questions"]} вопросов; SHA256 {hashlib.sha256(locked.encode()).hexdigest()}')
     catalog = json.loads((SRC / 'catalog.json').read_text())
     if catalog['demo'] != DEMO or len({t['id'] for t in catalog['topics']}) != len(catalog['topics']):
@@ -79,6 +83,7 @@ def main():
         if html.count(marker) != 1:
             raise SystemExit('Не найден слот ' + marker)
         html = html.replace(marker, value)
+    html = html.replace('<script src="../auth/config.js"></script>', '<script>window.MA_TOPICS=' + encode(json.loads((ROOT / 'topics.json').read_text())) + ';</script>\n<script src="../auth/config.js"></script>')
     (ROOT / 'index.html').write_text(html)
     print(f'Публичная страница: ровно два конспекта, {len(catalog["topics"])-2} заголовков закрытых тем; {len(html.encode())//1024} КБ')
 

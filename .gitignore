@@ -26,3 +26,7 @@ micro-atlas/src/questions.js
 /biochem-atlas/data/*.json
 !/biochem-atlas/data/demo.json
 /biochem-atlas/screenshot.png
+
+# Python build cache and local security exports
+__pycache__/
+outputs/
