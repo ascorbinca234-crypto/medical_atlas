@@ -1,0 +1,68 @@
+'use strict';
+// Local acceptance: actual access API with disposable users, no production changes.
+const fs = require('node:fs'), path = require('node:path'), http = require('node:http'), assert = require('node:assert/strict');
+const {chromium} = require('../../pathophys-atlas/node_modules/playwright');
+const {config} = require('../src/config'), {createApp} = require('../src/app'), {memoryStore} = require('../src/store/memory'), {jwtSign, keys, now} = require('../src/tokens');
+const root = path.resolve(__dirname, '../..');
+(async () => {
+  const cfg = config({SITE_URL: 'http://127.0.0.1', API_URL: 'https://local-api.invalid', SECRET: 'local-home-acceptance-secret-not-production', STORE: 'memory', MAIL_TRANSPORT: 'log', CONTENT_DIR: path.join(root, 'server/content')});
+  const store = memoryStore();
+  await store.putUser({id: 'admin', tv: 0, name: 'Администратор', contentAdmin: true});
+  await store.putUser({id: 'student', tv: 0, name: 'Студент'});
+  await store.putDoc('access:student', {micro: {expiresAt: Date.now() + 60000}}, 0);
+  const app = createApp({cfg, store, mail: {}, log: {error: console.error}});
+  const server = http.createServer((req, res) => {
+    let rel = decodeURIComponent(new URL(req.url, 'http://127.0.0.1').pathname).slice(1); if (!rel || rel.endsWith('/')) rel += 'index.html';
+    const file = path.resolve(root, rel);
+    if (!file.startsWith(root + path.sep) || rel.split('/').some(s => s.startsWith('.'))) {res.writeHead(404); return res.end();}
+    try {res.setHeader('Content-Type', file.endsWith('.js') ? 'application/javascript' : 'text/html; charset=utf-8'); res.end(fs.readFileSync(file));}
+    catch {res.writeHead(404); res.end();}
+  });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  const origin = 'http://127.0.0.1:' + server.address().port; cfg.origins.push(origin);
+  const browser = await chromium.launch({headless: true, executablePath: process.env.ATLAS_BROWSER || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
+  try {
+    const context = await browser.newContext({viewport: {width: 1365, height: 900}, reducedMotion: 'reduce'}), requestedPortraits = [];
+    await context.route('**/*', async route => {
+      const req = route.request(), url = new URL(req.url());
+      if (/\/assets\/team\//.test(url.pathname)) requestedPortraits.push(url.pathname);
+      if (url.pathname === '/auth/config.js') return route.fulfill({contentType: 'application/javascript', body: 'window.MA_CONFIG={api:"https://local-api.invalid"};'});
+      if (url.hostname === 'local-api.invalid') {
+        const r = await app.handle({method: req.method(), path: url.pathname, query: Object.fromEntries(url.searchParams), headers: req.headers(), body: req.postData() || '', ip: 'local'});
+        return route.fulfill({status: r.status, headers: r.headers, body: r.base64 ? Buffer.from(r.body, 'base64') : r.body});
+      }
+      return url.origin === origin ? route.continue() : route.abort();
+    });
+    const page = await context.newPage(), errors = []; page.on('pageerror', e => errors.push(e.message));
+    const badges = () => page.locator('[data-ma-access-status]').allTextContents();
+    await page.goto(origin + '/'); assert.deepEqual(await badges(), Array(4).fill('Пробная версия'));
+    // An old offline cache retains a non-team image after the targeted purge.
+    await page.evaluate(async () => {
+      const cache = await caches.open('old-site-images');
+      for (const name of ['assets/team/ceo.jpg', 'assets/team/dev.jpg?old=1', 'assets/team/mkt.jpg', 'assets/lesson.jpg']) await cache.put(name, new Response('fixture'));
+      localStorage.setItem('ma-progress-v1', 'keep-progress');
+    });
+    await page.reload();
+    await page.waitForFunction(async () => (await (await caches.open('old-site-images')).keys()).length === 1);
+    assert.equal(await page.evaluate(() => localStorage.getItem('ma-progress-v1')), 'keep-progress');
+    async function signIn(id) {
+      const token = jwtSign({sub: id, tv: 0, typ: 'a', exp: now() + 3600}, keys(cfg.secret).jwt);
+      await page.evaluate(session => localStorage.setItem('ma-session', JSON.stringify(session)), {access: token, accessExp: now() + 3600, refresh: 'local', refreshExp: now() + 3600, user: {id}});
+      await page.reload();
+      await page.waitForFunction(() => !Array.from(document.querySelectorAll('[data-ma-access-status]')).some(n => n.textContent === 'Проверяем доступ…'));
+    }
+    await signIn('admin'); assert.deepEqual(await badges(), Array(4).fill('Открыт'));
+    assert.ok((await page.locator('[data-ma-access-note]').allTextContents()).every(t => t.includes('администратору')));
+    await page.locator('#atlases').scrollIntoViewIfNeeded(); await page.screenshot({path: path.join(root, 'outputs/home-admin-local.png')});
+    await signIn('student'); assert.deepEqual(await badges(), ['Пробная версия', 'Пробная версия', 'Открыт', 'Пробная версия']);
+    await page.evaluate(() => window.MA.logout(false)); assert.deepEqual(await badges(), Array(4).fill('Пробная версия'));
+    const team = page.locator('#team'); assert.equal(await team.locator('img').count(), 0); assert.equal(await team.locator('article').count(), 4);
+    assert.doesNotMatch(await team.innerText(), /Андрей|Павел|Давид|Med404|Сколтех|Meditron|SberMedAI|Павлова/);
+    await team.scrollIntoViewIfNeeded(); await page.screenshot({path: path.join(root, 'outputs/team-anonymous-local.png')});
+    await page.setViewportSize({width: 390, height: 844}); await team.scrollIntoViewIfNeeded();
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await page.screenshot({path: path.join(root, 'outputs/team-anonymous-mobile.png')});
+    assert.deepEqual(requestedPortraits, []); assert.deepEqual(errors, []);
+    console.log('Home: admin/guest/subject subscription/logout; anonymous team; targeted cache purge; mobile layout passed.');
+  } finally {await browser.close(); await new Promise(r => server.close(r));}
+})().catch(e => {console.error(e); process.exitCode = 1;});
