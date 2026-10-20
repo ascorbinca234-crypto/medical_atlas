@@ -30,3 +30,7 @@ micro-atlas/src/questions.js
 # Python build cache and local security exports
 __pycache__/
 outputs/
+
+# The supplied full pathophysiology source belongs in ATLAS_PRIVATE.
+/pathophys-atlas/PathoAtlas.jsx
+/pathophys-atlas/dist/

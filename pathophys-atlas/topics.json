@@ -1,0 +1,121 @@
+{
+  "topics": [
+    {
+      "id": "disease",
+      "title": "Болезнь и этиология"
+    },
+    {
+      "id": "pathogenesis",
+      "title": "Общий патогенез"
+    },
+    {
+      "id": "reactivity",
+      "title": "Реактивность и резистентность"
+    },
+    {
+      "id": "cell-injury",
+      "title": "Повреждение клетки"
+    },
+    {
+      "id": "heredity",
+      "title": "Наследственность и патология"
+    },
+    {
+      "id": "art-hyper",
+      "title": "Артериальная гиперемия"
+    },
+    {
+      "id": "ven-hyper",
+      "title": "Венозная гиперемия"
+    },
+    {
+      "id": "ischemia",
+      "title": "Ишемия"
+    },
+    {
+      "id": "stasis",
+      "title": "Стаз и сладж"
+    },
+    {
+      "id": "thrombosis",
+      "title": "Тромбоз"
+    },
+    {
+      "id": "embolism",
+      "title": "Эмболия"
+    },
+    {
+      "id": "inflammation",
+      "title": "Воспаление"
+    },
+    {
+      "id": "fever",
+      "title": "Лихорадка и перегревание"
+    },
+    {
+      "id": "hypoxia",
+      "title": "Гипоксии"
+    },
+    {
+      "id": "allergy",
+      "title": "Иммунопатология и аллергия"
+    },
+    {
+      "id": "tumor",
+      "title": "Опухолевый рост"
+    },
+    {
+      "id": "extreme",
+      "title": "Экстремальные состояния"
+    },
+    {
+      "id": "starvation",
+      "title": "Голодание"
+    },
+    {
+      "id": "acid-base",
+      "title": "Нарушения КОС"
+    },
+    {
+      "id": "water",
+      "title": "Дисгидрии и электролиты"
+    },
+    {
+      "id": "blood",
+      "title": "Система крови"
+    },
+    {
+      "id": "cardio",
+      "title": "Сердечно-сосудистая система"
+    },
+    {
+      "id": "respiratory",
+      "title": "Внешнее дыхание"
+    },
+    {
+      "id": "kidney",
+      "title": "Почки"
+    },
+    {
+      "id": "liver",
+      "title": "Печень"
+    },
+    {
+      "id": "digestion",
+      "title": "Пищеварение"
+    },
+    {
+      "id": "endocrine",
+      "title": "Эндокринная система"
+    },
+    {
+      "id": "nervous",
+      "title": "Нервная система"
+    }
+  ],
+  "aliases": {},
+  "demo": [
+    "disease",
+    "pathogenesis"
+  ]
+}

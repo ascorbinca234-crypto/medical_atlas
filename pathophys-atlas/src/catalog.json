@@ -1,0 +1,206 @@
+[
+  {
+    "id": "disease",
+    "section": "nozo",
+    "icon": "ScrollText",
+    "title": "Болезнь и этиология",
+    "short": "Норма, болезнь, причины и условия, терминальные состояния"
+  },
+  {
+    "id": "pathogenesis",
+    "section": "nozo",
+    "icon": "Workflow",
+    "title": "Общий патогенез",
+    "short": "Звенья, главное звено, порочные круги, саногенез"
+  },
+  {
+    "id": "reactivity",
+    "section": "nozo",
+    "icon": "Shield",
+    "title": "Реактивность и резистентность",
+    "short": "Как организм отвечает на воздействие и что делает его устойчивым"
+  },
+  {
+    "id": "cell-injury",
+    "section": "nozo",
+    "icon": "Hexagon",
+    "title": "Повреждение клетки",
+    "short": "Механизмы повреждения, ПОЛ, некроз и апоптоз"
+  },
+  {
+    "id": "heredity",
+    "section": "nozo",
+    "icon": "Dna",
+    "title": "Наследственность и патология",
+    "short": "Мутации, типы наследования, хромосомные и моногенные болезни"
+  },
+  {
+    "id": "art-hyper",
+    "section": "tpp",
+    "cluster": "local",
+    "icon": "Activity",
+    "title": "Артериальная гиперемия",
+    "short": "Избыточный приток крови по расширенным артериолам"
+  },
+  {
+    "id": "ven-hyper",
+    "section": "tpp",
+    "cluster": "local",
+    "icon": "Waves",
+    "title": "Венозная гиперемия",
+    "short": "Застой крови из-за затруднённого оттока"
+  },
+  {
+    "id": "ischemia",
+    "section": "tpp",
+    "cluster": "local",
+    "icon": "HeartCrack",
+    "title": "Ишемия",
+    "short": "Малокровие ткани из-за ограниченного притока"
+  },
+  {
+    "id": "stasis",
+    "section": "tpp",
+    "cluster": "local",
+    "icon": "CirclePause",
+    "title": "Стаз и сладж",
+    "short": "Остановка кровотока в микрососудах"
+  },
+  {
+    "id": "thrombosis",
+    "section": "tpp",
+    "cluster": "local",
+    "icon": "Droplet",
+    "title": "Тромбоз",
+    "short": "Прижизненный сгусток на стенке сосуда"
+  },
+  {
+    "id": "embolism",
+    "section": "tpp",
+    "cluster": "local",
+    "icon": "CircleDot",
+    "title": "Эмболия",
+    "short": "Закупорка сосуда частицей, принесённой током крови"
+  },
+  {
+    "id": "inflammation",
+    "section": "tpp",
+    "icon": "Flame",
+    "title": "Воспаление",
+    "short": "Альтерация, экссудация с эмиграцией лейкоцитов, пролиферация"
+  },
+  {
+    "id": "fever",
+    "section": "tpp",
+    "icon": "Thermometer",
+    "title": "Лихорадка и перегревание",
+    "short": "Смещение установочной точки против срыва терморегуляции"
+  },
+  {
+    "id": "hypoxia",
+    "section": "tpp",
+    "icon": "Wind",
+    "title": "Гипоксии",
+    "short": "Недостаточность биологического окисления"
+  },
+  {
+    "id": "allergy",
+    "section": "tpp",
+    "icon": "ShieldAlert",
+    "title": "Иммунопатология и аллергия",
+    "short": "Гиперчувствительность, иммунодефициты, аутоиммунитет"
+  },
+  {
+    "id": "tumor",
+    "section": "tpp",
+    "icon": "Sprout",
+    "title": "Опухолевый рост",
+    "short": "Канцерогенез, атипизмы, онкогены и супрессоры, метастазирование"
+  },
+  {
+    "id": "extreme",
+    "section": "tpp",
+    "icon": "Siren",
+    "title": "Экстремальные состояния",
+    "short": "Стресс, шок, коллапс, кома"
+  },
+  {
+    "id": "starvation",
+    "section": "tpp",
+    "icon": "UtensilsCrossed",
+    "title": "Голодание",
+    "short": "Периоды голодания, белково-энергетическая недостаточность"
+  },
+  {
+    "id": "acid-base",
+    "section": "tpp",
+    "cluster": "kos",
+    "icon": "FlaskConical",
+    "title": "Нарушения КОС",
+    "short": "Ацидозы и алкалозы, буферы и компенсация"
+  },
+  {
+    "id": "water",
+    "section": "tpp",
+    "cluster": "kos",
+    "icon": "Droplets",
+    "title": "Дисгидрии и электролиты",
+    "short": "Гипо- и гипергидратации, отёки, натрий и калий"
+  },
+  {
+    "id": "blood",
+    "section": "chast",
+    "icon": "TestTube",
+    "title": "Система крови",
+    "short": "Анемии, лейкоцитозы и лейкозы, геморрагические синдромы, ДВС"
+  },
+  {
+    "id": "cardio",
+    "section": "chast",
+    "icon": "HeartPulse",
+    "title": "Сердечно-сосудистая система",
+    "short": "Сердечная недостаточность, гипертрофия, аритмии, гипертензия, атеросклероз"
+  },
+  {
+    "id": "respiratory",
+    "section": "chast",
+    "icon": "AirVent",
+    "title": "Внешнее дыхание",
+    "short": "Дыхательная недостаточность, обструкция и рестрикция, ОРДС"
+  },
+  {
+    "id": "kidney",
+    "section": "chast",
+    "icon": "Bean",
+    "title": "Почки",
+    "short": "ОПП и ХБП, нефротический и нефритический синдромы"
+  },
+  {
+    "id": "liver",
+    "section": "chast",
+    "icon": "Filter",
+    "title": "Печень",
+    "short": "Печёночная недостаточность, желтухи, портальная гипертензия, энцефалопатия"
+  },
+  {
+    "id": "digestion",
+    "section": "chast",
+    "icon": "Soup",
+    "title": "Пищеварение",
+    "short": "Язвенная болезнь, диарея, мальабсорбция, панкреатит"
+  },
+  {
+    "id": "endocrine",
+    "section": "chast",
+    "icon": "SlidersHorizontal",
+    "title": "Эндокринная система",
+    "short": "Уровни эндокринопатий, сахарный диабет, щитовидная железа, надпочечники, гипофиз"
+  },
+  {
+    "id": "nervous",
+    "section": "chast",
+    "icon": "Brain",
+    "title": "Нервная система",
+    "short": "Повреждение нейрона, двигательные расстройства, боль, ГПУВ"
+  }
+]
