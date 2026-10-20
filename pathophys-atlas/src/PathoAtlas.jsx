@@ -644,6 +644,7 @@ function CausalGraph() {
 }
 
 
+const SUBJECT_ACCESS = !!window.MA?.hasAtlasAccess('pathophys');
 const TOPICS = catalog.map(t => ({...t, locked:true, tags:[], definition:'', classification:[], etiology:[], signs:[], flows:[], sanogenesis:[], circles:[], traps:[], quiz:[], tables:[]}));
 for(const topic of [T_DISEASE,T_PATHOGEN,window.MA_PATHO_TOPIC?.topic].filter(Boolean)){const i=TOPICS.findIndex(t=>t.id===topic.id);if(i>=0)TOPICS[i]=topic;}
 const TOPIC_MAP=Object.fromEntries(TOPICS.map(t=>[t.id,t]));
@@ -861,7 +862,7 @@ function Sidebar({ view, topicId, store, query, setQuery, onOpen, onHome, onRun,
     const sc = store.scores[t.id];
     return (
       <button type="button" onClick={() => onOpen(t.id)} className={cx('pa-navitem flex w-full items-center gap-2.5 px-3 py-2 text-left text-[14px]', indent && 'pl-5', active && 'is-active')} aria-current={active ? 'page' : undefined}>
-        <span className="pa-nav-muted shrink-0">{t.locked ? <Lock size={16} /> : <TopicIcon name={t.icon} size={16} />}</span>
+        <span className="pa-nav-muted shrink-0">{t.locked && !SUBJECT_ACCESS ? <Lock size={16} aria-label="По подписке" /> : <TopicIcon name={t.icon} size={16} />}</span>
         <span className="min-w-0 flex-1 leading-snug">{t.title}</span>
         {store.done[t.id] && <CircleCheck size={15} className="shrink-0" style={{ color: 'var(--san)' }} aria-label="Изучено" />}
         {sc && <span className="pa-navbadge tabnum shrink-0 rounded-md px-1.5 text-[11px] leading-5">{sc.ok}/{sc.total}</span>}
@@ -1033,7 +1034,7 @@ function HomeView({ store, onOpen, onRun }) {
                         </div>
                         <p className="pa-muted mt-3 text-[14px] leading-snug">{t.short}</p>
                         <div className="pa-faint mt-auto flex flex-wrap gap-x-3 gap-y-1 pt-4 text-[12.5px] tabnum">
-                          {t.locked ? <span><Lock size={13} className="inline"/> По подписке</span> : <><span>{t.flows.reduce((s2, f) => s2 + f.steps.length, 0)} звеньев</span>
+                          {t.locked ? (SUBJECT_ACCESS ? <span>Открыть тему</span> : <span><Lock size={13} className="inline"/> По подписке</span>) : <><span>{t.flows.reduce((s2, f) => s2 + f.steps.length, 0)} звеньев</span>
                           <span>{t.circles.length} {plural(t.circles.length, 'круг', 'круга', 'кругов')}</span>
                           <span>{t.traps.length} {plural(t.traps.length, 'ловушка', 'ловушки', 'ловушек')}</span>
                           <span>{sc ? `блиц ${sc.ok}/${sc.total}` : `${t.quiz.length} задач`}</span></>}
@@ -1474,7 +1475,7 @@ function RunView({ onOpen }) {
                     {TOPICS.filter((t) => t.section === sec.id).map((t) => {
                       const on = sel.has(t.id);
                       return (
-                        <button key={t.id} type="button" onClick={() => toggle(t.id)} disabled={t.locked} title={t.locked ? "Откройте тему по подписке" : undefined} aria-pressed={on} className={cx('inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[13.5px] font-medium', on ? 'tone-etio' : 'pa-chip')}>
+                        <button key={t.id} type="button" onClick={() => toggle(t.id)} disabled={t.locked} title={t.locked ? (SUBJECT_ACCESS ? "Откройте тему, чтобы загрузить задания" : "Откройте тему по подписке") : undefined} aria-pressed={on} className={cx('inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[13.5px] font-medium', on ? 'tone-etio' : 'pa-chip')}>
                           {on ? <Check size={14} aria-hidden="true" /> : <TopicIcon name={t.icon} size={14} />}{t.title}
                         </button>
                       );
@@ -1585,7 +1586,7 @@ function PathoAtlas() {
   useEffect(() => { saveStore(store); }, [store]);
   useEffect(() => { window.MA?.mount(document.querySelectorAll('[data-ma-acct]')); }, []);
   useEffect(() => {
-    window.MAP?.sections('pathophys', TOPICS.map(t => ({id:t.id,n:t.title,total:1,learned:store.done[t.id]?1:0,seen:store.done[t.id]?1:0,locked:!!t.locked})));
+    window.MAP?.sections('pathophys', TOPICS.map(t => ({id:t.id,n:t.title,total:1,learned:store.done[t.id]?1:0,seen:store.done[t.id]?1:0,locked:!!t.locked&&!SUBJECT_ACCESS})));
   }, [store.done]);
   useEffect(() => {
     const t=TOPIC_MAP[topicId];
