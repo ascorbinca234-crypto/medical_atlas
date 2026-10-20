@@ -5,11 +5,11 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 # Public output must be rebuilt and pass leak checks before export.
 subprocess.run([sys.executable, str(ROOT/'build.py')], check=True)
-subprocess.run(['node', '--test', 'server/test/client-access.test.js', 'server/test/micro.test.js'], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
+subprocess.run(['node', '--test', 'server/test/client-access.test.js', 'server/test/micro.test.js', 'server/test/pathophys.test.js'], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
 OUT=ROOT/'outputs'
 OUT.mkdir(exist_ok=True)
 files=[ROOT/'index.html',ROOT/'cabinet/index.html',ROOT/'auth/index.html',ROOT/'auth/auth.js',ROOT/'auth/config.js',ROOT/'progress/progress.js']
-files += [ROOT/(a+'-atlas/index.html') for a in ['farma','biochem','micro']]
+files += [ROOT/(a+'-atlas/index.html') for a in ['farma','biochem','micro','pathophys']]
 files += [p for directory in ['assets','biochem-atlas/vendor'] for p in (ROOT/directory).rglob('*') if p.is_file() and p.name!='.DS_Store']
 assert all(f.is_file() for f in files)
 manifest={}

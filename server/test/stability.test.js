@@ -54,9 +54,9 @@ test('права предметов независимы; выдача темы 
   assert.equal((await call('PATCH','/me',{name:'Student',access:{farma:{expiresAt:Date.now()+60000}},tv:10})).status,200);
   assert.equal((await call('GET','/content-v3/farma/test-topic')).status,403);
   let version=0;
-  for(const id of ['farma','biochem','micro']) {
+  for(const id of ['farma','biochem','micro','pathophys']) {
     await store.putDoc('access:u1',{[id]:{expiresAt:Date.now()+60000}},version++);
-    for(const other of ['farma','biochem','micro']) assert.equal((await call('GET','/content-v3/'+other+'/test-topic')).status,other===id?200:403);
+    for(const other of ['farma','biochem','micro','pathophys']) assert.equal((await call('GET','/content-v3/'+other+'/test-topic')).status,other===id?200:403);
     const r=await call('GET','/content-v3/'+id+'/test-topic');assert.equal(r.status,200);assert.equal(r.headers['X-Access-Policy'],'subject-subscription-v1');
     await store.putDoc('access:u1',{[id]:{expiresAt:Date.now()-1}},version++);
     assert.equal((await call('GET','/content-v3/'+id+'/test-topic')).status,403);

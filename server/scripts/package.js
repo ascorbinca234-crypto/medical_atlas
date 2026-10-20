@@ -13,7 +13,7 @@ function files() {
   const out = ['index.js', 'package.json'];
   const walk = d => fs.readdirSync(path.join(root, d)).forEach(f => { const p = d + '/' + f; fs.statSync(path.join(root, p)).isDirectory() ? walk(p) : out.push(p); });
   walk('src');
-  for (const atlas of ['farma', 'biochem', 'micro']) {
+  for (const atlas of ['farma', 'biochem', 'micro', 'pathophys']) {
     const dir = 'content/topics/' + atlas, mp = dir + '/manifest.json';
     const manifest = JSON.parse(fs.readFileSync(path.join(root, mp), 'utf8'));
     if (manifest.policy !== 'topic-delivery-v1' || !Object.keys(manifest.topics || {}).length) throw new Error('Invalid topic manifest: ' + atlas);
@@ -29,7 +29,7 @@ function files() {
   return out;
 }
 const list = files();
-for (const id of ['farma','biochem','micro']) { if (!list.includes('content/topics/' + id + '/manifest.json')) throw new Error('Missing content: ' + id); }
+for (const id of ['farma','biochem','micro','pathophys']) { if (!list.includes('content/topics/' + id + '/manifest.json')) throw new Error('Missing content: ' + id); }
 const parts = [], central = [];
 let offset = 0;
 for (const name of list) {

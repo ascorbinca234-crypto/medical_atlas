@@ -47,7 +47,7 @@ function config(e = process.env) {
       leadTo: e.LEAD_TO || e.SMTP_USER || '',
     },
     requestTimeoutMs: 8000,
-    requiredContent: ['farma', 'biochem', 'micro'],
+    requiredContent: ['farma', 'biochem', 'micro', 'pathophys'],
     contentDir: e.CONTENT_DIR || path.join(__dirname, '..', 'content'),
     gzip: e.GZIP !== '0',
     contentLimits: { minute: 12, hour: 80, day: 250, bytesDay: 32 * 1024 * 1024 },

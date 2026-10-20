@@ -806,7 +806,7 @@ a.btn-coral { text-decoration: none; }
         </div>
         <p class="m-note" id="mNote"></p>
         <a class="btn btn-coral" id="learnBtn" href="../farma-atlas/#learn"><i data-lucide="layers"></i><span id="learnLabel">Повторить карточки</span></a>
-        <p class="m-links">Учить: <a href="../farma-atlas/#learn">фармакология</a>, <a href="../biochem-atlas/#study">биохимия</a>, <a href="../micro-atlas/">микробиология</a></p>
+        <p class="m-links">Учить: <a href="../farma-atlas/#learn">фармакология</a>, <a href="../biochem-atlas/#study">биохимия</a>, <a href="../micro-atlas/">микробиология</a>, <a href="../pathophys-atlas/">патофизиология</a></p>
       </article>
 
       <!-- Карточка быстрого возврата -->
@@ -822,6 +822,7 @@ a.btn-coral { text-decoration: none; }
           <button type="button" role="radio" data-atlas="farma" aria-checked="true">Фармакология</button>
           <button type="button" role="radio" data-atlas="biochem" aria-checked="false">Биохимия</button>
           <button type="button" role="radio" data-atlas="micro" aria-checked="false">Микробиология</button>
+          <button type="button" role="radio" data-atlas="pathophys" aria-checked="false">Патофизиология</button>
         </div>
         <div class="sys-scroll" id="masBody"></div>
         <p class="mastery-foot"><span><span class="dot-ok" aria-hidden="true"></span><span id="masteryHint">Закреплено: карточку вспомнили 3 раза с растущим интервалом</span></span></p>
@@ -993,6 +994,7 @@ document.addEventListener('DOMContentLoaded', function () {
     farma: SITE + 'farma-atlas/', farmaLearn: SITE + 'farma-atlas/#learn',
     biochem: SITE + 'biochem-atlas/', biochemLearn: SITE + 'biochem-atlas/#study',
     micro: SITE + 'micro-atlas/', microLearn: SITE + 'micro-atlas/#g1',
+    pathophys: SITE + 'pathophys-atlas/', pathophysLearn: SITE + 'pathophys-atlas/#run',
     cabinet: SITE + 'cabinet/', account: SITE + 'auth/#account'
   };
   const DEMO = new URLSearchParams(location.search).has('demo');
@@ -1001,7 +1003,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const ATLASES = {
     farma: { name: 'Фармакология', url: URLS.farma, learn: URLS.farmaLearn, unit: 'лекция' },
     biochem: { name: 'Биохимия', url: URLS.biochem, learn: URLS.biochemLearn, unit: 'раздел' },
-    micro: { name: 'Микробиология', url: URLS.micro, learn: URLS.microLearn, unit: 'конспект' }
+    micro: { name: 'Микробиология', url: URLS.micro, learn: URLS.microLearn, unit: 'конспект' },
+    pathophys: { name: 'Патофизиология', url: URLS.pathophys, learn: URLS.pathophysLearn, unit: 'тема' }
   };
 
   const RANKS = [
@@ -1227,7 +1230,7 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#defibCount').textContent = s.freezes + ' из 2 ' + plural(2, W_CHARGE);
     const atlas = V.last && ATLASES[V.last.atlas] ? V.last.atlas : 'farma';
     $('#learnBtn').href = ATLASES[atlas].learn;
-    $('#learnLabel').textContent = atlas === 'micro' ? 'Продолжить микробиологию' : s.todayDone ? 'Повторить ещё карточки' : 'Повторить карточки: ' + ATLASES[atlas].name.toLowerCase();
+    $('#learnLabel').textContent = atlas === 'pathophys' ? 'Повторить патофизиологию' : atlas === 'micro' ? 'Продолжить микробиологию' : s.todayDone ? 'Повторить ещё карточки' : 'Повторить карточки: ' + ATLASES[atlas].name.toLowerCase();
   }
 
   function atlasTotals(atlas) {
@@ -1242,11 +1245,11 @@ document.addEventListener('DOMContentLoaded', function () {
         '<a class="btn btn-primary" href="' + URLS.farma + '"><i data-lucide="pill"></i>Открыть фармакологию</a><a class="btn btn-ghost" href="' + URLS.biochem + '"><i data-lucide="flask-conical"></i>Открыть биохимию</a></div>';
       return;
     }
-    const A = ATLASES[L.atlas] || ATLASES.farma, tot = atlasTotals(ATLASES[L.atlas] ? L.atlas : 'farma'), W_UNIT = L.atlas === 'micro' ? ['конспектов', 'конспекта', 'конспектов'] : L.atlas === 'biochem' ? W_OF_SUBST : W_OF_CARDS;
+    const A = ATLASES[L.atlas] || ATLASES.farma, tot = atlasTotals(ATLASES[L.atlas] ? L.atlas : 'farma'), W_UNIT = L.atlas === 'pathophys' ? ['тем', 'темы', 'тем'] : L.atlas === 'micro' ? ['конспектов', 'конспекта', 'конспектов'] : L.atlas === 'biochem' ? W_OF_SUBST : W_OF_CARDS;
     const sec = ((V.sec[L.atlas] || {}).list || []).find(x => x.n === L.title);
     const pr = sec && sec.total ? sec : tot.total ? { learned: tot.learned, total: tot.total } : null;
     body.innerHTML =
-      '<p class="res-sys"><span class="sys-ico"><i data-lucide="' + (L.atlas === 'micro' ? 'microscope' : L.atlas === 'biochem' ? 'flask-conical' : 'pill') + '"></i></span><span>' + esc(L.sub || A.name) + '</span></p>' +
+      '<p class="res-sys"><span class="sys-ico"><i data-lucide="' + (L.atlas === 'pathophys' ? 'activity' : L.atlas === 'micro' ? 'microscope' : L.atlas === 'biochem' ? 'flask-conical' : 'pill') + '"></i></span><span>' + esc(L.sub || A.name) + '</span></p>' +
       '<p class="res-title">' + esc(L.title) + '</p>' +
       (pr ? '<div class="res-meta"><p class="res-atlas">' + (sec ? 'Закреплено в теме' : 'Закреплено в атласе') + ': <b class="num">' + nf.format(pr.learned) + ' из ' + nf.format(pr.total) + '</b> ' + plural(pr.total, W_UNIT) + '</p>' +
         '<div class="bar"><span style="--w:' + (pr.learned / pr.total * 100).toFixed(1) + '%"></span></div></div>' : '') +
@@ -1255,7 +1258,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function renderMastery() {
-    $('#masteryHint').textContent = masAtlas === 'micro' ? 'Закреплено: конспект отмечен вами как изученный' : 'Закреплено: карточку вспомнили 3 раза с растущим интервалом';
+    $('#masteryHint').textContent = masAtlas === 'pathophys' ? 'Закреплено: тема отмечена вами как изученная' : masAtlas === 'micro' ? 'Закреплено: конспект отмечен вами как изученный' : 'Закреплено: карточку вспомнили 3 раза с растущим интервалом';
     $$('#masSeg [data-atlas]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.atlas === masAtlas)));
     const A = ATLASES[masAtlas], sec = V.sec[masAtlas], list = ((sec && sec.list) || []).filter(x => x.total > 0 || x.locked);
     const tot = atlasTotals(masAtlas);
