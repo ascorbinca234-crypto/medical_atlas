@@ -21,7 +21,6 @@ micro-atlas/src/questions.js
 # Formerly public full material now belongs in the private source directory
 /farma-atlas/src/k_02_pns.js
 /farma-atlas/src/rx_*.js
-/farma-atlas/src/body.js
 /farma-atlas/src/learn.js
 /biochem-atlas/data/*.json
 !/biochem-atlas/data/demo.json

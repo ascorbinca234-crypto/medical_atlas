@@ -13,4 +13,8 @@ function grantFor(doc, subject, at = Date.now()) {
   const g = doc && Object.hasOwn(doc, subject) && doc[subject];
   return g && g.revoked !== true && Number.isFinite(g.expiresAt) && g.expiresAt > at ? g : null;
 }
-module.exports = { SUBJECTS, POLICY, grantFor };
+function grantForUser(user, doc, subject, at = Date.now()) {
+  if (user.contentAdmin === true && SUBJECTS.some(s => s.id === subject && s.available)) return { expiresAt: at + 15 * 60 * 1000, admin: true };
+  return grantFor(doc, subject, at);
+}
+module.exports = { SUBJECTS, POLICY, grantFor, grantForUser };

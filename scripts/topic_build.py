@@ -31,6 +31,8 @@ def farma(data, body, learn):
     # Strip the old embedded all-drug model, including its merge of locked entries.
     bstart, bend = body.index('const VIT ='), body.index('const VCAT =')
     body_template = body[:bstart] + 'const VIT = __TOPIC_VIT__;\n' + body[bend:]
+    public_body = body_template.replace('__TOPIC_VIT__', enc(full))
+    (ROOT / 'farma-atlas/src/body.js').write_text(public_body)
     packages, titles, aliases = {}, {}, {}
     for item in data['KP'] + data['P']:
         tid = item['id']; titles[tid] = item['title']
@@ -39,23 +41,25 @@ def farma(data, body, learn):
         # Include prototype dossiers needed to render the selected topic correctly.
         for _ in range(10):
             old = set(names)
-            names |= {data['DRUGS'][n]['like'] for n in names if data['DRUGS'][n].get('like') in data['DRUGS']}
+            names |= {data['DRUGS'][n]['like'] for n in sorted(names) if data['DRUGS'][n].get('like') in data['DRUGS']}
             if names == old: break
         rxnames = names | {k for k in data['RXD'] if len(k)>3 and k.lower() in hay}
-        vit = {k:v for k,v in full.items() if k in names or len(k)>3 and k.lower() in hay}
         code = []
         for key in ['P','KP']:
             if any(t['id']==tid for t in data[key]):
                 code.append('{const i='+key+'.findIndex(t=>t.id==='+enc(tid)+');if(i>=0)'+key+'[i]='+enc(item)+';}')
-        values = {'DRUGS':{n:data['DRUGS'][n] for n in names}, 'RXD':{n:data['RXD'][n] for n in rxnames if n in data['RXD']},
+        values = {'DRUGS':{n:data['DRUGS'][n] for n in sorted(names)}, 'RXD':{n:data['RXD'][n] for n in sorted(rxnames) if n in data['RXD']},
                   'KALIAS':{k:v for k,v in data['KALIAS'].items() if v in names or v in rxnames}}
         code += ['Object.assign('+k+','+enc(v)+');' for k,v in values.items()]
         code += ['RXAL.push(...'+enc([x for x in data['RXAL'] if x[1] in rxnames])+');']
         code += ['ANTIDOTES.push(...'+enc([x for x in data['ANTIDOTES'] if any(n in enc(x) for n in names)])+');']
-        code += ['const DRUGS_ORDER='+enc([n for n in data['DRUGS_ORDER'] if n in names])+';', body_template.replace('__TOPIC_VIT__',enc(vit)), learn]
+        code += ['const DRUGS_ORDER='+enc([n for n in data['DRUGS_ORDER'] if n in names])+';', learn]
         packages[tid] = '\n'.join(code)
-        for n in names: aliases.setdefault('body/'+n,tid)
     emit('farma', packages, titles, aliases)
+    catalog_path = ROOT / 'farma-atlas/topics.json'
+    catalog = json.loads(catalog_path.read_text())
+    catalog.update(demo=['k-gen', 'k-aff'], publicRoutes=['body', 'drugs'])
+    catalog_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2)+'\n')
 
 def micro(data):
     packages, titles, aliases = {}, {}, {}

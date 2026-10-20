@@ -7,6 +7,11 @@ const trim = s => String(s || '').trim().replace(/\/+$/, '');
 function config(e = process.env) {
   const siteUrl = trim(e.SITE_URL);
   const secret = String(e.SECRET || '');
+  const adminSeed = e.ADMIN_BOOTSTRAP_EMAIL || e.ADMIN_BOOTSTRAP_PASSWORD_HASH ? {
+    id: e.ADMIN_BOOTSTRAP_ID || 'atlas-content-admin-v1',
+    email: String(e.ADMIN_BOOTSTRAP_EMAIL || '').trim().toLowerCase(),
+    passwordHash: e.ADMIN_BOOTSTRAP_PASSWORD_HASH || '',
+  } : null;
   const c = {
     siteUrl,
     siteOrigin: siteUrl ? new URL(siteUrl).origin : '',
@@ -14,6 +19,7 @@ function config(e = process.env) {
     apiUrl: trim(e.API_URL),
     origins: [siteUrl ? new URL(siteUrl).origin : '', ...String(e.EXTRA_ORIGINS || '').split(',').map(trim)].filter(Boolean),
     secret,
+    adminSeed,
     yandex: {
       clientId: e.YANDEX_CLIENT_ID || '', clientSecret: e.YANDEX_CLIENT_SECRET || '',
       authUrl: e.YANDEX_AUTH_URL || 'https://oauth.yandex.ru/authorize',
@@ -58,6 +64,7 @@ function config(e = process.env) {
   if (!c.siteUrl) missing.push('SITE_URL');
   if (!c.apiUrl) missing.push('API_URL');
   if (secret.length < 32) missing.push('SECRET (не короче 32 символов)');
+  if (adminSeed && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminSeed.email) || !adminSeed.passwordHash.startsWith('s1$'))) missing.push('ADMIN_BOOTSTRAP_EMAIL, ADMIN_BOOTSTRAP_PASSWORD_HASH');
   if (c.store === 'ydb' && (!c.ydb.endpoint || !c.ydb.accessKeyId || !c.ydb.secretAccessKey)) missing.push('YDB_DOCAPI_ENDPOINT, YDB_ACCESS_KEY_ID, YDB_SECRET_ACCESS_KEY');
   if (c.mail.transport === 'smtp' && (!c.mail.user || !c.mail.pass)) missing.push('SMTP_USER, SMTP_PASS');
   c.missing = missing;

@@ -156,7 +156,7 @@
       var bar = document.createElement('aside'); bar.id = 'ma-topic-controls';
       var title = catalog.topics.find(function (t) { return t.id === topic; });
       var message = full ? 'Открыта тема: ' + (title ? title.title : topic) :
-        r.status === 'public' ? 'Пробная тема доступна без подписки.' :
+        r.status === 'public' ? 'Этот раздел доступен без подписки.' :
         r.status === 'limited' ? 'Временный лимит загрузки. Повторите через ' + (r.retryAfter || 60) + ' сек.' :
         r.status === 'error' ? 'Тему не удалось загрузить. Проверьте соединение и повторите.' :
         r.status === 'subscription-required' ? 'Для выбранной темы нужна подписка на этот предмет.' : 'Выберите тему. Два пробных конспекта доступны всем.';
@@ -192,7 +192,8 @@
     window.addEventListener('pagehide', function () { if (full) document.documentElement.style.visibility = 'hidden'; });
     window.addEventListener('pageshow', function (e) { if (e.persisted) reload(); });
     document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
-    var delivery = catalog.demo && catalog.demo.indexOf(topic) >= 0 ? Promise.resolve({ status: 'public', code: null }) : loadLocked(atlas, topic);
+    var publicRoute = (catalog.publicRoutes || []).indexOf(location.hash.slice(1).split('/')[0]) >= 0;
+    var delivery = publicRoute || catalog.demo && catalog.demo.indexOf(topic) >= 0 ? Promise.resolve({ status: 'public', code: null }) : loadLocked(atlas, topic);
     delivery.then(function (r) {
       var allowed = r.status === 'ok' && stillOwner() && r.expiresAt > Date.now();
       window.MA_STATE.auth = allowed ? 'ok' : r.status;
