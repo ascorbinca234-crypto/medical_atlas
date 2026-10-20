@@ -10,7 +10,7 @@ OUT=ROOT/'outputs'
 OUT.mkdir(exist_ok=True)
 files=[ROOT/'index.html',ROOT/'cabinet/index.html',ROOT/'auth/index.html',ROOT/'auth/auth.js',ROOT/'auth/config.js',ROOT/'progress/progress.js']
 files += [ROOT/(a+'-atlas/index.html') for a in ['farma','biochem','micro','pathophys']]
-files += [p for directory in ['assets','biochem-atlas/vendor'] for p in (ROOT/directory).rglob('*') if p.is_file() and p.name!='.DS_Store']
+files += [p for directory in ['assets','biochem-atlas/vendor'] for p in (ROOT/directory).rglob('*') if p.is_file() and p.name!='.DS_Store' and not p.is_relative_to(ROOT/'assets/team')]
 assert all(f.is_file() for f in files)
 manifest={}
 with zipfile.ZipFile(OUT/'medical_atlas_public_site.zip','w',zipfile.ZIP_DEFLATED) as z:

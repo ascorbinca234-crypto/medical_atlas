@@ -33,3 +33,6 @@ outputs/
 # The supplied full pathophysiology source belongs in ATLAS_PRIVATE.
 /pathophys-atlas/PathoAtlas.jsx
 /pathophys-atlas/dist/
+
+# Retired team portraits must not return to the public site.
+/assets/team/

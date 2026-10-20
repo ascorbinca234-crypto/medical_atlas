@@ -100,6 +100,28 @@
     }).catch(function () {});
   }
   cacheClear();
+  // Remove only the three retired team portraits from this site's CacheStorage.
+  // Learning images, authentication and progress are left intact.
+  function purgeTeamPortraits() {
+    if (!window.caches) return;
+    var retired = ['ceo.jpg', 'dev.jpg', 'mkt.jpg'].map(function (name) {
+      return new URL('assets/team/' + name, SITE_URL).href;
+    });
+    window.caches.keys().then(function (names) {
+      return Promise.all(names.map(function (name) {
+        if (/^ma-content(?:-|$)/.test(name)) return;
+        return window.caches.open(name).then(function (cache) {
+          return cache.keys().then(function (requests) {
+            return Promise.all(requests.filter(function (request) {
+              var url = new URL(request.url); url.search = ''; url.hash = '';
+              return retired.indexOf(url.href) !== -1;
+            }).map(function (request) { return cache.delete(request); }));
+          });
+        });
+      }));
+    }).catch(function () {});
+  }
+  purgeTeamPortraits();
   var POLICY = 'subject-subscription-v1', DELIVERY = 'topic-delivery-v1', sessionEpoch = 0;
   function loadLocked(atlas, topic) {
     var owner = user(), epoch = sessionEpoch;
