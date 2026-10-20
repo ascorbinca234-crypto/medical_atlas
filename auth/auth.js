@@ -155,17 +155,19 @@
     }
     var topic = selected('');
     window.MA_TOPIC = topic;
-    window.MA_STATE = { auth: 'none' };
+    window.MA_STATE = { auth: 'none', atlas: atlas, owner: owner && owner.id, accessExpiresAt: 0, admin: false };
     function run(code) { var el = document.createElement('script'); el.textContent = code; document.body.appendChild(el); el.remove(); }
     function reload() { document.documentElement.style.visibility = 'hidden'; location.reload(); }
     function stillOwner() { var current = user(); return !!(current && owner && current.id === owner.id); }
     function check() {
-      if (!full) return;
+      if (!owner) return;
       document.documentElement.style.visibility = 'hidden';
-      if (!stillOwner() || Date.now() >= expiresAt) { reload(); return; }
+      var hadAccess = hasAtlasAccess(atlas);
+      if (!stillOwner() || full && Date.now() >= expiresAt) { reload(); return; }
       api('/access').then(function (r) {
         var grant = r.grants && r.grants[atlas];
-        if (r.policy !== POLICY || !grant || grant.expiresAt <= Date.now() || !stillOwner()) { reload(); return; }
+        var open = r.policy === POLICY && grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now();
+        if (!stillOwner() || !!open !== hadAccess || full && !open) { reload(); return; }
         document.documentElement.style.visibility = '';
       }).catch(reload);
     }
@@ -178,7 +180,7 @@
       var bar = document.createElement('aside'); bar.id = 'ma-topic-controls';
       var title = catalog.topics.find(function (t) { return t.id === topic; });
       var message = full ? 'Открыта тема: ' + (title ? title.title : topic) :
-        r.status === 'public' ? 'Этот раздел доступен без подписки.' :
+        r.status === 'public' ? (hasAtlasAccess(atlas) ? 'Все материалы предмета доступны. Выберите тему.' : 'Этот раздел доступен без подписки.') :
         r.status === 'limited' ? 'Временный лимит загрузки. Повторите через ' + (r.retryAfter || 60) + ' сек.' :
         r.status === 'error' ? 'Тему не удалось загрузить. Проверьте соединение и повторите.' :
         r.status === 'subscription-required' ? 'Для выбранной темы нужна подписка на этот предмет.' : 'Выберите тему. Два пробных конспекта доступны всем.';
@@ -216,16 +218,39 @@
     document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
     var publicRoute = (catalog.publicRoutes || []).indexOf(location.hash.slice(1).split('/')[0]) >= 0;
     var delivery = publicRoute || catalog.demo && catalog.demo.indexOf(topic) >= 0 ? Promise.resolve({ status: 'public', code: null }) : loadLocked(atlas, topic);
-    delivery.then(function (r) {
+    // A title-only stub means "not loaded", not "no subscription".
+    // Resolve subject rights even when the current page is a free lesson/tool.
+    var rights = owner ? api('/access').then(function (r) { return r.policy === POLICY ? r : null; }).catch(function () { return null; }) : Promise.resolve(null);
+    Promise.all([delivery, rights]).then(function (results) {
+      var r = results[0], rights = results[1], grant = rights && rights.grants && rights.grants[atlas];
       var allowed = r.status === 'ok' && stillOwner() && r.expiresAt > Date.now();
+      if (stillOwner()) {
+        window.MA_STATE.accessExpiresAt = grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now() ? grant.expiresAt : allowed ? r.expiresAt : 0;
+        window.MA_STATE.admin = !!(rights && rights.admin);
+      }
       window.MA_STATE.auth = allowed ? 'ok' : r.status;
       if (atlas === 'micro' && r.status === 'error') window.MICRO_LOAD_ERROR = true;
       if (allowed) { full = true; expiresAt = r.expiresAt; run(r.code); }
       if (appId) run(document.getElementById(appId).textContent);
+      // Legacy biochemistry packages create their navigation before returning.
+      // Remove entitlement markers only; loading another package still goes through the API.
+      if (atlas === 'biochem' && hasAtlasAccess(atlas)) {
+        [].forEach.call(document.querySelectorAll('#pTabs .is-locked, #anList .is-locked'), function (button) {
+          button.classList.remove('is-locked');
+          [].forEach.call(button.querySelectorAll('.lock-ico'), function (icon) { icon.remove(); });
+        });
+      }
       controls(r);
       mount(document.querySelectorAll('[data-ma-acct]'));
-      if (full) { setTimeout(reload, Math.min(expiresAt - Date.now(), 2147483647)); setInterval(check, 60000); }
+      var expiry = full ? Math.min(expiresAt, window.MA_STATE.accessExpiresAt) : window.MA_STATE.accessExpiresAt;
+      if (expiry > Date.now()) setTimeout(reload, Math.min(expiry - Date.now(), 2147483647));
+      if (owner) setInterval(check, 60000);
     });
+  }
+
+  function hasAtlasAccess(atlas) {
+    var state = window.MA_STATE, current = user();
+    return !!(state && current && state.owner === current.id && state.atlas === atlas && state.accessExpiresAt > Date.now());
   }
 
   // ---------- вход и выход ----------
@@ -266,7 +291,7 @@
 
   window.MA = {
     enabled: enabled, signedIn: signedIn, user: user, loginUrl: loginUrl, AUTH_URL: AUTH_URL, SITE_URL: SITE_URL, API: API,
-    mount: mount, bootAtlas: bootAtlas, onChange: function (f) { listeners.push(f); }, loadLocked: loadLocked,
+    mount: mount, bootAtlas: bootAtlas, hasAtlasAccess: hasAtlasAccess, onChange: function (f) { listeners.push(f); }, loadLocked: loadLocked,
     call: call, api: api, setSession: setSession, logout: logout, refresh: refresh,
   };
 })();

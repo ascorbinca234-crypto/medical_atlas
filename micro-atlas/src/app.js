@@ -7,6 +7,7 @@ const BLOCKS = [
   {id:'prv', rom:'II', title:'Частная микробиология', short:'Возбудители по группам заболеваний и принципы их лабораторной диагностики'}
 ];
 
+const SUBJECT_ACCESS = !!window.MA?.hasAtlasAccess('micro');
 const TMAP = {}, PMAP = {};
 TH.forEach(t => TMAP[t.id] = t);
 PG.forEach(p => PMAP[p.id] = p);
@@ -142,7 +143,7 @@ function lockedPage(title){
 function syncProgress(r){
   if (!window.MAP) return;
   const done = LS.json('read', {});
-  MAP.sections('micro', TH.map(t=>({id:t.id,n:t.title,sub:'Микробиология',total:1,learned:!t.locked&&done[t.id]?1:0,seen:!t.locked&&done[t.id]?1:0,locked:!!t.locked})));
+  MAP.sections('micro', TH.map(t=>({id:t.id,n:t.title,sub:'Микробиология',total:1,learned:!t.locked&&done[t.id]?1:0,seen:!t.locked&&done[t.id]?1:0,locked:!!t.locked&&!SUBJECT_ACCESS})));
   if (r.v === 'topic' && !r.t.locked) MAP.last({atlas:'micro',title:r.t.title,sub:'Микробиология',url:new URL('#'+r.t.id, location.href).href});
 }
 
@@ -183,12 +184,12 @@ function homePage(){
   let h = '<section class="hero"><h1>Атлас <em>микробиологии</em></h1>' +
     '<p>Конспекты по общей и частной микробиологии, досье возбудителей и вопросы для подготовки к экзамену.</p></section>';
 
-  if (!window.MICRO_FULL) h += '<div class="kwarn"><b>Пробная версия · два базовых конспекта</b><p>Морфология и физиология микроорганизмов доступны без подписки. Остальные темы, досье и тренажёр входят в полную версию; продажи подписок ещё не открыты.</p></div>';
+  if (!SUBJECT_ACCESS) h += '<div class="kwarn"><b>Пробная версия · два базовых конспекта</b><p>Морфология и физиология микроорганизмов доступны без подписки. Остальные темы, досье и тренажёр входят в полную версию; продажи подписок ещё не открыты.</p></div>';
   if (window.MICRO_LOAD_ERROR) h += '<p class="kwarn" role="status">Не удалось проверить полный доступ. Пробные конспекты доступны. <button class="btn" data-reload>Повторить</button></p>';
   h += '<div class="stats">' +
     stat(TH.length, 'листа атласа') +
-    stat(MICRO_CATALOG.pathogens, 'досье в полной версии', PG.length ? filled / PG.length : null, window.MICRO_FULL ? filled + ' заполнено по всем основным полям' : 'Доступ по подписке') +
-    stat(MICRO_CATALOG.questions, 'вопросов в полной версии', null, window.MICRO_FULL ? QBLK.gen.length + ' общая · ' + QBLK.prv.length + ' частная' : 'Доступ по подписке') +
+    stat(MICRO_CATALOG.pathogens, 'досье в полной версии', PG.length ? filled / PG.length : null, SUBJECT_ACCESS ? 'Доступны все досье' : 'Доступ по подписке') +
+    stat(MICRO_CATALOG.questions, 'вопросов в полной версии', null, SUBJECT_ACCESS ? 'Доступны все вопросы' : 'Доступ по подписке') +
     stat(learned, 'выучено в тренажёре', PG.length ? learned / PG.length : null) +
     '</div>';
 
@@ -199,7 +200,7 @@ function homePage(){
         const q = (QBYTOPIC[t.id] || []).length;
         return '<a class="hcard" href="#' + t.id + '"><b>' + t.no + '. ' + lat(t.title) + '</b>' +
           '<span>' + lat(t.short || '') + '</span>' +
-          '<small>' + (t.locked ? 'По подписке' : window.MICRO_FULL ? q + ' ' + plural(q, 'вопрос', 'вопроса', 'вопросов') : 'Бесплатный конспект') + '</small></a>';
+          '<small>' + (t.locked ? (SUBJECT_ACCESS ? 'Открыть конспект' : 'По подписке') : window.MICRO_FULL ? q + ' ' + plural(q, 'вопрос', 'вопроса', 'вопросов') : 'Бесплатный конспект') + '</small></a>';
       }).join('') + '</div>';
   });
 
@@ -465,19 +466,19 @@ function renderResults(raw){
 /* ---------- навигация ---------- */
 function rail(){
   let h = '<div class="site-links"><a href="../">← Все предметы</a><a href="../cabinet/">Личный кабинет</a><span data-ma-acct></span></div>' +
-    '<a class="brand" href="#"><b>Атлас микробиологии</b><span>' + (window.MICRO_FULL ? 'Полный доступ' : 'Два базовых конспекта бесплатно') + '</span></a>' +
+    '<a class="brand" href="#"><b>Атлас микробиологии</b><span>' + (SUBJECT_ACCESS ? 'Полный доступ' : 'Два базовых конспекта бесплатно') + '</span></a>' +
     '<div class="search">' + searchSvg() + '<input id="sq" type="search" placeholder="Поиск по атласу" autocomplete="off"></div>' +
     '<div class="results" id="results"></div><nav class="nav">';
   BLOCKS.forEach((b, i) => {
     h += '<section><h6>' + esc(b.title) + '</h6>' + TOPICS[i].map(t => {
       const q = (QBYTOPIC[t.id] || []).length;
       return '<a href="#' + t.id + '" data-id="' + t.id + '"><span class="n">' + t.no + '</span><span>' + lat(t.title) + '</span>' +
-        (t.locked ? '<span class="fill" aria-label="По подписке">🔒</span>' : q ? '<span class="fill">' + q + '</span>' : '') + '</a>';
+        (t.locked && !SUBJECT_ACCESS ? '<span class="fill" aria-label="По подписке">🔒</span>' : q ? '<span class="fill">' + q + '</span>' : '') + '</a>';
     }).join('') + '</section>';
   });
   h += '<section><h6>Справочники</h6>' +
-    '<a href="#pathogens" data-id="pathogens"><span class="n">А—Я</span><span>Возбудители</span><span class="fill">' + (window.MICRO_FULL ? PG.length : '🔒') + '</span></a>' +
-    '<a href="#questions" data-id="questions"><span class="n">№</span><span>Вопросы экзамена</span><span class="fill">' + (window.MICRO_FULL ? QS.length : '🔒') + '</span></a>' +
+    '<a href="#pathogens" data-id="pathogens"><span class="n">А—Я</span><span>Возбудители</span><span class="fill">' + (SUBJECT_ACCESS ? MICRO_CATALOG.pathogens : '🔒') + '</span></a>' +
+    '<a href="#questions" data-id="questions"><span class="n">№</span><span>Вопросы экзамена</span><span class="fill">' + (SUBJECT_ACCESS ? MICRO_CATALOG.questions : '🔒') + '</span></a>' +
     '<a href="#learn" data-id="learn"><span class="n">↻</span><span>Учить</span></a>' +
     '</section></nav>' +
     '<div class="acts" style="margin-top:auto"><button class="btn" id="theme">Сменить тему</button></div>';
