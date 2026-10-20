@@ -322,10 +322,11 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
       var u = r.user, names = { email: 'почта и пароль', yandex: 'Яндекс ID', vk: 'VK ID' };
       var ways = u.providers.filter(function (p) { return p !== 'email' || u.hasPassword; }).map(function (p) { return names[p] || p; });
       var ava = u.avatar ? '<img src="' + esc(u.avatar) + '" alt="" referrerpolicy="no-referrer">' : esc((u.name || u.email || '?').charAt(0).toUpperCase());
-      view.innerHTML = '<h1>Аккаунт</h1><p class="sub" data-msg>Все темы атласов открыты.</p>' +
+      view.innerHTML = '<h1>Аккаунт</h1><p class="sub" data-msg>' + (u.isAdmin ? 'Администратор: все материалы доступны без подписки.' : 'Профиль и настройки аккаунта.') + '</p>' +
         '<div class="who"><span class="ava" aria-hidden="true">' + ava + '</span><div><b>' + esc(u.name || 'Без имени') + '</b><span>' + esc(u.email || 'почта не указана') + '</span></div></div>' +
         '<dl class="props"><dt>Вход</dt><dd>' + esc(ways.join(', ') || '—') + '</dd><dt>С нами с</dt><dd>' + esc(new Date(u.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })) + '</dd></dl>' +
         '<form id="fn" novalidate><label class="f" for="name">Имя</label><div class="row"><input id="name" type="text" maxlength="60" value="' + esc(u.name) + '"><button class="btn" type="submit">Сохранить</button></div></form>' +
+        (u.isAdmin ? '<form id="credentials" style="margin-top:22px" novalidate><h2>Логин и пароль</h2><label class="f" for="adminLogin">Логин (в формате почты)</label><input id="adminLogin" type="email" autocomplete="username" value="' + esc(u.email) + '">' + pwField('currentPw', 'Текущий пароль', 'current-password') + pwField('newPw', 'Новый пароль', 'new-password', 'оставьте пустым, чтобы сохранить').replace(' required', '') + '<button class="btn" type="submit" style="margin-top:14px">Изменить логин и пароль</button></form>' : '') +
         '<div class="stack" style="margin-top:22px"><a class="btn pri" href="' + esc(next()) + '">К атласам</a><a class="btn" href="../cabinet/">Личный кабинет</a><button class="btn" id="out" type="button">Выйти</button><button class="btn" id="outAll" type="button">Выйти на всех устройствах</button>' +
         (u.email && !u.hasPassword ? '<a class="btn" href="#forgot">Задать пароль для входа по почте</a>' : '') +
         '<button class="btn danger" id="del" type="button">Удалить аккаунт</button></div>';
@@ -334,6 +335,17 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
         ev.preventDefault(); var b = fn.querySelector('button'); busy(b, true, '…');
         MA.api('/me', { method: 'PATCH', body: { name: fn.name.value } }).then(function (r) { busy(b, false); var s = JSON.parse(localStorage.getItem('ma-session') || '{}'); s.user = r.user; localStorage.setItem('ma-session', JSON.stringify(s)); setMsg('ok', 'Имя сохранено.'); }, function (e) { busy(b, false); setMsg('err', e.message); });
       });
+      var credentials = document.getElementById('credentials');
+      if (credentials) {
+        eyes();
+        credentials.addEventListener('submit', function (ev) {
+          ev.preventDefault(); var button = credentials.querySelector('button[type=submit]'); busy(button, true, 'Сохраняем…');
+          MA.api('/me/credentials', { method: 'PATCH', body: { email: credentials.adminLogin.value, currentPassword: credentials.currentPw.value, newPassword: credentials.newPw.value } }).then(function (r) {
+            MA.setSession(r); credentials.currentPw.value = ''; credentials.newPw.value = ''; busy(button, false); setMsg('ok', 'Данные обновлены. Используйте новый логин и пароль. На остальных устройствах потребуется войти заново.');
+            document.querySelector('.who div span').textContent = r.user.email;
+          }, function (error) { busy(button, false); setMsg('err', error.message); });
+        });
+      }
       document.getElementById('out').addEventListener('click', function () { MA.logout(false).then(function () { location.replace(MA.SITE_URL); }); });
       document.getElementById('outAll').addEventListener('click', function () { MA.logout(true).then(function () { location.hash = 'login?ok=' + encodeURIComponent('Вы вышли на всех устройствах.'); }); });
       var del = document.getElementById('del');

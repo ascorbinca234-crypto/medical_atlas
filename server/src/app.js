@@ -8,7 +8,7 @@ const { hashPassword, verifyPassword } = require('./passwords');
 const { providers, pkce } = require('./oauth');
 const emails = require('./emails');
 const { createSocial } = require('./social');
-const { SUBJECTS, POLICY, grantFor } = require('./access');
+const { SUBJECTS, POLICY, grantForUser } = require('./access');
 
 class HttpError extends Error { constructor(status, code, message, extra) { super(message); this.status = status; this.code = code; this.extra = extra; } }
 const bad = (code, message) => new HttpError(400, code, message);
@@ -49,7 +49,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   }
   const fp = pw => crypto.createHash('sha256').update('fp:' + (pw || '')).digest('hex').slice(0, 16);
   const view = u => ({ id: u.id, name: u.name || '', email: u.email || null, emailVerified: !!u.emailVerified, avatar: u.avatar || null,
-    providers: [...new Set((u.ids || []).map(k => k.split(':')[0]))], hasPassword: !!u.pw, createdAt: u.createdAt });
+    providers: [...new Set((u.ids || []).map(k => k.split(':')[0]))], hasPassword: !!u.pw, isAdmin: u.contentAdmin === true, createdAt: u.createdAt });
   function session(u) {
     const t = now();
     return {
@@ -349,6 +349,26 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const u = await changeAuthenticated(req, current => { if (b.name !== undefined) current.name = cleanName(b.name); });
     return json(200, { user: view(u) });
   }
+  async function changeCredentials(req) {
+    const snapshot = await authUser(req), b = body(req);
+    if (!snapshot.contentAdmin) throw new HttpError(403, 'forbidden', 'Изменение логина здесь доступно администратору.');
+    await limit('credentials:' + snapshot.id, 10, 900);
+    if (!await verifyPassword(String(b.currentPassword || ''), snapshot.pw || DUMMY_HASH)) throw bad('wrong_password', 'Текущий пароль указан неверно.');
+    const email = b.email === undefined ? snapshot.email : checkEmail(normEmail(b.email));
+    const pw = b.newPassword ? await hashPassword(checkPassword(b.newPassword)) : snapshot.pw;
+    const renamed = email !== snapshot.email, identity = 'email:' + email;
+    if (renamed && !await store.createIdentity(identity, snapshot.id)) throw new HttpError(409, 'email_taken', 'Этот логин уже занят.');
+    let u;
+    try {
+      u = await changeUser(snapshot.id, current => {
+        if (!current.contentAdmin || current.tv !== snapshot.tv || current.pw !== snapshot.pw || current.email !== snapshot.email) throw new HttpError(409, 'credentials_changed', 'Данные уже изменились. Войдите заново.');
+        current.pw = pw; current.email = email; current.emailVerified = true; current.tv = (current.tv || 0) + 1;
+        if (renamed) current.ids = [...(current.ids || []).filter(k => k !== 'email:' + snapshot.email), identity];
+      });
+    } catch (error) { if (renamed) await store.deleteIdentity(identity); throw error; }
+    if (renamed) await store.deleteIdentity('email:' + snapshot.email);
+    return json(200, session(u));
+  }
   async function logoutAll(req) {
     await changeAuthenticated(req, u => { u.tv = (u.tv || 0) + 1; });
     return json(200, { ok: true });
@@ -385,8 +405,8 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     }],
     ['GET', /^\/access$/, async req => {
       const u = await authUser(req), record = await store.getDoc('access:' + u.id), grants = {};
-      for (const subject of SUBJECTS) { const g = grantFor(record && record.d, subject.id); if (g) grants[subject.id] = { expiresAt: g.expiresAt }; }
-      return json(200, { policy: POLICY, subjects: SUBJECTS, grants });
+      for (const subject of SUBJECTS) { const g = grantForUser(u, record && record.d, subject.id); if (g) grants[subject.id] = { expiresAt: g.expiresAt }; }
+      return json(200, { policy: POLICY, subjects: SUBJECTS, grants, admin: u.contentAdmin === true });
     }],
     ['POST', /^\/auth\/register$/, register],
     ['POST', /^\/auth\/verify$/, verify],
@@ -402,6 +422,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     ['GET', /^\/auth\/(yandex|vk)\/callback$/, (req, m) => oauthCallback(req, m[1])],
     ['GET', /^\/me$/, me],
     ['PATCH', /^\/me$/, updateMe],
+    ['PATCH', /^\/me\/credentials$/, changeCredentials],
     ['DELETE', /^\/me$/, deleteMe],
     ['GET', /^\/content-v3\/([^/]+)\/([^/]+)$/, (req, m) => content.topic(req, m[1], m[2])],
     ['GET', /^\/content-v2\/([^/]+)$/, (req, m) => content.retired(req, m[1])],

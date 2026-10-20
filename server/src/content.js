@@ -1,6 +1,6 @@
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), zlib = require('zlib');
-const { SUBJECTS, POLICY, grantFor } = require('./access');
+const { SUBJECTS, POLICY, grantForUser } = require('./access');
 const DELIVERY = 'topic-delivery-v1';
 const idOK = s => /^[a-z0-9][a-z0-9-]{0,79}$/.test(s);
 
@@ -31,7 +31,7 @@ function createContent({ cfg, store, authUser, HttpError, json }) {
   async function allowed(req, atlas) {
     const user = await authUser(req);
     if (!SUBJECTS.some(s => s.id === atlas)) throw new HttpError(404, 'not_found', 'Нет такого предмета.');
-    const record = await store.getDoc('access:' + user.id), grant = grantFor(record && record.d, atlas);
+    const record = await store.getDoc('access:' + user.id), grant = grantForUser(user, record && record.d, atlas);
     if (!grant) throw new HttpError(403, 'subscription_required', 'Для этого предмета нужна действующая подписка.');
     return { user, grant };
   }

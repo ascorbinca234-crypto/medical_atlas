@@ -89,6 +89,8 @@ P.filter(isK).forEach(p=>p.blocks.forEach(b=>{
 const uLinkD = e=>{ const ns=[e.n,...e.names]; for(const n of ns){ if(/ \+ /.test(n)){ const m=UCOMBO[key(n)]; if(m&&DRUGS[m]) return DRUGS[m]; if(DKEY[key(n)]) return DKEY[key(n)]; continue; } const d=kFindDrug(n); if(d) return d; } return null; };
 UNI.forEach(e=>{ e.d=uLinkD(e); });
 DLIST.forEach(d=>{ if(UNI.some(e=>e.d===d)) return; const e=UBY[uK(UMERGE[d.n]||d.n)]||uNew(d.n); e.d=d; e.ps.add(d.p); (d.al||[]).forEach(a=>e.names.add(a)); });
+// The free animation catalog contains names and physiological effects, not closed lecture dossiers.
+if(HASV) Object.keys(VIT).forEach(n=>{ const e=UBY[uK(n)]||uNew(n); const v=vEntry(n); if(!e.groups.length && v.g)e.groups.push({g:v.g}); });
 if(typeof RXAL!=='undefined') RXAL.forEach(([n,t])=>{ if(RXD[t]&&!RXD[n]) RXD[n]=RXD[t]; });
 UNI.forEach(e=>{ if(e.d) e.ps.add(e.d.p);
   const own=[e.n,...e.names]; const RX0=typeof RXD!=='undefined'?RXD:{};
@@ -150,13 +152,14 @@ function uBodyHTML(e){
 }
 function uCardHTML(e){
   const kl=uKLecs(e); const pr=uProto(e);
-  const grp = e.groups.length ? e.groups.map(g=>`<li><span class="roman">${BY[g.p].roman}</span>${g.g}</li>`).join('') : '';
+  const grp = e.groups.length ? e.groups.map(g=>`<li><span class="roman">${BY[g.p]?BY[g.p].roman:''}</span>${g.g}</li>`).join('') : '';
   const other=[...e.names].filter(n=>n!==e.n);
   const feats=uCardsF(e,'f'), fm=uCardsF(e,'fm'), pp=uCardsF(e,'pp'), xs=e.cards.map(({c})=>c.x).filter(Boolean);
   const kli=e.cards.map(({c})=>c.kl).filter(Boolean);
   const m=e.d?(e.d.m||(pr&&pr.m)||[]):[], s=e.d?(e.d.s||(pr&&pr.s)||{}):{};
   const head=`<header class="dz-h"><p class="eyebrow">${kl.length?'Конспект '+kl.map(p=>`<span class="roman">${p.roman}</span>`).join(', '):(e.d?'Лист <span class="roman">'+BY[e.d.p].roman+'</span>':'Препарат')}</p><h2 id="dz-title">${e.n}</h2>${other.length?`<p class="dz-al">${e.cards.length||e.groups.length?'Также: ':'Другие названия: '}${other.join(', ')}</p>`:''}${e.hl?`<p class="u-hl">${uHlBadge(e.hl)}</p>`:''}
     ${grp?`<ul class="u-grp">${grp}</ul>`:(e.d?`<p class="dz-g">${e.d.g}</p>`:'')}${kli.length?`<p class="kc-kl"><span>кл</span>${kli.join('; ')}</p>`:''}${e.d?`<span class="dz-t">${e.d.t}</span>`:''}</header>`;
+  if(e.v && !e.d && !e.cards.length && !e.rx.length && !e.x) return head + uBodyHTML(e) + '<p class="dz-p">Анимация доступна бесплатно. Подробные досье и остальные конспекты открываются по подписке.</p>';
   const sec=(cls,h,body)=>`<section class="dz-sec u-sec ${cls}"><h3>${h}</h3>${body}</section>`;
   let o=head;
   o+=sec('u-dose','Дозировка и форма выпуска',uDoseHTML(e,{all:true}));
@@ -186,6 +189,7 @@ function uLearnHTML(e){
 /* ---------- закрытые темы ---------- */
 const LOCK_ICO='<svg class="lock-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.6"/><path d="M5.3 7V5.2a2.7 2.7 0 0 1 5.4 0V7"/></svg>';
 const LOCKED_N = P.filter(p=>p.locked).length;
+const CONTENT_ADMIN = !!(window.MA && window.MA.user && window.MA.user() && window.MA.user().isAdmin);
 function maState(){ return window.MA_STATE||{auth:'none'}; }
 function lockActions(){
   const MA=window.MA, st=maState();
@@ -195,10 +199,11 @@ function lockActions(){
   return `<div class="dz-act"><a class="btn pri" href="${esc(MA.loginUrl())}">Войти</a><a class="btn" href="${esc(MA.loginUrl('register'))}">Зарегистрироваться</a></div><p class="par lock-how">Регистрация бесплатная.</p>`;
 }
 function lockBanner(){
+  if(CONTENT_ADMIN) return '<div class="lockban"><div><b>Администратор: все конспекты доступны без подписки.</b><span>Выберите нужную тему в указателе.</span></div></div>';
   if(!LOCKED_N) return '';
   const open=KP.filter(p=>!p.locked).length, sh=P.filter(p=>p.mod!=='kon'&&!p.locked).length;
   const shAll=P.filter(p=>p.mod!=='kon').length, pl=(n,a,b,c)=>{ const m=n%10, h=n%100; return m===1&&h!==11?a:(m>=2&&m<=4&&(h<12||h>14)?b:c); };
-  return `<div class="lockban">${LOCK_ICO}<div><b>В пробной версии открыты ${open} ${pl(open,'лекция','лекции','лекций')} из ${KP.length} и ${sh} ${pl(sh,'лист','листа','листов')} из ${shAll}.</b><span>Остальные темы, препараты к ним и модель «Организм» целиком откроются по подписке.</span></div>${window.MA&&window.MA.enabled()?`<a class="btn pri" href="${esc(window.MA.loginUrl())}">Войти</a>`:''}</div>`;
+  return `<div class="lockban">${LOCK_ICO}<div><b>В пробной версии открыты ${open} ${pl(open,'лекция','лекции','лекций')} из ${KP.length} и ${sh} ${pl(sh,'лист','листа','листов')} из ${shAll}.</b><span>Модель «Организм» и анимации действия препаратов открыты бесплатно. Остальные конспекты и подробные досье доступны по подписке.</span></div>${window.MA&&window.MA.enabled()?`<a class="btn pri" href="${esc(window.MA.loginUrl())}">Войти</a>`:''}</div>`;
 }
 function renderLockedPlate(p){
   $('#page').innerHTML=`<section class="hero locked-hero"><p class="eyebrow">${isK(p)?(p.lec||'Лекция')+' · '+p.roman:'Лист '+p.roman}</p><h1>${p.title}</h1>${p.sum?`<p class="lead">${p.sum}</p>`:''}
@@ -211,7 +216,7 @@ const ICO = {
 };
 function buildNav(){
   const due = typeof lDueCount==='function' ? lDueCount(A) : 0;
-  $('#nav').innerHTML = `<div class="navtop"><a href="#drugs" data-id="drugs" class="navdb"><span class="n">${ICO.db}</span><span>${LOCKED_N?'Препараты из конспектов':'Все препараты'} <small>${UNI.length}</small></span></a>${HASV?`<a href="#body" data-id="body" class="navdb"><span class="n">${ICO.body}</span><span>Организм <small>${Object.keys(VIT).length}</small></span></a>`:''}${typeof lDeck==='function'?`<a href="#learn" data-id="learn" class="navdb"><span class="n">${ICO.learn}</span><span>Учить препараты <small class="due" title="к повторению сегодня"${due?'':' hidden'}>${due}</small></span></a>`:''}</div>` + MODULES.map(m=>`<div><h6>${m.t}</h6>${P.filter(p=>p.mod===m.id).map(p=>`<a href="#${p.id}" data-id="${p.id}"${p.locked?' class="is-locked" title="Откроется по подписке"':''}><span class="n">${p.roman}</span><span>${p.title}</span>${p.locked?LOCK_ICO:''}</a>`).join('')}</div>`).join('');
+  $('#nav').innerHTML = `<div class="navtop"><a href="#drugs" data-id="drugs" class="navdb"><span class="n">${ICO.db}</span><span>${LOCKED_N?'Препараты из конспектов':'Все препараты'} <small>${UNI.length}</small></span></a>${HASV?`<a href="#body" data-id="body" class="navdb"><span class="n">${ICO.body}</span><span>Организм <small>${Object.keys(VIT).length}</small></span></a>`:''}${typeof lDeck==='function'?`<a href="#learn" data-id="learn" class="navdb"><span class="n">${ICO.learn}</span><span>Учить препараты <small class="due" title="к повторению сегодня"${due?'':' hidden'}>${due}</small></span></a>`:''}</div>` + MODULES.map(m=>`<div><h6>${m.t}</h6>${P.filter(p=>p.mod===m.id).map(p=>`<a href="#${p.id}" data-id="${p.id}"${p.locked&&!CONTENT_ADMIN?' class="is-locked" title="Откроется по подписке"':''}><span class="n">${p.roman}</span><span>${p.title}</span>${p.locked&&!CONTENT_ADMIN?LOCK_ICO:''}</a>`).join('')}</div>`).join('');
 }
 function setCurrent(id){ $$('#nav a').forEach(a=>{ if(a.dataset.id===id) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); }); }
 
@@ -230,7 +235,7 @@ q.addEventListener('input',()=>{
   const nv=v.replace(/ё/g,'е');
   const dh=UNI.map(e=>{ const ns=[e.n,...e.names]; const m=ns.find(n=>key(n).replace(/ё/g,'е').includes(nv)); return m?{e,m,st:key(m).replace(/ё/g,'е').startsWith(nv)}:null; }).filter(Boolean).sort((a,b)=>(b.st-a.st)||a.e.n.localeCompare(b.e.n,'ru')).slice(0,10);
   const gh=IDX.filter(x=>(x.kind==='g'||x.kind==='kg')&&x.k.includes(v)).slice(0,5);
-  const sub=e=>{ const g=e.groups[0]; return g?`${BY[g.p].roman} · ${g.g}`:(e.d?e.d.g:''); };
+  const sub=e=>{ const g=e.groups[0]; return g?`${BY[g.p]?BY[g.p].roman:''} · ${g.g}`:(e.d?e.d.g:''); };
   res.innerHTML = dh.length||gh.length ? dh.map(h=>`<button type="button" data-u="${esc(h.e.n)}"><b>${esc(h.e.n)}${h.m!==h.e.n?` <i>(${esc(h.m)})</i>`:''}</b><small>${esc(plain(sub(h.e)))}</small></button>`).join('') + gh.map(h=>`<button type="button" data-p="${h.p}" data-n="${esc(h.n)}" data-kind="${h.kind}"><b>${esc(h.n)}</b><small>Группа · ${plab(BY[h.p])}</small></button>`).join('') : '<div class="none">Ничего не найдено</div>';
 });
 res.addEventListener('click',e=>{

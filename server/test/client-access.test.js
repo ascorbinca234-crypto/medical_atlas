@@ -47,6 +47,16 @@ test('публичная фармакология содержит только 
   assert.equal(vm.runInContext('KP.filter(p=>p.locked).every(p=>!p.lead&&p.blocks.length===0)',ctx),true);
   assert.ok(!fs.existsSync(path.join(root,'farma-atlas/src/k_02_pns.js')));
 });
+test('бесплатная Фарма содержит все анимации, сохраняя закрытые конспекты и досье',()=>{
+  const ctx=vm.createContext({window:{},localStorage:{getItem:()=>null}}),src=path.join(root,'farma-atlas/src');
+  vm.runInContext(['data.js','k0.js','k_00_gen.js','k_01_aff.js','locked_stubs.js','drugs.js','body.js'].map(f=>fs.readFileSync(path.join(src,f),'utf8')).join('\n'),ctx);
+  assert.equal(vm.runInContext('Object.keys(VIT).length',ctx),176);
+  assert.equal(vm.runInContext('typeof EXTRA.routes.body',ctx),'function');
+  assert.equal(vm.runInContext('Object.keys(DRUGS).length',ctx),0);
+  assert.equal(vm.runInContext('KP.filter(p=>!p.locked).length',ctx),2);
+  const catalog=JSON.parse(fs.readFileSync(path.join(root,'farma-atlas/topics.json')));
+  assert.deepEqual(catalog.publicRoutes,['body','drugs']);assert.deepEqual(catalog.aliases,{});
+});
 test('публичная биохимия — ровно два конспекта без полной базы и схем',()=>{
   const data=JSON.parse(fs.readFileSync(path.join(root,'biochem-atlas/data/demo.json')));
   assert.deepEqual(data.map(x=>x.id),['amino-acids','monosaccharides']);

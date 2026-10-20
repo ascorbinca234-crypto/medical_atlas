@@ -66,7 +66,7 @@ if args.full:
 
 # ---------- публичная часть ----------
 css = read(src / 'style.css')
-data_files = ['data.js', 'k0.js', 'k_00_gen.js', 'k_01_aff.js', 'locked_stubs.js', 'drugs.js']
+data_files = ['data.js', 'k0.js', 'k_00_gen.js', 'k_01_aff.js', 'locked_stubs.js', 'drugs.js', 'body.js']
 code_files = ['fixup.js', 'fx.js', 'app.js']
 data_js = '\n'.join(read(src / f) for f in data_files)
 code_js = '\n'.join(read(src / f) for f in code_files)
@@ -114,7 +114,7 @@ body{{margin:0}}
 <div class="dz" id="dz" lang="ru" hidden><div class="dz-scrim" data-close></div><aside class="dz-panel" role="dialog" aria-modal="true" aria-labelledby="dz-title" tabindex="-1"><div class="dz-top"><button type="button" class="dz-back" hidden>← Назад</button><button type="button" class="dz-x" data-close aria-label="Закрыть досье">×</button></div><div class="dz-body" id="dzBody"></div></aside></div>
 <script>window.MA_TOPICS={read(root / "topics.json")};</script>
 <script src="../auth/config.js"></script>
-<script src="../auth/auth.js?v=topic-delivery-v1"></script>
+<script src="../auth/auth.js?v=admin-farma-v1"></script>
 <script src="../progress/progress.js?v=topic-delivery-v1"></script>
 <script>
 {data_js}
