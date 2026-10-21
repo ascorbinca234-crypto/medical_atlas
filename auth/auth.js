@@ -172,6 +172,7 @@
       }).catch(reload);
     }
     function href(t) {
+      if (t.route) return '#' + t.route;
       if (atlas === 'biochem') return '#topic/' + t.id;
       if (t.id.indexOf('pg-') === 0) return '#pathogens/' + t.id.slice(3);
       return '#' + t.id;
