@@ -184,7 +184,8 @@
         r.status === 'public' ? (hasAtlasAccess(atlas) ? 'Все материалы предмета доступны. Выберите тему.' : 'Этот раздел доступен без подписки.') :
         r.status === 'limited' ? 'Временный лимит загрузки. Повторите через ' + (r.retryAfter || 60) + ' сек.' :
         r.status === 'error' ? 'Тему не удалось загрузить. Проверьте соединение и повторите.' :
-        r.status === 'subscription-required' ? 'Для выбранной темы нужна подписка на этот предмет.' : 'Выберите тему. Два пробных конспекта доступны всем.';
+        r.status === 'subscription-required' ? 'Для выбранной темы нужна подписка на этот предмет.' :
+        hasAtlasAccess(atlas) ? 'Все материалы предмета доступны. Выберите тему.' : 'Выберите тему. Два пробных конспекта доступны всем.';
       bar.innerHTML = '<div role="status">' + esc(message) + '</div><details><summary>Темы и материалы предмета</summary><nav aria-label="Выбор темы">' +
         catalog.topics.map(function (t) { return '<a href="' + esc(href(t)) + '">' + esc(t.title) + '</a>'; }).join('') + '</nav></details>' +
         (r.status === 'error' || r.status === 'limited' ? '<button type="button" data-topic-retry>Повторить загрузку</button>' : '');
