@@ -868,7 +868,7 @@ a.btn-coral { text-decoration: none; }
     <div class="page-head">
       <div>
         <h1>Достижения</h1>
-        <p>Награды за ритм, освоение атласов и работу в команде. У закрытых видно, сколько осталось.</p>
+        <p id="achHint">Награды за ритм, освоение атласов и работу в команде. У неполученных видно, сколько осталось.</p>
       </div>
       <span class="muted num" id="achCount2"></span>
     </div>
@@ -901,6 +901,10 @@ a.btn-coral { text-decoration: none; }
   <section role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" hidden>
     <div class="page-head"><div><h1>Настройки</h1></div></div>
     <div class="settings">
+      <section class="card set" aria-labelledby="setAccessH">
+        <h2 id="setAccessH">Доступ к атласам</h2>
+        <div id="accessBody"></div>
+      </section>
       <section class="card set" aria-labelledby="setPH">
         <h2 id="setPH">Профиль</h2>
         <dl class="props" id="props"></dl>
@@ -1097,6 +1101,15 @@ document.addEventListener('DOMContentLoaded', function () {
   let V = null, SOC = null, socState = 'guest', socErr = '', syncState = 'idle', masAtlas = 'farma', prevXp = null, prevSrc = null;
   const signedIn = () => !DEMO && !!(MA && MA.enabled() && MA.signedIn());
   const user = () => (signedIn() && MA.user()) || null;
+  let ACCESS = null, accessOwner = null, accessState = 'idle', accessRequest = 0, accessTimer;
+  function hasAtlasAccess(atlas) {
+    const u = user(), grant = ACCESS && ACCESS.grants && ACCESS.grants[atlas];
+    return !!(u && accessOwner === u.id && grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now());
+  }
+  function adminAccess() {
+    return !!(ACCESS && ACCESS.admin === true && Object.keys(ATLASES).every(hasAtlasAccess));
+  }
+  const sectionLocked = (atlas, row) => !!row.locked && !hasAtlasAccess(atlas);
 
   function ctxOf(v) {
     const s = v.stats, days = v.days || {};
@@ -1125,6 +1138,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (!signedIn() && MA && MA.enabled()) {
       b.innerHTML = '<div class="banner"><i data-lucide="cloud-off"></i><p>Прогресс сейчас хранится только в этом браузере. Войдите, чтобы он сохранялся в аккаунте, был виден с телефона и компьютера и открылась ординаторская.</p><div class="acts"><a class="btn btn-primary btn-sm" href="' + esc(MA.loginUrl()) + '">Войти</a><a class="btn btn-ghost btn-sm" href="' + esc(MA.loginUrl('register')) + '">Зарегистрироваться</a></div></div>';
+      return;
+    }
+    if (adminAccess()) {
+      b.innerHTML = '<div class="banner"><i data-lucide="shield-check"></i><p><b>Администратор.</b> Полный доступ ко всем опубликованным атласам и всем достижениям.</p></div>';
       return;
     }
     b.innerHTML = '';
@@ -1235,7 +1252,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function atlasTotals(atlas) {
     const list = (V.sec[atlas] && V.sec[atlas].list) || [];
-    return list.reduce((a, x) => ({ total: a.total + (x.locked ? 0 : x.total), learned: a.learned + x.learned }), { total: 0, learned: 0 });
+    return list.reduce((a, x) => ({ total: a.total + (sectionLocked(atlas, x) ? 0 : x.total), learned: a.learned + x.learned }), { total: 0, learned: 0 });
   }
 
   function renderResume() {
@@ -1268,11 +1285,11 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
     $('#masBody').innerHTML = '<ul class="sys-list compact">' + list.map(x => {
-      const pct = x.total ? Math.round(x.learned / x.total * 100) : 0, ok = pct >= 80;
-      const right = x.locked
+      const pct = x.total ? Math.round(x.learned / x.total * 100) : 0, ok = pct >= 80, locked = sectionLocked(masAtlas, x);
+      const right = locked
         ? '<span class="sys-lock"><i data-lucide="lock"></i>' + 'по подписке' + '</span>'
         : '<b class="sys-pct num"><small>' + x.learned + '/' + x.total + '</small>' + pct + '%</b>';
-      return '<li class="sys-row' + (ok ? ' ok' : '') + (x.locked ? ' locked' : '') + '"><div><div class="sys-top"><span class="sys-name">' + esc(x.n) + (x.sub && masAtlas === 'farma' ? '<small>' + esc(x.sub) + '</small>' : '') + '</span>' + right + '</div>' +
+      return '<li class="sys-row' + (ok ? ' ok' : '') + (locked ? ' locked' : '') + '"><div><div class="sys-top"><span class="sys-name">' + esc(x.n) + (x.sub && masAtlas === 'farma' ? '<small>' + esc(x.sub) + '</small>' : '') + '</span>' + right + '</div>' +
         '<div class="bar' + (ok ? ' ok' : '') + '" role="progressbar" aria-label="' + esc(x.n) + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '"><span data-w="' + pct + '%" style="--w:0%"></span></div></div></li>';
     }).join('') + '</ul>';
     requestAnimationFrame(() => requestAnimationFrame(() => $$('#masBody .bar > span').forEach(el => el.style.setProperty('--w', el.dataset.w))));
@@ -1413,28 +1430,35 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function achState(c) {
+    const preview = adminAccess();
     return ACH.map(a => {
       const [cur, goal] = a.p(c), got = V.ach[a.id];
-      return { a, got, open: !!got || cur >= goal, cur: Math.min(cur, goal), goal, pct: Math.min(100, goal ? cur / goal * 100 : 0) };
+      const earned = !!got || cur >= goal;
+      return { a, got, earned, open: earned || preview, preview: !earned && preview, cur: Math.min(cur, goal), goal, pct: Math.min(100, goal ? cur / goal * 100 : 0) };
     });
   }
   function renderAch(fresh) {
     fresh = fresh || new Set();
-    const list = achState(ctxOf(V)), open = list.filter(x => x.open).length;
-    $('#achCount').textContent = 'Открыто ' + open + ' из ' + ACH.length;
-    $('#achCount2').textContent = 'Открыто ' + open + ' из ' + ACH.length;
-    $('#badgesMini').innerHTML = list.map(x => '<li><button class="badge' + (fresh.has(x.a.id) ? ' pop' : '') + '" type="button" data-state="' + (x.open ? 'open' : 'locked') + '" data-tone="' + x.a.tone + '" data-ach="' + x.a.id + '" title="' + esc(x.a.desc) + (x.open ? '' : ' (ещё не получено)') + '">' +
-      '<span class="medal"><i data-lucide="' + x.a.icon + '"></i><span class="lock"><i data-lucide="lock"></i></span></span><span class="badge-name">' + esc(x.a.title) + '</span></button></li>').join('');
-    const near = list.filter(x => !x.open && x.goal > 1 && x.pct > 0).sort((p, q) => q.pct - p.pct).slice(0, 2);
+    const list = achState(ctxOf(V)), earned = list.filter(x => x.earned).length;
+    const count = adminAccess() ? 'Доступны все ' + ACH.length + ' · получено ' + earned : 'Получено ' + earned + ' из ' + ACH.length;
+    $('#achCount').textContent = count;
+    $('#achCount2').textContent = count;
+    $('#achHint').textContent = adminAccess() ? 'Администратору доступны все достижения. Полученные награды отмечены отдельно; прогресс отражает ваши занятия.' : 'Награды за ритм, освоение атласов и работу в команде. У неполученных видно, сколько осталось.';
+    const state = x => x.preview ? 'preview' : x.earned ? 'open' : 'locked';
+    const lock = x => x.open ? '' : '<span class="lock"><i data-lucide="lock"></i></span>';
+    $('#badgesMini').innerHTML = list.map(x => '<li><button class="badge' + (fresh.has(x.a.id) ? ' pop' : '') + '" type="button" data-state="' + state(x) + '" data-tone="' + x.a.tone + '" data-ach="' + x.a.id + '" title="' + esc(x.a.desc) + (x.preview ? ' (доступно администратору)' : x.earned ? '' : ' (ещё не получено)') + '">' +
+      '<span class="medal"><i data-lucide="' + x.a.icon + '"></i>' + lock(x) + '</span><span class="badge-name">' + esc(x.a.title) + '</span></button></li>').join('');
+    const near = list.filter(x => !x.earned && x.goal > 1 && x.pct > 0).sort((p, q) => q.pct - p.pct).slice(0, 2);
     $('#achNext').innerHTML = near.map(x => '<div class="tn" data-tone="' + x.a.tone + '"><div class="tn-top"><b>' + esc(x.a.title) + '</b><span>' + nf.format(x.cur) + ' / ' + nf.format(x.goal) + (x.a.unit || '') + '</span></div><div class="bar"><span style="--w:' + x.pct.toFixed(1) + '%"></span></div></div>').join('');
     $('#achNext').hidden = !near.length;
     $('#achGrid').innerHTML = list.map(x => {
       let foot;
-      if (x.open) foot = '<p class="ach-date"><i data-lucide="check"></i>' + (x.got ? 'Получено ' + fmtDM.format(parse(x.got)) : 'Получено') + '</p>';
+      if (x.preview) foot = '<p class="ach-date"><i data-lucide="shield-check"></i>Доступно администратору</p>';
+      else if (x.earned) foot = '<p class="ach-date"><i data-lucide="check"></i>' + (x.got ? 'Получено ' + fmtDM.format(parse(x.got)) : 'Получено') + '</p>';
       else if (x.goal > 1) foot = '<div class="ach-prog"><div class="bar"><span style="--w:' + x.pct.toFixed(1) + '%"></span></div><span>' + nf.format(x.cur) + ' / ' + nf.format(x.goal) + (x.a.unit || '') + '</span></div>';
       else foot = '<p class="ach-lockline"><i data-lucide="lock"></i>Ещё не получено</p>';
-      return '<li class="ach' + (fresh.has(x.a.id) ? ' pop' : '') + '" id="ach-' + x.a.id + '" data-state="' + (x.open ? 'open' : 'locked') + '" data-tone="' + x.a.tone + '">' +
-        '<span class="medal medal-lg"><i data-lucide="' + x.a.icon + '"></i><span class="lock"><i data-lucide="lock"></i></span></span><div><h3>' + esc(x.a.title) + '</h3><p>' + esc(x.a.desc) + '</p>' + foot + '</div></li>';
+      return '<li class="ach' + (fresh.has(x.a.id) ? ' pop' : '') + '" id="ach-' + x.a.id + '" data-state="' + state(x) + '" data-tone="' + x.a.tone + '">' +
+        '<span class="medal medal-lg"><i data-lucide="' + x.a.icon + '"></i>' + lock(x) + '</span><div><h3>' + esc(x.a.title) + '</h3><p>' + esc(x.a.desc) + '</p>' + foot + '</div></li>';
     }).join('');
   }
   // новые достижения сохраняются в журнал и уходят на сервер
@@ -1442,7 +1466,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!V) return new Set();
     const c = ctxOf(V), fresh = [];
     achState(c).forEach(x => {
-      if (x.got || !x.open) return;
+      if (x.got || !x.earned) return;
       if (DEMO) { V.ach[x.a.id] = V.today; return; }
       if (MAP.achieve(x.a.id, V.today)) { V.ach[x.a.id] = V.today; fresh.push(x.a); }
     });
@@ -1474,6 +1498,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const rows = [['Имя', DEMO ? 'Анна Морозова' : u ? (u.name || '—') : 'Гость'], ['Вуз', p.uni || '—'], ['Курс', p.course || '—'], ['Статус', p.status || '—']];
     if (V.code) rows.push(['ID', V.code]);
     $('#props').innerHTML = rows.map(([k, v]) => '<dt>' + k + '</dt><dd>' + esc(v) + '</dd>').join('');
+    $('#accessBody').innerHTML = '<dl class="props">' + Object.entries(ATLASES).map(([id, atlas]) => {
+      const label = DEMO ? 'Демо-режим' : hasAtlasAccess(id) ? (adminAccess() ? 'Полный доступ · администратор' : 'Подписка активна') : signedIn() && accessState !== 'ok' ? (accessState === 'error' ? 'Не удалось проверить доступ' : 'Проверяем доступ…') : 'Пробная версия';
+      return '<dt><a href="' + esc(atlas.url) + '">' + esc(atlas.name) + '</a></dt><dd data-atlas-access="' + id + '">' + label + '</dd>';
+    }).join('') + '</dl>';
     $('#propsActs').innerHTML = (u || DEMO) ? '<button class="btn btn-soft" type="button" data-edit-profile><i data-lucide="pencil"></i>Редактировать профиль</button>' : '<p class="muted">Профиль появится после входа.</p>';
     let line, acts = '';
     if (DEMO) line = '<span class="sync-dot local"></span>Демо-режим: ничего не сохраняется.';
@@ -1541,8 +1569,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
   async function refreshAll() {
-    await Promise.all([syncNow(), loadSocial()]);
+    await Promise.all([syncNow(), loadSocial(), loadAccess()]);
     renderAll();
+  }
+  async function loadAccess() {
+    const request = ++accessRequest, owner = user();
+    clearTimeout(accessTimer);
+    if (!owner) { ACCESS = null; accessOwner = null; accessState = 'guest'; return; }
+    if (accessOwner !== owner.id) { ACCESS = null; accessOwner = owner.id; }
+    accessState = 'loading';
+    try {
+      const result = await MA.api('/access');
+      if (request !== accessRequest || !user() || user().id !== owner.id) return;
+      if (result.policy !== 'subject-subscription-v1') throw new Error('Access policy mismatch');
+      ACCESS = result; accessState = 'ok';
+      const expiries = Object.values(result.grants || {}).map(x => x.expiresAt).filter(x => Number.isFinite(x) && x > Date.now());
+      if (expiries.length) accessTimer = setTimeout(() => { ACCESS = null; renderAll(); refreshAll(); }, Math.min(2147483647, Math.max(1, Math.min(...expiries) - Date.now())));
+    } catch (e) {
+      if (request === accessRequest) { ACCESS = null; accessState = 'error'; }
+    }
   }
   async function socialAction(fn) {
     try { const r = await fn(); await loadSocial(); renderAll(); return r; }
