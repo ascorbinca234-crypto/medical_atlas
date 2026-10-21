@@ -34,8 +34,11 @@ const root=path.resolve(__dirname,'../..');
   });
   await context.addInitScript(s=>{if(!localStorage.getItem('ma-browser-initialized')){localStorage.setItem('ma-session',JSON.stringify(s));localStorage.setItem('ma-browser-initialized','1');}},session);
   const failures=[];let count=0;
-  for(const atlas of ['farma','biochem','micro']){
-   const topics=JSON.parse(fs.readFileSync(path.join(root,atlas+'-atlas/topics.json'))).topics;
+  const original=await context.newPage();await original.goto(origin+'/biochem-atlas/');
+  await original.locator('#grid .card').first().waitFor();assert.equal(await original.locator('#grid .card').count(),131);await original.close();
+  for(const atlas of ['farma','micro']){
+   const catalog=JSON.parse(fs.readFileSync(path.join(root,atlas+'-atlas/topics.json')));
+   const topics=catalog.topics.filter(t=>!(catalog.demo||[]).includes(t.id));
    for(const topic of (process.env.ATLAS_SMOKE ? topics.slice(0,1) : topics)){
     const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
     const hash=atlas==='biochem'?'topic/'+topic.id:topic.id.startsWith('pg-')?'pathogens/'+topic.id.slice(3):topic.id;

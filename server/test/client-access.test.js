@@ -57,12 +57,17 @@ test('бесплатная Фарма содержит все анимации, 
   const catalog=JSON.parse(fs.readFileSync(path.join(root,'farma-atlas/topics.json')));
   assert.deepEqual(catalog.publicRoutes,['body','drugs']);assert.deepEqual(catalog.aliases,{});
 });
-test('публичная биохимия — ровно два конспекта без полной базы и схем',()=>{
-  const data=JSON.parse(fs.readFileSync(path.join(root,'biochem-atlas/data/demo.json')));
-  assert.deepEqual(data.map(x=>x.id),['amino-acids','monosaccharides']);
+test('восстановлена исходная полная биохимия: 131 вещество, 275 реакций, формулы и все разделы без входа',()=>{
+  const read=n=>JSON.parse(fs.readFileSync(path.join(root,'biochem-atlas/data',n+'.json')));
+  const substances=read('substances'),reactions=read('reactions'),ids=new Set(substances.map(x=>x.id));
+  assert.equal(substances.length,131);assert.equal(reactions.length,275);
+  assert.equal(new Set(substances.map(x=>x.s)).size,10);
+  for(const reaction of reactions)for(const token of reaction.s.concat(reaction.p))if(token[1])assert.ok(ids.has(token[1]));
   const page=fs.readFileSync(path.join(root,'biochem-atlas/index.html'),'utf8');
-  assert.equal((page.match(/<article /g)||[]).length,2);assert.doesNotMatch(page,/const BX|const PATHS|mountEtc|"reactions":/);
-  assert.deepEqual(fs.readdirSync(path.join(root,'biochem-atlas/data')),['demo.json']);
+  assert.match(page,/const DB = \[/);assert.match(page,/const PATHS = \[/);
+  assert.doesNotMatch(page,/Начните с основ|bootAtlas|data-biochem-shell|src="\.\.\/auth/);
+  for(const name of ['ETC','Kin','Hb','Box','Camp'])assert.match(page,new RegExp('function mount'+name+'\\('));
+  assert.deepEqual(fs.readdirSync(path.join(root,'biochem-atlas/data')).sort(),['cheatsheets.json','formulas.json','mnemonics.json','pairs.json','reactions.json','substances.json']);
 });
 test('полная фармакология восстанавливает данные и регистрирует все расширения', {skip:!fs.existsSync(path.join(root,'server/content/farma.js'))},()=>{
   const ctx=vm.createContext({window:{},localStorage:{getItem:()=>null}});

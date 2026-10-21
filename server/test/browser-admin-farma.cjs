@@ -42,10 +42,12 @@ const root=path.resolve(__dirname,'../..');
   await page.goto(origin+'/farma-atlas/#k-adr');await page.locator('.locked-hero').waitFor();assert.equal(await page.locator('.lockcard').count(),1);
   await page.goto(origin+'/auth/#login');await page.locator('#email').fill('admin@example.test');await page.locator('#pw').fill('test-admin-password-123');
   await page.locator('#f button[type=submit]').click();await page.waitForFunction(()=>JSON.parse(localStorage.getItem('ma-session')||'{}').user?.isAdmin===true);
-  for(const [atlas,topic] of [['farma','k-adr'],['biochem','sec-aa'],['micro','g3'],['pathophys','inflammation']]){
+  for(const [atlas,topic] of [['farma','k-adr'],['micro','g3'],['pathophys','inflammation']]){
    await page.goto(origin+'/'+atlas+'-atlas/#'+(atlas==='biochem'?'topic/':'')+topic);await page.locator('#ma-copy-label').waitFor();
    assert.equal(await page.evaluate(()=>window.MA_COPY.atlas),atlas);
   }
+  await page.goto(origin+'/biochem-atlas/');await page.locator('#grid .card').first().waitFor();
+  assert.equal(await page.locator('#grid .card').count(),131);
   await page.goto(origin+'/auth/#account');await page.locator('#credentials').waitFor();
   await page.locator('#adminLogin').fill('renamed-admin@example.test');await page.locator('#currentPw').fill('test-admin-password-123');await page.locator('#newPw').fill('changed-test-password-123');
   await page.locator('#credentials button[type=submit]').click();await page.getByText(/Данные обновлены/).waitFor();

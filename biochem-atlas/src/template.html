@@ -1,29 +1,2769 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Атлас биохимии · пробные конспекты</title>
-<meta name="description" content="Два базовых конспекта по биохимии: аминокислоты и моносахариды. Полный атлас доступен по подписке.">
-<style id="biochem-demo-style">
-:root{color-scheme:light dark;--bg:#f7f8fb;--ink:#202b45;--line:#dce2ef;--paper:#fff;--muted:#56647c;--accent:#2f55d4}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 system-ui,sans-serif}header,main,footer{max-width:1000px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}a{color:var(--accent)}.intro{padding:28px 0}h1{font:500 clamp(36px,6vw,64px)/1.12 Georgia,serif;margin:16px 0}h2{font:500 30px/1.3 Georgia,serif}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.intro p{max-width:680px;color:var(--muted)}nav{display:flex;gap:12px;flex-wrap:wrap}nav a{padding:8px 14px;border:1px solid var(--line);border-radius:8px;text-decoration:none}article{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:32px;margin:24px 0;scroll-margin-top:24px}table{border-collapse:collapse;width:100%;text-align:left}td,th{padding:14px;border-bottom:1px solid var(--line);vertical-align:top}tbody th{font-weight:500;width:35%}.formula{font-family:monospace;font-size:22px}.table-wrap{overflow-x:auto}.locked{border:1px dashed var(--line);padding:24px;border-radius:14px;color:var(--muted)}footer{font-size:14px;color:var(--muted)}@media(max-width:600px){header,main,footer{padding:16px}article{padding:20px}td,th{padding:10px;font-size:14px}}@media(prefers-color-scheme:dark){:root{--bg:#131925;--paper:#1b2433;--ink:#edf0f8;--muted:#aebbd0;--line:#354158;--accent:#97adff}}
-.ma-login:focus-visible,.ma-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.ma-user{position:relative}
-.ma-chip{display:flex;align-items:center;gap:9px;max-width:220px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);font:inherit;font-size:14.5px;cursor:pointer}
-.ma-chip:hover{border-color:var(--muted)}
-.ma-ava{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 16%,var(--paper));color:var(--accent);font-weight:600;font-size:13px;overflow:hidden}
-.ma-ava img{width:100%;height:100%;object-fit:cover}
-.ma-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ma-menu{position:absolute;z-index:60;right:0;top:calc(100% + 6px);min-width:200px;display:grid;padding:6px;border:1px solid var(--line);border-radius:12px;background:var(--paper);box-shadow:0 12px 30px #0002}
-.ma-menu[hidden]{display:none}
-.ma-menu a,.ma-menu button{display:block;padding:8px 10px;border:0;border-radius:8px;background:none;color:var(--ink);font:inherit;font-size:14.5px;text-align:left;text-decoration:none;cursor:pointer}
-.ma-menu a:hover,.ma-menu button:hover{background:var(--paper)}
-.lock-ico{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;vertical-align:-2px}
-.lkn{display:inline-flex;align-items:center;gap:3px;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Интерактивный атлас веществ и реакций курса биохимии лечебного факультета: учебные формулы, метаболические пути, анимации, интервальное повторение.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 3.5l10.8 6.25v12.5L16 28.5 5.2 22.25V9.75z' fill='none' stroke='%232F55D4' stroke-width='2.6' stroke-linejoin='round'/%3E%3Ccircle cx='16' cy='16' r='5.2' fill='none' stroke='%232F55D4' stroke-width='2.2'/%3E%3C/svg%3E">
+<title>Атлас биохимии</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF1F5;--surface:#FFFFFF;--ink:#172036;--muted:#576178;--line:#D5DBE4;--accent:#2F55D4;
+  --m-c:#1B2540;--m-o:#CF243B;--m-n:#2F55D4;--m-s:#9A7300;--m-p:#C25A06;--m-i:#7838AE;--m-f:#1B8655;
+  --scrim:rgba(18,26,44,.42);--g-acid:#C21F36;--g-n:#2650C4;--g-oh:#0A7F6B;--g-co:#8638BD;--g-p:#BD5605;--g-s:#8F6A00;--g-hal:#7535AA;--df:#D39400;--dfbg:rgba(242,178,0,.22);--dftx:#FFE08A;--shadow:0 24px 60px -24px rgba(23,32,54,.45);
+  color-scheme:light;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#121A2D;--surface:#1A243C;--ink:#E3E9F3;--muted:#97A3BB;--line:#2C3856;--accent:#8EA7FF;
+    --m-c:#DCE3EF;--m-o:#FF6F7D;--m-n:#8DA6FF;--m-s:#F0C850;--m-p:#FFA055;--m-i:#CB98F0;--m-f:#5DD08D;
+    --scrim:rgba(5,9,18,.6);--g-acid:#FF7D8A;--g-n:#97AEFF;--g-oh:#52D6B8;--g-co:#CCA4F5;--g-p:#FFA75F;--g-s:#F0C850;--g-hal:#CE9CF2;--df:#F2C14E;--dfbg:rgba(242,193,78,.18);--dftx:rgba(242,193,78,.4);--shadow:0 24px 60px -24px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121A2D;--surface:#1A243C;--ink:#E3E9F3;--muted:#97A3BB;--line:#2C3856;--accent:#8EA7FF;
+  --m-c:#DCE3EF;--m-o:#FF6F7D;--m-n:#8DA6FF;--m-s:#F0C850;--m-p:#FFA055;--m-i:#CB98F0;--m-f:#5DD08D;
+  --scrim:rgba(5,9,18,.6);--g-acid:#FF7D8A;--g-n:#97AEFF;--g-oh:#52D6B8;--g-co:#CCA4F5;--g-p:#FFA75F;--g-s:#F0C850;--g-hal:#CE9CF2;--df:#F2C14E;--dfbg:rgba(242,193,78,.18);--dftx:rgba(242,193,78,.4);--shadow:0 24px 60px -24px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none !important}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 "Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+body.locked{overflow:hidden}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+sub,sup{font-size:.72em;line-height:0;position:relative}
+sub{vertical-align:-.28em}sup{vertical-align:.5em}
+.serif{font-family:Literata,Georgia,"Times New Roman",serif}
 
-</style></head><body>
-<header><a href="../">← Медицинский атлас</a><div data-ma-acct></div></header>
-<main><div class="intro"><span class="eyebrow">Биохимия</span><h1>Начните с основ</h1><p>Два конспекта доступны без подписки. Полный атлас веществ, реакций, схем и тренажёров открывается по действующей подписке на биохимию.</p><p data-access-status role="status">Пробная версия · два конспекта</p><nav aria-label="Конспекты"><a href="#amino-acids">01 · Аминокислоты</a><a href="#monosaccharides">02 · Моносахариды</a></nav></div>
-<!--NOTES-->
-<aside class="locked"><strong>Полный атлас — по подписке</strong><p>Регистрация сама по себе не открывает платные материалы. Продажи пока не запущены.</p></aside></main>
-<footer>Учебные материалы не заменяют учебник и консультацию преподавателя.</footer>
-<script src="vendor/smiles-drawer-1.0.10.min.js"></script>
-<script src="../auth/config.js"></script><script src="../auth/auth.js?v=subject-access-v1"></script><script src="../progress/progress.js?v=topic-delivery-v1"></script>
-<script>if(window.MA) window.MA.bootAtlas('biochem');</script>
-</body></html>
+.app{max-width:1240px;margin:0 auto;padding:28px clamp(16px,4vw,40px) 56px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px 28px;flex-wrap:wrap;margin-bottom:24px}
+h1{font-family:Literata,Georgia,serif;font-weight:600;font-size:clamp(36px,5.6vw,58px);line-height:1;letter-spacing:-.018em;margin:0 0 12px}
+.lede{margin:0;color:var(--muted);max-width:56ch}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.views{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
+.views button{border:0;background:none;color:var(--muted);font-weight:500;font-size:15px;padding:8px 15px;border-radius:9px;cursor:pointer}
+.views button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.btn{font-weight:500;font-size:14.5px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn:disabled{opacity:.4;cursor:default;border-color:var(--line)}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.search{position:relative}
+.search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--muted);pointer-events:none}
+.search input{width:100%;font:inherit;font-size:17px;padding:14px 16px 14px 48px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);-webkit-appearance:none;appearance:none}
+.search input::placeholder{color:var(--muted)}
+.search input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+
+.chroma{display:flex;gap:2px;height:16px;border-radius:8px;overflow:hidden;margin:22px 0 12px}
+.seg{flex:var(--n) 1 0;min-width:6px;border:0;padding:0;background:var(--sc);cursor:pointer;transform-origin:left center;animation:develop 1s cubic-bezier(.2,.75,.2,1) both;animation-delay:calc(var(--i)*85ms + 150ms);transition:opacity .2s}
+.seg:hover{filter:brightness(1.12)}
+.chroma.filtered .seg:not(.on){opacity:.2}
+@keyframes develop{from{transform:scaleX(0)}}
+.legend{display:flex;flex-wrap:wrap;gap:6px 8px}
+.lg{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:6px 12px 6px 10px;border-radius:999px;font-size:14px;cursor:pointer}
+.lg .dot{width:10px;height:10px;border-radius:50%;background:var(--sc,var(--ink))}
+.lg .num{color:var(--muted);font-variant-numeric:tabular-nums}
+.lg[aria-pressed="true"]{border-color:var(--sc,var(--ink));background:color-mix(in srgb,var(--sc,var(--ink)) 13%,var(--surface))}
+.count{color:var(--muted);font-size:14px;margin:18px 0 10px;min-height:1.4em}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px 12px 15px;cursor:pointer;box-shadow:inset 3px 0 0 var(--sc);transition:border-color .15s}
+.card:hover{border-color:color-mix(in srgb,var(--sc) 60%,var(--line))}
+.card .mol{aspect-ratio:260/180;display:grid;place-items:center;margin-bottom:8px}
+.mol canvas,.dmol canvas,.tmol canvas{width:100% !important;height:auto !important;display:block}
+.cname{font-family:Literata,Georgia,serif;font-weight:500;font-size:17px;line-height:1.25}
+.cf{font-size:13.5px;color:var(--muted);margin-top:3px}
+.fb{display:grid;place-items:center;gap:6px;text-align:center;padding:10px}
+.fb .fbf{font-size:22px;font-weight:500}
+.fb .fbn{font-size:12.5px;color:var(--muted)}
+.ph{width:100%;height:auto;display:block}
+.empty{padding:36px 0}
+.empty p{margin:0 0 12px;color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:13.5px;max-width:70ch}
+
+.scrim{position:fixed;inset:0;background:var(--scrim);opacity:0;transition:opacity .25s;z-index:40}
+.scrim.open{opacity:1}
+.sheet{position:fixed;top:0;right:0;bottom:0;width:min(680px,100%);background:var(--surface);z-index:50;display:flex;flex-direction:column;transform:translateX(104%);transition:transform .34s cubic-bezier(.2,.8,.2,1);border-left:1px solid var(--line);box-shadow:var(--shadow);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet.open{transform:none}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px 12px 22px;border-bottom:1px solid var(--line)}
+.secpill{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500}
+.secpill::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--sc)}
+.iconbtn{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;border:0;background:none;cursor:pointer;color:var(--ink)}
+.iconbtn:hover{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.sheet-body{overflow-y:auto;padding:18px 24px 28px;flex:1;overscroll-behavior:contain}
+.sheet h2{font-family:Literata,Georgia,serif;font-weight:600;font-size:clamp(26px,4.5vw,34px);line-height:1.1;margin:2px 0 6px;letter-spacing:-.01em}
+.alt{color:var(--muted);margin:0 0 16px}
+.dmol{border:1px solid var(--line);border-radius:14px;padding:8px;background:var(--surface);min-height:200px;display:grid;place-items:center;overflow:hidden}
+.dmol.reveal canvas,.dmol.reveal svg,.tmol.reveal canvas{animation:reveal .8s cubic-bezier(.2,.7,.2,1) both}
+@keyframes reveal{from{clip-path:circle(0% at 50% 50%);filter:blur(6px);transform:scale(.9)}to{clip-path:circle(75% at 50% 50%);filter:none;transform:none}}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 12px}
+.facts dt{font-size:13px;color:var(--muted)}
+.facts dd{margin:0;font-size:19px;font-weight:500}
+.tag{display:inline-block;font-size:13px;padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var(--sc) 13%,var(--surface));margin:0 6px 6px 0}
+.sheet h3{font-family:Literata,Georgia,serif;font-weight:600;font-size:18px;margin:22px 0 6px}
+.sheet p{margin:0;max-width:62ch}
+.pchips{display:flex;gap:8px;flex-wrap:wrap}
+.sheet-foot{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
+
+.ptabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.playout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:24px;align-items:start}
+@media (max-width:920px){.playout{grid-template-columns:1fr}}
+.pdiag{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;overflow-x:auto}
+.pdiag svg{display:block;width:100%;min-width:600px;height:auto}
+.pside h2{font-family:Literata,Georgia,serif;font-weight:600;font-size:28px;line-height:1.1;margin:0 0 6px}
+.pwhere{color:var(--muted);margin:0 0 12px}
+.psum{font-size:14.5px;background:color-mix(in srgb,var(--pc) 11%,var(--surface));border-radius:10px;padding:10px 12px;margin:0 0 14px}
+.steps{list-style:none;counter-reset:s;padding:0;margin:0}
+.steps li{counter-increment:s;display:grid;grid-template-columns:30px 1fr;padding:10px 0;border-top:1px solid var(--line)}
+.steps li::before{content:counter(s);font-weight:600;color:var(--pc);font-variant-numeric:tabular-nums}
+.steps .eq{font-weight:500}
+.steps .enz{font-size:14px}
+.steps .note{font-size:13.5px;color:var(--muted)}
+
+.pn rect{fill:var(--surface);stroke:var(--sc);stroke-width:1.7}
+.pn text{fill:var(--ink);font:500 14px "Golos Text",system-ui,sans-serif}
+.pn.link{cursor:pointer}
+.pn.link:hover rect{fill:color-mix(in srgb,var(--sc) 14%,var(--surface))}
+.pn:focus{outline:none}
+.pn:focus-visible rect{stroke-width:3.5}
+.pn.hl rect{animation:hl 1.1s ease 4}
+@keyframes hl{50%{fill:color-mix(in srgb,var(--sc) 40%,var(--surface));stroke-width:4}}
+.pn.plain rect{stroke-dasharray:4 4;stroke:var(--muted)}
+.arc{fill:none;stroke:var(--line);stroke-width:2.2}
+.flowl{fill:none;stroke:var(--pc);stroke-width:3;stroke-linecap:round;stroke-dasharray:.1 16;animation:flow 1.1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-16.1}}
+.arrowhead{fill:var(--muted)}
+.enzt{fill:var(--muted);font:500 12.5px "Golos Text",system-ui,sans-serif}
+.chipt rect{fill:color-mix(in srgb,var(--pc) 15%,var(--surface))}
+.chipt text{fill:var(--ink);font:600 11.5px "Golos Text",system-ui,sans-serif}
+.ctitle{fill:var(--ink);font:600 23px Literata,Georgia,serif}
+.csub{fill:var(--muted);font:400 13px "Golos Text",system-ui,sans-serif}
+.token{fill:var(--pc)}
+
+.flow{display:flex;flex-direction:column;align-items:center;padding:10px 0}
+.frow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.fnode{font-weight:500;font-size:15px;padding:8px 16px;border-radius:999px;border:1.7px solid var(--sc);background:var(--surface);cursor:pointer}
+.fnode:hover{background:color-mix(in srgb,var(--sc) 14%,var(--surface))}
+.fnode.hl{animation:hlb 1.1s ease 4}
+@keyframes hlb{50%{background:color-mix(in srgb,var(--sc) 40%,var(--surface))}}
+.iso{font-size:13px;color:var(--muted)}
+.fstep{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;width:100%;min-height:60px}
+.fchips{justify-self:end;padding-right:14px;display:flex;gap:6px}
+.fline{width:2px;height:54px;background:var(--line);position:relative;overflow:hidden}
+.fline i{position:absolute;left:-2px;top:-6px;width:6px;height:6px;border-radius:50%;background:var(--pc);animation:drip 1.5s linear infinite;animation-delay:var(--d)}
+@keyframes drip{to{top:100%}}
+.fstep.irr .fline{width:3px;background:color-mix(in srgb,var(--pc) 50%,var(--line))}
+.finfo{padding-left:14px;font-size:13.5px;color:var(--muted);line-height:1.35}
+.finfo b{color:var(--ink);font-weight:500}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--pc) 15%,var(--surface));white-space:nowrap}
+.x2{font-size:12.5px;color:var(--muted);text-align:center;margin:2px 0 4px}
+
+.tlayout{max-width:720px}
+.tlayout h2{font-family:Literata,Georgia,serif;font-weight:600;font-size:28px;margin:0 0 6px}
+.tlayout>p{color:var(--muted);margin:0 0 14px}
+.tsecs{display:flex;flex-wrap:wrap;gap:6px 8px}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px 18px;margin-top:16px}
+.tprog{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tmol{aspect-ratio:560/360;display:grid;place-items:center;margin:8px 0}
+.tans{border-top:1px solid var(--line);padding-top:12px}
+.tans .tn{font-family:Literata,Georgia,serif;font-weight:600;font-size:24px}
+.tans .tm{color:var(--muted);font-size:14.5px}
+.tactions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.tdone{padding:28px 0 8px}
+.tdone p{margin:0 0 14px;font-size:18px}
+
+
+.crx{font-size:12.5px;color:var(--muted);margin-top:1px}
+.rxf{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 10px}
+.rxlist{display:flex;flex-direction:column;gap:8px}
+.rx{border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:inset 3px 0 0 var(--ec)}
+.rx>summary{list-style:none;cursor:pointer;padding:10px 42px 11px 16px;position:relative;border-radius:12px}
+.rx>summary::-webkit-details-marker{display:none}
+.rx>summary::after{content:"";position:absolute;right:18px;top:17px;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
+.rx[open]>summary::after{transform:rotate(225deg);top:21px}
+.rx>summary:hover{background:color-mix(in srgb,var(--ec) 6%,transparent)}
+.rx-eq{font-size:15px;line-height:1.55}
+.tk{color:var(--ink);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--ink) 28%,transparent)}
+a.tk:hover{border-bottom-color:var(--ink)}
+.tk.me{background:color-mix(in srgb,var(--sc) 24%,transparent);border-radius:4px;padding:0 4px;border-bottom:0;font-weight:600}
+.tk.t{border:0}
+.op{color:var(--muted)}
+.rx-meta{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:5px;font-size:13.5px;color:var(--muted);line-height:1.35}
+.ec{display:inline-flex;align-items:center;gap:6px;font-weight:500;color:var(--ink);font-size:12.5px;padding:1px 9px;border-radius:999px;background:color-mix(in srgb,var(--ec) 15%,var(--surface));white-space:nowrap}
+.ec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ec)}
+.rxc{container-type:inline-size}
+.rx-body{padding:2px 16px 14px}
+.rs{display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr);align-items:center;gap:8px;margin:4px 0 10px}
+.rs-side{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.rs-mol{width:100%;aspect-ratio:300/210;display:grid;place-items:center}
+.rs-mol canvas{width:100% !important;height:auto !important;display:block}
+.rs-mol.pop>:not(.txfit){animation:reveal .7s cubic-bezier(.2,.7,.2,1) both}
+.rs-text{font-family:Literata,Georgia,serif;font-size:16px;line-height:1.3;text-align:center;padding:14px 10px;border:1.5px dashed var(--line);border-radius:12px;width:100%}
+.rs-q{font-family:Literata,Georgia,serif;font-size:52px;color:var(--muted)}
+.rs-name{font-size:14px;font-weight:500;text-align:center;min-height:1.3em}
+.rs-mid{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.rs-enz{font-size:12.5px;font-weight:600;line-height:1.25}
+.rs-co{font-size:12.5px;color:var(--muted);line-height:1.3}
+.rs-co.in{color:var(--ink)}
+.rs-ar{display:block;width:130px;height:28px;overflow:visible}
+.rs-ar.v{display:none;width:28px;height:56px}
+.rs-ar path{fill:none;stroke:var(--ec);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.rs-ar .fl{stroke-width:3.2;stroke-dasharray:.1 12;opacity:0;animation:fadein .3s 1.05s forwards,flow2 1s 1.05s linear infinite}
+.rs.go .rs-ar .ln{stroke-dasharray:140;stroke-dashoffset:140;animation:draw .6s .3s cubic-bezier(.4,0,.2,1) forwards}
+.rs.go .rs-ar .hd{opacity:0;animation:fadein .2s .85s forwards}
+.rs.go [data-side="s"] .rs-mol>:not(.txfit){animation:reveal .7s cubic-bezier(.2,.7,.2,1) both}
+.rs.go [data-side="p"] .rs-mol>:not(.txfit){animation:reveal .8s .85s cubic-bezier(.2,.7,.2,1) both}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadein{to{opacity:1}}
+@keyframes flow2{to{stroke-dashoffset:-12.1}}
+@container (max-width:480px){
+  .rs{grid-template-columns:1fr;justify-items:center}
+  .rs-side{width:min(100%,320px)}
+  .rs-ar.h{display:none}
+  .rs-ar.v{display:block}
+}
+.rx-dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:14px}
+.rx-dl dt{color:var(--muted)}
+.rx-dl dd{margin:0}
+.rx-note{font-size:14px;margin:8px 0 0 !important}
+.rxwrap{max-width:920px}
+.tmode{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.tq{margin:10px 0 0;color:var(--muted)}
+
+.views{max-width:100%;overflow-x:auto}
+.anlay{display:grid;grid-template-columns:210px minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:960px){.anlay{grid-template-columns:1fr}}
+.anlist{display:flex;flex-direction:column;gap:6px;position:sticky;top:12px}
+@media (max-width:960px){.anlist{flex-direction:row;flex-wrap:wrap;position:static}}
+.anlist .lg{text-align:left}
+.an-top h2{font-family:Literata,Georgia,serif;font-weight:600;font-size:28px;line-height:1.1;margin:0 0 6px}
+.an-top p{color:var(--muted);max-width:72ch;margin:0 0 14px}
+.an-grid{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:14px;align-items:start}
+@media (max-width:1150px){.an-grid{grid-template-columns:1fr}}
+.an-stage{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px;overflow-x:auto}
+.an-svg{display:block;width:100%;height:auto;min-width:620px}
+.kin-stage{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kin-stage .kin-box{grid-row:span 2;align-self:center}
+.hb-stage{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:8px;align-items:center}
+.kin-stage .an-svg,.hb-stage .an-svg{min-width:0}
+@media (max-width:700px){.kin-stage,.hb-stage{grid-template-columns:1fr}.kin-stage .kin-box{grid-row:auto}.hb-tet{max-width:260px;margin:0 auto}}
+.an-side{display:flex;flex-direction:column;gap:10px}
+.an-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.st{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.st b{display:block;font-size:21px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.st span{font-size:12.5px;color:var(--muted);line-height:1.25;display:block}
+.st .bar{height:6px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden}
+.st .bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .25s}
+.an-cap{margin:0;font-size:14.5px;line-height:1.5;background:color-mix(in srgb,var(--ac) 11%,var(--surface));border-radius:12px;padding:10px 13px}
+.an-ctrl{display:flex;flex-wrap:wrap;gap:14px 24px;margin-top:14px;align-items:flex-end}
+.an-g{display:flex;flex-direction:column;gap:6px}
+.an-g>span{font-size:13px;color:var(--muted)}
+.an-g .row{display:flex;gap:6px;flex-wrap:wrap}
+.sl{display:flex;flex-direction:column;gap:2px;width:190px}
+.sl label{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
+.sl output{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.sl.off{opacity:.4}
+.sl input{accent-color:var(--ac);width:100%}
+.svt{fill:var(--muted);font:500 12.5px "Golos Text",system-ui,sans-serif}
+.svt.b{fill:var(--ink);font-weight:600}
+.etc-ims,.cp-out{fill:color-mix(in srgb,var(--m-o) 7%,var(--surface))}
+.etc-mat,.cp-in{fill:color-mix(in srgb,var(--m-n) 6%,var(--surface))}
+.etc-mem{fill:color-mix(in srgb,var(--m-s) 15%,var(--surface))}
+.lip{fill:color-mix(in srgb,var(--m-s) 42%,var(--surface))}
+.cx{fill:var(--surface);stroke:var(--ink);stroke-width:1.6}
+.cxl{fill:var(--ink);font:600 18px Literata,Georgia,serif}
+.cxs{fill:var(--muted);font:500 11px "Golos Text",system-ui,sans-serif}
+.qd{fill:color-mix(in srgb,var(--m-s) 32%,var(--surface));stroke:var(--m-s);stroke-width:1.2}
+.ee{fill:#F2B400;stroke:rgba(242,180,0,.35);stroke-width:6}
+.hh{fill:var(--m-o)}
+.stripe{stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.stalk{stroke:var(--ink);stroke-width:6;stroke-linecap:round}
+.gam{stroke:var(--ac);stroke-width:4;stroke-linecap:round}
+.fa{fill:color-mix(in srgb,var(--m-n) 30%,var(--surface));stroke:var(--ink);stroke-width:1}
+.fb{fill:color-mix(in srgb,var(--m-f) 30%,var(--surface));stroke:var(--ink);stroke-width:1}
+.atpt{fill:var(--m-f);font:700 14px "Golos Text",system-ui,sans-serif}
+.wt{fill:var(--m-n);font:600 13px "Golos Text",system-ui,sans-serif}
+.glow{fill:#FF8A3D}
+.blk circle{fill:#CF243B}
+.blk text{fill:#fff;font:700 15px "Golos Text",system-ui,sans-serif}
+.enzb{fill:color-mix(in srgb,var(--ac) 22%,var(--surface));stroke:var(--ac);stroke-width:1.7;transition:fill .25s,stroke .25s}
+.enzb.inact{fill:color-mix(in srgb,var(--muted) 16%,var(--surface));stroke:var(--muted)}
+.ls{fill:var(--m-n)}.li{fill:#D52B45}.lp{fill:var(--m-f)}
+.axis{stroke:var(--muted);stroke-width:1.2}
+.tick{fill:var(--muted);font:500 11.5px "Golos Text",system-ui,sans-serif}
+.cv{fill:none;stroke:var(--ac);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.cv.ref{stroke:var(--muted);stroke-width:2;stroke-dasharray:6 5}
+.guide{stroke:var(--ac);stroke-width:1.2;stroke-dasharray:4 4;opacity:.75}
+.vline{stroke:var(--muted);stroke-width:1;stroke-dasharray:2 4}
+.pt{fill:var(--ac);stroke:var(--surface);stroke-width:2}
+.subt{fill:color-mix(in srgb,var(--m-n) 24%,var(--surface));stroke:var(--ink);stroke-width:1.4}
+.subr{fill:color-mix(in srgb,var(--m-o) 34%,var(--surface))}
+.heme{fill:#8B5A2B}
+.o2{fill:var(--m-o)}
+.bpg{fill:#E0A800;stroke:var(--ink);stroke-width:1}
+.cc{fill:var(--ink)}
+.bond{stroke:var(--ink);stroke-width:2.2;stroke-linecap:round}
+.bond.hi{stroke:var(--ac)}
+.cc.hi{fill:var(--ac)}
+.ol{fill:var(--m-o);font:600 14px "Golos Text",system-ui,sans-serif}
+.sl2{fill:var(--m-s);font:600 13px "Golos Text",system-ui,sans-serif}
+.chipb rect{fill:var(--surface);stroke:var(--ac);stroke-width:1.4}
+.chipb text{fill:var(--ink);font:600 12px "Golos Text",system-ui,sans-serif}
+.chipb.pr rect{stroke:var(--m-p)}
+.icn{fill:var(--surface);stroke:var(--muted);stroke-width:1.4;transition:fill .3s,stroke .3s}
+.icn.on{fill:color-mix(in srgb,var(--ac) 38%,var(--surface));stroke:var(--ac)}
+.pbad circle{fill:var(--m-p)}
+.pbad text{fill:#fff;font:700 9px "Golos Text",system-ui,sans-serif}
+.cam{fill:var(--ac)}
+.pkc{fill:var(--ac)}
+.glc{fill:var(--m-f)}
+.hor{fill:#D52B45}
+.gly{fill:color-mix(in srgb,var(--m-s) 45%,var(--surface));stroke:var(--m-s);stroke-width:1}
+.arr2{fill:none;stroke:var(--ac);stroke-width:2.6;stroke-dasharray:.1 11;stroke-linecap:round;animation:flow2 .9s linear infinite}
+
+/* formulas */
+.g{font-weight:600}
+.g-acid{color:var(--g-acid);fill:var(--g-acid)}
+.g-n{color:var(--g-n);fill:var(--g-n)}
+.g-oh{color:var(--g-oh);fill:var(--g-oh)}
+.g-co{color:var(--g-co);fill:var(--g-co)}
+.g-p{color:var(--g-p);fill:var(--g-p)}
+.g-s{color:var(--g-s);fill:var(--g-s)}
+.g-hal{color:var(--g-hal);fill:var(--g-hal)}
+.me{color:var(--g-p);font-weight:700;padding:0 .04em}
+body.nocolor .g{color:inherit;font-weight:inherit}
+body.nocolor .gt{fill:var(--ink)}
+.mol,.rs-mol,.tmol,.omol,.prs-mol{position:relative;overflow:hidden}
+.txw{display:flex;justify-content:center;align-items:center;max-width:100%}
+.txfit{position:absolute;left:50%;top:50%;translate:-50% -50%;transform-origin:center;font-size:14px;width:max-content}
+.dmol{overflow:auto}
+.dmol>.txw{padding:14px 6px;font-size:17px}
+.vf{display:inline-grid;grid-template-columns:1fr auto 1fr;align-items:center;font-family:"Golos Text",system-ui,sans-serif;font-weight:500;line-height:1.2;color:var(--ink)}
+.vrow{display:grid;grid-column:1/-1;grid-template-columns:subgrid;align-items:center;border-radius:5px}
+.vl{text-align:right;white-space:nowrap;padding-left:.25em}
+.vrr{text-align:left;white-space:nowrap;padding-right:.25em}
+.vc{display:flex;align-items:center;justify-content:center;min-height:1.4em}
+.vt{white-space:nowrap;padding:0 .1em}
+.hb{flex:1 1 0;min-width:.75em;height:0;border-top:1.5px solid currentColor;visibility:hidden}
+.hb.on{visibility:visible}
+.hb.dbl{height:4px;border-bottom:1.5px solid currentColor}
+.hb.me{border:0;height:auto;text-align:center;line-height:1;font-weight:700;color:var(--g-p)}
+.hb.me::after{content:"~"}
+.vb .vc{min-height:0}
+.vbs{display:block;width:.62em;height:.75em;overflow:visible}
+.vbs path{fill:none;stroke:currentColor;stroke-width:1.5}
+.vrow.hl{background:color-mix(in srgb,var(--sc,var(--accent)) 15%,transparent)}
+.vrow.df{background:var(--dfbg);box-shadow:inset 3px 0 0 var(--df)}
+.vf.build .vrow{animation:vin .38s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i)*65ms)}
+.vrow.pop{animation:vin .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes vin{from{opacity:0;transform:translateY(-.4em)}}
+.gly{display:block;overflow:visible}
+.gb{fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round}
+.gt{fill:var(--ink);font:600 12px "Golos Text",system-ui,sans-serif}
+.rgf,.hwf{display:block;overflow:visible;color:var(--ink);max-width:none}
+.rb{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round}
+.rb.dash{stroke-dasharray:2.4 2.2}
+.rw{fill:var(--ink)}
+.rl{fill:var(--muted);opacity:.32;font:600 15px Literata,Georgia,serif}
+.rn{fill:var(--muted);font:500 9.5px "Golos Text",system-ui,sans-serif}
+.hwb{fill:none;stroke:var(--ink);stroke-linecap:round}
+.rb.sdf,.hwb.sdf{stroke:var(--df);stroke-width:3}
+.rw.sdf{fill:var(--df)}
+.gt.sdf{stroke:var(--dftx);stroke-width:7px;paint-order:stroke;stroke-linejoin:round}
+.rgf.build .rb,.rgf.build .rw,.hwf.build .hwb{animation:rfade .3s both;animation-delay:calc(var(--i)*35ms)}
+.rgf.build .gt,.hwf.build .gt,.rgf.build .rn{animation:rfade .45s .55s both}
+@keyframes rfade{from{opacity:0}}
+.bf{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;row-gap:8px;max-width:30em;font-family:"Golos Text",system-ui,sans-serif}
+.bk{--bc:var(--muted);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;padding:.3em .65em;border-radius:10px;background:color-mix(in srgb,var(--bc) 14%,var(--surface));border:1.5px solid var(--bc);line-height:1.2;text-align:center;color:var(--ink)}
+.bk b{font-weight:600;font-size:.9em;white-space:nowrap}
+.bk small{font-size:.68em;color:var(--muted);max-width:12em}
+.bk.t-base{--bc:var(--m-n)}.bk.t-sug{--bc:#D3920F}.bk.t-vit{--bc:#679A1E}.bk.t-aa{--bc:#12A08B}.bk.t-fa{--bc:#7A5ADB}.bk.t-grp{--bc:var(--m-s)}
+.bk.t-p{--bc:var(--m-p);border-radius:999px;min-width:2.2em;min-height:2.2em;padding:.2em .5em}
+.bk.df{box-shadow:0 0 0 3px var(--df)}
+.bc{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:1.5em;gap:1px;font-size:.7em;color:var(--muted);padding:0 2px}
+.bc i{display:block;width:100%;min-width:1.5em;border-top:1.6px solid var(--ink)}
+.bc i.dbl{height:4px;border-bottom:1.6px solid var(--ink)}
+.bc i.me{border:0;height:auto}
+.bc i.me::after{content:"~";display:block;text-align:center;font-style:normal;font-weight:700;color:var(--g-p);font-size:1.7em;line-height:.7}
+.bf.build .bk,.bf.build .bc{animation:vin .35s both;animation-delay:calc(var(--i)*55ms)}
+.rs.go [data-side="s"] .rs-mol>.txfit{animation:reveal2 .6s both}
+.rs.go [data-side="p"] .rs-mol>.txfit{animation:reveal2 .7s .85s both}
+.rs-mol.pop>.txfit{animation:reveal2 .6s both}
+@keyframes reveal2{from{opacity:0;clip-path:circle(0% at 50% 50%)}to{opacity:1;clip-path:circle(80% at 50% 50%)}}
+
+/* detail additions */
+.shbtns{display:flex;gap:2px}
+#dStar svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+#dStar[aria-pressed="true"]{color:#D39400}
+#dStar[aria-pressed="true"] svg{fill:#F2B400}
+.dvtabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.dvtabs .lg{padding:5px 11px;font-size:13.5px}
+.dtools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:10px}
+.glegend{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:13px}
+body.nocolor .glegend{display:none}
+.txcap{margin:8px 0 0 !important;font-size:14px;color:var(--muted)}
+.btn.sm{padding:6px 11px;font-size:13.5px}
+.mnl{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:6px;max-width:64ch}
+.mnl li::marker{color:var(--sc,var(--accent))}
+.pairs{display:flex;flex-direction:column;gap:10px}
+.pairs.big{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:12px}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px 8px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
+.prs-side{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;text-align:center;font-size:14px}
+.prs-mol{width:100%;aspect-ratio:280/200;display:grid;place-items:center}
+.psep{color:var(--muted);font-size:18px}
+.ptxt{grid-column:1/-1;margin:0 !important;font-size:14px}
+
+/* atlas additions */
+.card{position:relative;min-width:0}
+.cmeta{position:absolute;top:8px;right:10px;display:flex;align-items:center;gap:6px;pointer-events:none}
+.cstar{color:#E0A400;font-size:13px;line-height:1}
+.lvl{display:flex;gap:2px}
+.lvl i{width:4px;height:10px;border-radius:2px;background:var(--line)}
+.lvl i.on{background:var(--sc)}
+.hidenames .card .cname,.hidenames .card .cf{filter:blur(6px);transition:filter .2s}
+.hidenames .card:hover .cname,.hidenames .card:hover .cf,.hidenames .card:focus-visible .cname,.hidenames .card:focus-visible .cf{filter:none}
+.atools{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:8px}
+.views button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.views button{border:0;background:none;color:var(--muted);font-weight:500;font-size:15px;padding:8px 13px;border-radius:9px;cursor:pointer}
+
+/* study */
+.study{max-width:980px}
+.stabs{display:flex;flex-wrap:wrap;gap:6px 8px;margin-bottom:18px}
+.stabs .lg{font-size:15px;padding:8px 14px}
+.sgrp{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.slab{font-size:13px;color:var(--muted)}
+.sstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:6px 0 14px}
+.sstats .bar i{background:var(--accent)}
+.ssave{font-size:13.5px;color:var(--muted);margin:12px 0 0}
+.shead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:14px;color:var(--muted);margin-bottom:10px}
+.sbar{flex:1 1 160px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.sbar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.scard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px 18px}
+.sq{margin:0 0 10px;font-size:17px}
+.sq b{font-family:Literata,Georgia,serif;font-weight:600;font-size:22px}
+.sopts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sopt{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:4px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);padding:8px;cursor:pointer;text-align:left;font:inherit;color:var(--ink)}
+.sopt:hover:not(:disabled){border-color:var(--muted)}
+.sopt:disabled{cursor:default}
+.okey{position:absolute;top:6px;left:9px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.omol{width:100%;aspect-ratio:300/200;display:grid;place-items:center}
+.sopt.txt{min-height:58px;justify-content:center;padding:12px 14px 12px 30px;font-size:15px}
+.sopt.right{border-color:var(--g-oh);background:color-mix(in srgb,var(--g-oh) 12%,var(--surface))}
+.sopt.wrong{border-color:var(--g-acid);background:color-mix(in srgb,var(--g-acid) 10%,var(--surface))}
+.sfb{margin-top:12px;font-size:15px;max-width:70ch}
+.sfb .ok{color:var(--g-oh);font-weight:600}
+.sfb .bad{color:var(--g-acid);font-weight:600}
+.seq{font-size:16px;line-height:1.6;margin:0 0 6px}
+.sloc{color:var(--muted);font-size:14px;margin:0 0 12px}
+.sans{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+.sans .tn{font-family:Literata,Georgia,serif;font-weight:600;font-size:24px}
+.sans .tm{color:var(--muted);font-size:14.5px}
+.sans .mnx{margin:8px 0 0;font-size:14.5px;max-width:70ch}
+.muted{color:var(--muted)}
+.bname{font-family:Literata,Georgia,serif;font-weight:600;font-size:26px;margin:0 0 4px}
+.bprog{color:var(--muted);font-size:14px;margin:0 0 12px}
+.bgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:700px){.bgrid{grid-template-columns:1fr}}
+.btarget{min-height:180px;border:1.5px dashed var(--line);border-radius:14px;padding:14px;display:flex;justify-content:center;align-items:flex-start;font-size:18px;overflow-x:auto;background:var(--surface)}
+.bchips{display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+.bchip{position:relative;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);padding:6px 12px;cursor:pointer;font-size:16px;color:var(--ink)}
+.bchip:hover{border-color:var(--muted)}
+.bmark{position:absolute;top:-9px;left:8px;font-size:11px;line-height:1.3;background:var(--surface);padding:0 4px;color:var(--g-p);font-weight:700;border-radius:4px}
+.bchip.shake{animation:shake .35s}
+.bchip.hint{border-color:var(--accent);animation:hintp 1s ease 2}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes hintp{50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 30%,transparent)}}
+.bdone{margin:0;font-weight:500;align-self:center}
+.cheat h3{font-family:Literata,Georgia,serif;font-weight:600;font-size:22px;margin:26px 0 6px}
+.cheat h3:first-child{margin-top:0}
+.cheat h4{font-size:15px;margin:16px 0 8px;font-weight:600}
+.cheat>p{margin:0 0 6px;max-width:70ch}
+.aag{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.aat .mol{aspect-ratio:220/150}
+.bdg{display:inline-block;font-size:11.5px;font-weight:600;padding:0 6px;border-radius:999px;background:color-mix(in srgb,var(--sc) 16%,var(--surface));margin-left:4px;color:var(--ink)}
+.bdg.n{background:color-mix(in srgb,var(--g-acid) 16%,var(--surface))}
+.tblw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.ctab{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+.ctab th,.ctab td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--line)}
+.ctab th{font-size:13px;color:var(--muted);font-weight:500}
+.ctab tr:last-child td{border-bottom:0}
+.cheat .mnl{margin-top:12px}
+@media (max-width:560px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .card{padding:8px 10px 10px 13px}
+  .cname{font-size:15.5px}
+  .sheet-body{padding:16px 18px 24px}
+  .views button{padding:8px 11px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  .fline i,.flowl,.rs-ar .fl,.arr2{display:none}
+  .bchip.hint{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div>
+      <h1>Атлас биохимии</h1>
+      <p class="lede" id="lede"></p>
+    </div>
+    <div class="controls">
+      <div class="views" role="tablist" aria-label="Режим">
+        <button role="tab" data-view="atlas" aria-selected="true">Атлас</button>
+        <button role="tab" data-view="rx" aria-selected="false">Реакции</button>
+        <button role="tab" data-view="paths" aria-selected="false">Пути</button>
+        <button role="tab" data-view="anim" aria-selected="false">Анимации</button>
+        <button role="tab" data-view="study" aria-selected="false">Учёба</button>
+      </div>
+      <div class="views fsw" role="group" aria-label="Вид формул">
+        <button type="button" data-fs="tx" aria-pressed="true">Учебные формулы</button>
+        <button type="button" data-fs="sk" aria-pressed="false">Скелетные</button>
+      </div>
+      <button class="btn" id="themeBtn" type="button">Тема: авто</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="v-atlas">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <input id="q" type="search" autocomplete="off" placeholder="Название, формула, фермент или болезнь" aria-label="Поиск по атласу">
+      </div>
+      <div class="chroma" id="chroma"></div>
+      <div class="legend" id="legend"></div>
+      <div class="atools">
+        <button type="button" class="lg" id="aFav" aria-pressed="false">★ Избранное <span class="num" id="aFavN">0</span></button>
+        <button type="button" class="lg" id="aHide" aria-pressed="false">Скрыть названия для самопроверки</button>
+      </div>
+      <p class="count" id="count" aria-live="polite"></p>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" hidden>
+        <p>Ничего не найдено. Проверьте написание или ищите по формуле, ферменту, заболеванию.</p>
+        <button class="btn" id="reset" type="button">Сбросить поиск и раздел</button>
+      </div>
+      <p class="foot">Учебные формулы нарисованы так, как их пишут в учебниках: проекции Фишера и Хеуорса, развёрнутые формулы с цветом функциональных групп, кольца с нумерацией атомов. Скелетные формулы строятся из SMILES библиотекой SmilesDrawer. Лабораторные нормы ориентировочные и зависят от метода и лаборатории.</p>
+    </section>
+
+    <section id="v-rx" hidden>
+      <div class="rxwrap">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input id="rq" type="search" autocomplete="off" placeholder="Вещество, фермент, кофактор, орган или болезнь" aria-label="Поиск по реакциям">
+        </div>
+        <div class="legend" id="rxEc" style="margin-top:16px"></div>
+        <p class="count" id="rxCount" aria-live="polite"></p>
+        <div class="rxlist" id="rxAll"></div>
+      </div>
+    </section>
+
+    <section id="v-paths" hidden>
+      <div class="ptabs" id="pTabs"></div>
+      <div class="playout">
+        <div class="pdiag" id="pDiag"></div>
+        <aside class="pside">
+          <h2 id="pTitle"></h2>
+          <p class="pwhere" id="pWhere"></p>
+          <p class="psum" id="pSum"></p>
+          <ol class="steps" id="pSteps"></ol>
+        </aside>
+      </div>
+    </section>
+
+    <section id="v-anim" hidden>
+      <div class="anlay">
+        <nav class="anlist" id="anList" aria-label="Анимации"></nav>
+        <div id="anBox"></div>
+      </div>
+    </section>
+
+    <section id="v-study" hidden>
+      <div class="study">
+        <div class="stabs" id="sTabs" role="group" aria-label="Режим учёбы"></div>
+        <div id="sBody"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="dName" hidden>
+  <div class="sheet-head">
+    <span class="secpill" id="dSec"></span>
+    <div class="shbtns">
+    <button class="iconbtn" id="dStar" type="button" aria-pressed="false" aria-label="Добавить в избранное"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/></svg></button>
+    <button class="iconbtn" id="dClose" type="button" aria-label="Закрыть">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    </div>
+  </div>
+  <div class="sheet-body" id="dBody">
+    <h2 id="dName"></h2>
+    <p class="alt" id="dAlt"></p>
+    <div class="dvtabs" id="dViews" role="group" aria-label="Вид формулы"></div>
+    <div class="dmol" id="dMol"></div>
+    <p class="txcap" id="dCap" hidden></p>
+    <div class="dtools" id="dTxTools">
+      <button class="btn sm" id="dReplay" type="button">Собрать заново</button>
+      <button class="lg" id="dColor" type="button" aria-pressed="true">Цвет групп</button>
+      <span class="glegend" aria-label="Цвета функциональных групп"><span class="g g-acid">COOH</span><span class="g g-n">NH₂</span><span class="g g-oh">OH</span><span class="g g-co">C=O</span><span class="g g-p">фосфат</span><span class="g g-s">S</span><span class="me">~ макроэрг</span></span>
+    </div>
+    <dl class="facts">
+      <div><dt>Брутто-формула</dt><dd id="dF"></dd></div>
+      <div><dt>Молярная масса</dt><dd id="dM"></dd></div>
+    </dl>
+    <div id="dTags"></div>
+    <div id="dMnWrap"><h3>Как запомнить</h3><ul class="mnl" id="dMn"></ul></div>
+    <div id="dPairWrap"><h3>Не перепутай</h3><div class="pairs" id="dPairs"></div></div>
+    <div id="dRxWrap"><h3>Реакции в организме</h3><div class="rxf" id="dRxF"></div><div class="rxlist" id="dRx"></div></div>
+    <h3>Роль в обмене</h3>
+    <p id="dD"></p>
+    <div id="dCwrap"><h3>Клиническое значение</h3><p id="dC"></p></div>
+    <div id="dPwrap"><h3>Метаболические пути</h3><div class="pchips" id="dP"></div></div>
+  </div>
+  <div class="sheet-foot">
+    <button class="btn" id="dPrev" type="button">Предыдущее</button>
+    <button class="btn" id="dNext" type="button">Следующее</button>
+  </div>
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/smiles-drawer@1.0.10/dist/smiles-drawer.min.js"></script>
+<script>
+"use strict";
+const DB = /*@substances.json*/;
+const SECS = [
+  {id:"aa",n:"Аминокислоты",c:"#12A08B"},
+  {id:"carb",n:"Углеводы и гликолиз",c:"#D3920F"},
+  {id:"tca",n:"ЦТК и биоэнергетика",c:"#D93A6C"},
+  {id:"lip",n:"Липиды",c:"#7A5ADB"},
+  {id:"nit",n:"Азотистый обмен",c:"#3865DF"},
+  {id:"neuro",n:"Нейромедиаторы",c:"#0D91B3"},
+  {id:"vit",n:"Витамины и коферменты",c:"#679A1E"},
+  {id:"nuc",n:"Нуклеотиды",c:"#E0601B"},
+  {id:"horm",n:"Гормоны",c:"#B23FA7"},
+  {id:"drug",n:"Лекарства",c:"#66738A"}
+];
+const SEC = Object.fromEntries(SECS.map(s => [s.id, s]));
+const BY = Object.fromEntries(DB.map(e => [e.id, e]));
+/* ---------- textbook formulas: data ---------- */
+const TX = /*@formulas.json*/;
+const MN = /*@mnemonics.json*/;
+const PAIRS = /*@pairs.json*/;
+const CHEAT = /*@cheatsheets.json*/;
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+const SUBD = "₀₁₂₃₄₅₆₇₈₉";
+const subU = s => String(s).replace(/([A-Za-zА-Яа-я)])(\d+)/g, (m, a, d) => a + d.replace(/\d/g, x => SUBD[+x]));
+const subH = s => esc(s).replace(/([A-Za-zА-Яа-я)])(\d+)/g, "$1<sub>$2</sub>");
+const GRE = /(COOH|COO⁻|CONH2|CHO|C=O|CO(?=[~–-])|PO3H2|PO2⁻|SO3H|N⁺\(CH3\)3|NH3⁺|NH2|H2N|NH|HN|OH|HO|S–КоА|SH)/g;
+function grpOf(t) {
+  if (t === "COOH" || t === "COO⁻") return "acid";
+  if (t === "CONH2" || t === "CHO" || t === "C=O" || t === "CO") return "co";
+  if (/^PO/.test(t)) return "p";
+  if (t === "SO3H" || t === "SH" || t === "S–КоА") return "s";
+  if (/N/.test(t)) return "n";
+  if (t === "OH" || t === "HO") return "oh";
+  return "";
+}
+function chemHTML(s) {
+  if (/^(N|S|I|F)$/.test(s)) return '<span class="g g-' + ({N: "n", S: "s"}[s] || "hal") + '">' + s + "</span>";
+  let o = "", last = 0, m;
+  GRE.lastIndex = 0;
+  while ((m = GRE.exec(s))) {
+    o += subH(s.slice(last, m.index)) + '<span class="g g-' + grpOf(m[0]) + '">' + subH(m[0]) + "</span>";
+    last = m.index + m[0].length;
+  }
+  o += subH(s.slice(last));
+  return o.replace(/~/g, '<span class="me">~</span>');
+}
+function labCls(t) {
+  if (/COOH/.test(t)) return "acid";
+  if (/PO[23]/.test(t)) return "p";
+  if (/^(I|F)$/.test(t)) return "hal";
+  if (/CHO$/.test(t)) return "co";
+  if (/OH|HO/.test(t)) return "oh";
+  if (/NH|^N$/.test(t)) return "n";
+  if (/CO|^O$/.test(t)) return "co";
+  if (/S/.test(t)) return "s";
+  return "";
+}
+
+const SD = window.SmilesDrawer;
+const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function plural(n, a, b, c) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return a;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return b;
+  return c;
+}
+function fhtml(e) {
+  let s = esc(e.f).replace(/(\d+)/g, "<sub>$1</sub>");
+  if (e.ch) s += "<sup>" + (Math.abs(e.ch) > 1 ? Math.abs(e.ch) : "") + (e.ch > 0 ? "+" : "−") + "</sup>";
+  return s;
+}
+const mass = e => e.m.toFixed(e.m > 1000 ? 1 : 2).replace(".", ",") + " г/моль";
+function norm(s) {
+  return String(s).toLowerCase().replace(/ё/g, "е")
+    .replace(/[\u2080-\u2089]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x2080 + 48))
+    .replace(/[⁺]/g, "+");
+}
+DB.forEach(e => { e._s = norm([e.n, e.a, e.t.join(" "), e.f, e.d, e.c, SEC[e.s].n].join(" ")); });
+/* ---------- reactions core ---------- */
+const RX = /*@reactions.json*/;
+const EC = {1:["Оксидоредуктаза","#E0601B"],2:["Трансфераза","#3865DF"],3:["Гидролаза","#12A08B"],4:["Лиаза","#7A5ADB"],5:["Изомераза","#D3920F"],6:["Лигаза","#B23FA7"],7:["Транслоказа","#0D91B3"],8:["Многостадийный путь","#4F6D8A"],0:["Неферментативная","#7A8597"],9:["Ингибирование","#CF243B"]};
+const ECP = {1:"Оксидоредуктазы",2:"Трансферазы",3:"Гидролазы",4:"Лиазы",5:"Изомеразы",6:"Лигазы",7:"Транслоказы",8:"Многостадийные пути",0:"Неферментативные",9:"Ингибирование"};
+const ALIAS = {"АТФ":"atp","NAD⁺":"nad","КоА":"coa","FAD":"fad","ТПФ":"tpp"};
+const sname = e => e.sn || e.n;
+const tokName = t => (t[0] ? t[0] + " " : "") + (t[1] ? sname(BY[t[1]]) : t[2]);
+const mainTok = side => side.find(t => t[1] && BY[t[1]].smi) || side.find(t => t[1]) || side[0];
+const ecLabel = c => c >= 1 && c <= 7 ? EC[c][0] + " (КФ " + c + ")" : EC[c][0];
+DB.forEach(e => { e._rx = []; });
+RX.forEach((r, i) => {
+  r.i = i;
+  const sI = new Set(r.s.map(t => t[1]).filter(Boolean)), pI = new Set(r.p.map(t => t[1]).filter(Boolean));
+  new Set([...sI, ...pI, ...r.x]).forEach(id => BY[id]._rx.push([i, pI.has(id) ? "p" : sI.has(id) ? "s" : "x"]));
+  r._s = norm(r.s.concat(r.p).map(tokName).join(" ") + " " + [r.e, r.f, r.l, r.n, EC[r.c][0], ECP[r.c]].join(" "));
+});
+function tokHTML(t, focus) {
+  const coef = t[0] ? t[0] + "\u00a0" : "";
+  if (t[1]) return '<a href="#" class="tk' + (t[1] === focus ? " me" : "") + '" data-go="' + t[1] + '">' + coef + esc(sname(BY[t[1]])) + "</a>";
+  const al = ALIAS[t[2]];
+  if (al) return '<a href="#" class="tk" data-go="' + al + '">' + coef + esc(t[2]) + "</a>";
+  return '<span class="tk t">' + coef + esc(t[2]) + "</span>";
+}
+function eqHTML(r, focus) {
+  const j = '<span class="op"> + </span>';
+  return r.s.map(t => tokHTML(t, focus)).join(j) + '<span class="op"> ' + (r.r ? "⇄" : "→") + " </span>" + r.p.map(t => tokHTML(t, focus)).join(j);
+}
+function rxCard(i, focus) {
+  const r = RX[i];
+  return '<details class="rx" data-rx="' + i + '" style="--ec:' + EC[r.c][1] + '"><summary><div class="rx-eq">' + eqHTML(r, focus) +
+    '</div><div class="rx-meta"><span class="ec">' + ecLabel(r.c) + '</span><span>' + esc(r.e) + '</span></div></summary><div class="rx-body rxc"></div></details>';
+}
+function arrowSVG(rev, v) {
+  if (!v) return rev
+    ? '<svg class="rs-ar h" viewBox="0 0 130 28" aria-hidden="true"><path class="ln" d="M4 10 H124"/><path class="ln" d="M126 18 H6"/><path class="hd" d="M116 3 L125 10"/><path class="hd" d="M14 25 L5 18"/><path class="fl" d="M8 10 H116"/></svg>'
+    : '<svg class="rs-ar h" viewBox="0 0 130 28" aria-hidden="true"><path class="ln" d="M4 14 H124"/><path class="hd" d="M115 6 L125 14 L115 22"/><path class="fl" d="M8 14 H114"/></svg>';
+  return rev
+    ? '<svg class="rs-ar v" viewBox="0 0 28 56" aria-hidden="true"><path class="ln" d="M10 4 V51"/><path class="ln" d="M18 53 V6"/><path class="hd" d="M4 44 L10 51"/><path class="hd" d="M24 13 L18 6"/><path class="fl" d="M10 7 V44"/></svg>'
+    : '<svg class="rs-ar v" viewBox="0 0 28 56" aria-hidden="true"><path class="ln" d="M14 4 V51"/><path class="hd" d="M6 42 L14 52 L22 42"/><path class="fl" d="M14 7 V41"/></svg>';
+}
+let uid = 0;
+function fillSide(el, t, o) {
+  const mol = el.querySelector(".rs-mol"), nm = el.querySelector(".rs-name");
+  if (t[1]) {
+    const e = BY[t[1]];
+    paint(mol, e, 300, 210, "rc" + (++uid), o);
+    nm.innerHTML = '<a href="#" class="tk" data-go="' + e.id + '">' + (t[0] ? t[0] + " " : "") + esc(sname(e)) + "</a>";
+  } else { mol.innerHTML = '<div class="rs-text">' + esc(tokName(t)) + "</div>"; nm.textContent = ""; }
+}
+function rxScheme(host, r, hideP) {
+  const ms = mainTok(r.s), mp = mainTok(r.p);
+  const coS = r.s.filter(t => t !== ms).map(tokName), coP = r.p.filter(t => t !== mp).map(tokName);
+  const side = k => '<div class="rs-side" data-side="' + k + '"><div class="rs-mol"></div><div class="rs-name"></div></div>';
+  host.innerHTML = '<div class="rs" style="--ec:' + EC[r.c][1] + '">' + side("s") +
+    '<div class="rs-mid"><div class="rs-enz">' + esc(r.e) + "</div>" + arrowSVG(r.r, false) + arrowSVG(r.r, true) +
+    (coS.length ? '<div class="rs-co in">+ ' + esc(coS.join(", ")) + "</div>" : "") +
+    (coP.length ? '<div class="rs-co out">→ ' + esc(coP.join(", ")) + "</div>" : "") + "</div>" + side("p") + "</div>";
+  const tp = fstyle === "tx" && ms[1] && mp[1] && ms[1] !== mp[1] ? txPair(ms[1], mp[1]) : null;
+  host._tp = tp;
+  fillSide(host.querySelector('[data-side="s"]'), ms, tp ? {view: tp[0], hl: tp[2][0]} : null);
+  const ps = host.querySelector('[data-side="p"]');
+  if (hideP) ps.querySelector(".rs-mol").innerHTML = '<span class="rs-q" aria-label="Продукт скрыт">?</span>';
+  else fillSide(ps, mp, tp ? {view: tp[1], hl: tp[2][1]} : null);
+  const rs = host.querySelector(".rs");
+  if (!REDUCE) { void rs.offsetWidth; rs.classList.add("go"); }
+}
+function fillRx(d) {
+  const body = d.querySelector(".rx-body");
+  if (body.dataset.done) return;
+  body.dataset.done = "1";
+  const r = RX[+d.dataset.rx];
+  let dl = "";
+  if (r.f) dl += "<dt>Кофакторы</dt><dd>" + esc(r.f) + "</dd>";
+  if (r.l) dl += "<dt>Где</dt><dd>" + esc(r.l) + "</dd>";
+  body.innerHTML = '<div class="rs-host"></div>' + (dl ? '<dl class="rx-dl">' + dl + "</dl>" : "") + (r.n ? '<p class="rx-note">' + esc(r.n) + "</p>" : "");
+  rxScheme(body.querySelector(".rs-host"), r, false);
+}
+document.addEventListener("toggle", ev => {
+  const d = ev.target;
+  if (d && d.matches && d.matches("details.rx") && d.open) fillRx(d);
+}, true);
+document.addEventListener("click", ev => {
+  const a = ev.target.closest && ev.target.closest("a[data-go]");
+  if (!a) return;
+  ev.preventDefault();
+  if (BY[a.dataset.go]) openDetail(a.dataset.go);
+});
+
+
+
+/* ---------- textbook formulas: renderers ---------- */
+const f1 = n => Math.round(n * 10) / 10;
+function parseV(s) {
+  return s.split(" / ").map(raw => {
+    let r = raw, hl = false, bond = 1;
+    for (;;) {
+      const c = r[0];
+      if (c === "*") hl = true; else if (c === "=") bond = 2; else if (c === "~") bond = 3; else break;
+      r = r.slice(1);
+    }
+    const o = {hl: hl, bond: bond, key: (bond === 2 ? "=" : bond === 3 ? "~" : "") + r, raw: raw, body: r};
+    if (r[0] === "@") { const i = r.indexOf(":"); o.gl = {name: i < 0 ? r.slice(1) : r.slice(1, i), par: i < 0 ? "" : r.slice(i + 1)}; }
+    else { const p = r.split("|"); if (p.length === 3) { o.l = p[0]; o.c = p[1]; o.r = p[2]; } else o.c = r; }
+    return o;
+  });
+}
+function vbondSVG(b) {
+  const d = b === 2 ? "M3 0V12M7 0V12" : b === 3 ? "M5 0q3 2 0 4q-3 2 0 4q3 2 0 4" : "M5 0V12";
+  return '<svg class="vbs" viewBox="0 0 10 12" aria-hidden="true"><path d="' + d + '"/></svg>';
+}
+const hbCls = (on, k) => "hb" + (on ? " on" : "") + (k === "=" ? " dbl" : k === "~" ? " me" : "");
+function vHTML(spec, o) {
+  o = o || {};
+  const rows = parseV(spec), hl = o.hl || null, n = rows.length;
+  let h = '<div class="vf' + (o.build ? " build" : "") + '">', k = 0;
+  rows.forEach((r, i) => {
+    const df = !!(hl && hl.has(i)), pop = o.last && i === n - 1 ? " pop" : "";
+    if (i) {
+      const p = rows[i - 1], pdf = hl && hl.has(i - 1);
+      h += '<div class="vrow vb' + (r.hl && p.hl ? " hl" : "") + (df && pdf ? " df" : "") + pop + '" style="--i:' + (k++) + '"><span></span><span class="vc">' + vbondSVG(r.bond) + "</span><span></span></div>";
+    }
+    const cls = "vrow vr" + (r.hl ? " hl" : "") + (df ? " df" : "") + pop;
+    if (r.gl) {
+      h += '<div class="' + cls + '" style="--i:' + (k++) + '"><span></span><span class="vc">' + glyphSVG(r.gl, i > 0, i < n - 1) + "</span><span></span></div>";
+      return;
+    }
+    const L = r.l || "", R = r.r || "";
+    const lk = /[=~]$/.test(L) ? L.slice(-1) : "", rk = /^[=~]/.test(R) ? R[0] : "";
+    const Lt = lk ? L.slice(0, -1) : L, Rt = rk ? R.slice(1) : R;
+    const side = (x, kk) => x === "O" && kk === "=" ? '<span class="g g-co">O</span>' : chemHTML(x);
+    h += '<div class="' + cls + '" style="--i:' + (k++) + '"><span class="vl">' + (Lt ? side(Lt, lk) : "") +
+      '</span><span class="vc"><span class="' + hbCls(!!L, lk) + '"></span><span class="vt">' + chemHTML(r.c) +
+      '</span><span class="' + hbCls(!!R, rk) + '"></span></span><span class="vrr">' + (Rt ? side(Rt, rk) : "") + "</span></div>";
+  });
+  return h + "</div>";
+}
+function txtAt(x, y, t, ux, uy, cls, grow) {
+  const tt = subU(t), w = tt.length * 7.4;
+  const an = ux > 0.35 ? "start" : ux < -0.35 ? "end" : "middle";
+  const yy = y + (uy > 0.6 ? 10 : uy < -0.6 ? -1 : 4.2);
+  const x0 = an === "start" ? x : an === "end" ? x - w : x - w / 2;
+  if (grow) grow(x0, yy - 10, x0 + w, yy + 2);
+  return '<text x="' + f1(x) + '" y="' + f1(yy) + '" text-anchor="' + an + '" class="' + cls + '">' + esc(tt) + "</text>";
+}
+function lnSeg(A, B, tA, tB, cls, i, w) {
+  const dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
+  let st = i !== undefined && i !== null ? "--i:" + i + ";" : "";
+  if (w) st += "stroke-width:" + w;
+  return '<line x1="' + f1(A[0] + ux * tA) + '" y1="' + f1(A[1] + uy * tA) + '" x2="' + f1(B[0] - ux * tB) + '" y2="' + f1(B[1] - uy * tB) + '" class="' + cls + '"' + (st ? ' style="' + st + '"' : "") + "/>";
+}
+function lnInner(A, B, C, off, sh, cls, i) {
+  const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
+  let nx = C[0] - mx, ny = C[1] - my;
+  const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+  return lnSeg([A[0] + nx * off, A[1] + ny * off], [B[0] + nx * off, B[1] + ny * off], sh, sh, cls, i);
+}
+function glyphSVG(g, prev, next) {
+  let s = "";
+  const bx = [0, 0, 0, 0];
+  const grow = (x1, y1, x2, y2) => { bx[0] = Math.min(bx[0], x1); bx[1] = Math.min(bx[1], y1); bx[2] = Math.max(bx[2], x2); bx[3] = Math.max(bx[3], y2); };
+  const poly = (n, R, rot) => Array.from({length: n}, (_, k) => { const a = (rot + k * 360 / n) * Math.PI / 180; return [R * Math.cos(a), R * Math.sin(a)]; });
+  const ringN = {}, subs = [];
+  g.par.split(",").filter(Boolean).forEach(p => { const k = +p[0] - 1; if (p[1] === ":") ringN[k] = p.slice(2); else subs.push([k, p.slice(2)]); });
+  function ring(V, labs, dbl, C, arom) {
+    V.forEach(p => grow(p[0], p[1], p[0], p[1]));
+    for (let k = 0; k < V.length; k++) {
+      const j = (k + 1) % V.length;
+      s += lnSeg(V[k], V[j], labs[k] ? 6.5 : 0, labs[j] ? 6.5 : 0, "gb");
+      if (dbl.indexOf(k) >= 0) s += lnInner(V[k], V[j], C, 3.6, (labs[k] || labs[j]) ? 6.5 : 3.2, "gb");
+    }
+    if (arom) s += '<circle cx="' + f1(C[0]) + '" cy="' + f1(C[1]) + '" r="' + arom + '" class="gb"/>';
+    Object.keys(labs).forEach(k => { const p = V[k]; grow(p[0] - 7, p[1] - 8, p[0] + 7, p[1] + 5); s += '<text x="' + f1(p[0]) + '" y="' + f1(p[1] + 4.2) + '" text-anchor="middle" class="gt g-n">' + labs[k] + "</text>"; });
+  }
+  function sub(A, C, t, trim) {
+    const dx = A[0] - C[0], dy = A[1] - C[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, len = t === "H" ? 5 : 9;
+    const E = [A[0] + ux * (trim + len), A[1] + uy * (trim + len)];
+    s += lnSeg(A, E, trim, 0, "gb");
+    grow(E[0], E[1], E[0], E[1]);
+    s += txtAt(E[0] + ux * 2.5, E[1] + uy * 2.5, t, ux, uy, "gt g-" + labCls(t), grow);
+  }
+  let top = -16, bot = 16;
+  if (g.name === "benz") {
+    const V = poly(6, 16, -90);
+    ring(V, ringN, [], [0, 0], 9.5);
+    subs.forEach(u => sub(V[u[0]], [0, 0], u[1], ringN[u[0]] ? 6.5 : 0));
+  } else if (g.name === "imid" || g.name === "pyrr") {
+    const V = poly(5, 15, -90);
+    if (g.name === "imid") { ring(V, {2: "N", 4: "N"}, [0, 3], [0, 0], 0); sub(V[2], [0, 0], "H", 6.5); }
+    else { ring(V, {4: "N"}, [], [0, 0], 0); sub(V[4], [0, 0], "H", 6.5); }
+    top = -15;
+  } else if (g.name === "indole") {
+    const V = poly(5, 15, -90), A = V[1], B = V[2];
+    const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2, sl = Math.hypot(B[0] - A[0], B[1] - A[1]), nl = Math.hypot(mx, my);
+    const Hc = [mx + mx / nl * sl * 0.866, my + my / nl * sl * 0.866];
+    const rot = (p, a) => { const c = Math.cos(a), sn = Math.sin(a), x = p[0] - Hc[0], y = p[1] - Hc[1]; return [Hc[0] + x * c - y * sn, Hc[1] + x * sn + y * c]; };
+    const t1 = rot(A, Math.PI / 3), sg = Math.hypot(t1[0] - B[0], t1[1] - B[1]) < 1 ? 1 : -1;
+    const H = [0, 1, 2, 3, 4, 5].map(k => rot(A, -sg * k * Math.PI / 3));
+    ring(V, {3: "N"}, [4], [0, 0], 0);
+    sub(V[3], [0, 0], "H", 6.5);
+    H.forEach(p => grow(p[0], p[1], p[0], p[1]));
+    for (let k = 0; k < 5; k++) s += lnSeg(H[k], H[k + 1], 0, 0, "gb");
+    s += '<circle cx="' + f1(Hc[0]) + '" cy="' + f1(Hc[1]) + '" r="9.5" class="gb"/>';
+    subs.forEach(u => { if (u[0] === 4) sub(H[2], Hc, u[1], 0); });
+    top = -15;
+  }
+  const half = Math.max(-bx[0], bx[2]) + 2;
+  const y0 = prev ? top : bx[1] - 2, y1 = next ? bot : bx[3] + 2, U = 14;
+  return '<svg class="gly" viewBox="' + f1(-half) + " " + f1(y0) + " " + f1(2 * half) + " " + f1(y1 - y0) + '" style="width:' + (2 * half / U).toFixed(2) +
+    "em;height:" + ((y1 - y0) / U).toFixed(2) + 'em" overflow="visible" aria-hidden="true">' + s + "</svg>";
+}
+function rgSVG(sp, hl, build) {
+  const L = 30, at = sp.at.map(p => [p[0] * L, p[1] * L]), labs = sp.lab || {};
+  const bx = [1e9, 1e9, -1e9, -1e9];
+  const grow = (x1, y1, x2, y2) => { bx[0] = Math.min(bx[0], x1); bx[1] = Math.min(bx[1], y1); bx[2] = Math.max(bx[2], x2); bx[3] = Math.max(bx[3], y2); };
+  at.forEach(p => grow(p[0] - 5, p[1] - 5, p[0] + 5, p[1] + 5));
+  const tr = i => labs[i] ? 8 : 0;
+  let s = "", k = 0;
+  (sp.ring || []).forEach(r => { s += '<text x="' + f1(r[0] * L) + '" y="' + f1(r[1] * L + 5) + '" text-anchor="middle" class="rl">' + r[2] + "</text>"; });
+  (sp.circ || []).forEach(c => { s += '<circle cx="' + f1(c[0] * L) + '" cy="' + f1(c[1] * L) + '" r="' + f1(c[2] * L) + '" class="rb' + (hl && hl.circ ? " sdf" : "") + '" style="--i:' + (k++) + '"/>'; });
+  sp.bd.forEach((d, i) => {
+    const A = at[d[0]], B = at[d[1]], c = "rb" + (hl && hl.bd && hl.bd.has(i) ? " sdf" : "");
+    s += lnSeg(A, B, tr(d[0]), tr(d[1]), c, k++);
+    if (d[2] === 2 && d[3]) s += lnInner(A, B, [d[3][0] * L, d[3][1] * L], 5, (tr(d[0]) || tr(d[1])) ? 9 : 5, c, k++);
+  });
+  sp.sub.forEach((u, i) => {
+    const A = at[u[0]], ux = u[1], uy = u[2], t = u[3], st = u[4], sd = hl && hl.sub && hl.sub.has(i) ? " sdf" : "";
+    const t0 = tr(u[0]), len = t ? (t === "H" ? 0.5 : 0.72) * L : 0.8 * L;
+    const E = [A[0] + ux * (t0 + len), A[1] + uy * (t0 + len)], S0 = [A[0] + ux * t0, A[1] + uy * t0], px = -uy, py = ux;
+    if (st === "w") s += '<polygon points="' + f1(S0[0]) + "," + f1(S0[1]) + " " + f1(E[0] + px * 2.8) + "," + f1(E[1] + py * 2.8) + " " + f1(E[0] - px * 2.8) + "," + f1(E[1] - py * 2.8) + '" class="rw' + sd + '" style="--i:' + (k++) + '"/>';
+    else if (st === "2") s += lnSeg([S0[0] + px * 2.3, S0[1] + py * 2.3], [E[0] + px * 2.3, E[1] + py * 2.3], 0, 0, "rb" + sd, k++) + lnSeg([S0[0] - px * 2.3, S0[1] - py * 2.3], [E[0] - px * 2.3, E[1] - py * 2.3], 0, 0, "rb" + sd, k++);
+    else s += lnSeg(S0, E, 0, 0, "rb" + (st === "d" ? " dash" : "") + sd, k++);
+    grow(E[0], E[1], E[0], E[1]);
+    if (t) s += txtAt(E[0] + ux * 3, E[1] + uy * 3, t, ux, uy, "gt g-" + labCls(t) + sd, grow);
+  });
+  Object.keys(labs).forEach(i => { const p = at[i]; s += '<text x="' + f1(p[0]) + '" y="' + f1(p[1] + 4.5) + '" text-anchor="middle" class="gt g-n">' + labs[i] + "</text>"; });
+  (sp.num || []).forEach(n => {
+    const A = at[n[0]], C = [n[2][0] * L, n[2][1] * L], f = labs[n[0]] ? 0.4 : 0.3;
+    s += '<text x="' + f1(A[0] + (C[0] - A[0]) * f) + '" y="' + f1(A[1] + (C[1] - A[1]) * f + 3.5) + '" text-anchor="middle" class="rn">' + n[1] + "</text>";
+  });
+  const pad = 6, W = bx[2] - bx[0] + 2 * pad, H = bx[3] - bx[1] + 2 * pad;
+  return '<svg class="rgf' + (build ? " build" : "") + '" viewBox="' + f1(bx[0] - pad) + " " + f1(bx[1] - pad) + " " + f1(W) + " " + f1(H) +
+    '" style="width:' + (W / 16).toFixed(2) + "em;height:" + (H / 16).toFixed(2) + 'em" role="img" aria-label="Структурная формула с нумерацией атомов">' + s + "</svg>";
+}
+const HWG = {
+  p: {pos: [[205, 80], [165, 118], [85, 118], [45, 80], [85, 42]], O: [165, 42], c: [125, 80], ed: [[5, 0, 1.8], [0, 1, 3.4], [1, 2, 6.5], [2, 3, 3.4], [3, 4, 1.8], [4, 5, 1.8]]},
+  f: {pos: [[198, 74], [168, 118], [88, 118], [58, 74]], O: [128, 40], c: [128, 88], ed: [[4, 0, 1.8], [0, 1, 3.4], [1, 2, 6.5], [2, 3, 3.4], [3, 4, 1.8]]}
+};
+function hwRing(t, subs, nums, dx, hl, pre, skip, grow, k0) {
+  const G = HWG[t], P = G.pos.map(p => [p[0] + dx, p[1]]), O = [G.O[0] + dx, G.O[1]], all = P.concat([O]), nO = P.length;
+  let s = "", k = k0 || 0;
+  G.ed.forEach(e => { s += lnSeg(all[e[0]], all[e[1]], e[0] === nO ? 7 : 0, e[1] === nO ? 7 : 0, "hwb", k++, e[2]); });
+  s += '<text x="' + O[0] + '" y="' + (O[1] + 4.5) + '" text-anchor="middle" class="gt">O</text>';
+  all.forEach(p => grow(p[0], p[1], p[0], p[1]));
+  P.forEach((p, i) => {
+    const sd = hl && hl.has(pre + i) ? " sdf" : "";
+    [[0, -1], [1, 1]].forEach(jd => {
+      const j = jd[0], d = jd[1], lab = subs[i][j];
+      if (!lab || lab === "H" || (skip && skip[i + "" + j])) return;
+      const E = [p[0], p[1] + d * 24];
+      s += lnSeg(p, E, 0, 0, "hwb", k++, 1.4);
+      const side = lab.length > 3 ? (i === 0 ? 1 : t === "f" && i === 3 ? -1 : 0) : 0;
+      s += txtAt(E[0] - side * 9, E[1] + d * 2, lab, side * 0.5, d, "gt g-" + labCls(lab) + sd, grow);
+    });
+    if (nums) { const c = [G.c[0] + dx, G.c[1]]; s += '<text x="' + f1(p[0] + (c[0] - p[0]) * 0.24) + '" y="' + f1(p[1] + (c[1] - p[1]) * 0.24 + 3.5) + '" text-anchor="middle" class="rn">' + nums[i] + "</text>"; }
+  });
+  return s;
+}
+function hwSVG(sp, hl, build) {
+  const bx = [1e9, 1e9, -1e9, -1e9];
+  const grow = (x1, y1, x2, y2) => { bx[0] = Math.min(bx[0], x1); bx[1] = Math.min(bx[1], y1); bx[2] = Math.max(bx[2], x2); bx[3] = Math.max(bx[3], y2); };
+  let s = "";
+  if (sp.t === "pp") {
+    const beta = sp.link === "β", oy = beta ? 54 : 106, ox = 245;
+    s += hwRing("p", sp.a.s, [1, 2, 3, 4, 5], 0, hl, "a", beta ? {"00": 1} : {"01": 1}, grow, 0);
+    s += hwRing("p", sp.b.s, [1, 2, 3, 4, 5], 240, hl, "b", {"31": 1}, grow, 20);
+    s += lnSeg([205, 80], [ox, oy], 0, 7, "hwb", 40, 1.4) + '<text x="' + ox + '" y="' + (oy + 4.5) + '" text-anchor="middle" class="gt g-oh">O</text>' + lnSeg([ox, oy], [285, 80], 7, 0, "hwb", 41, 1.4);
+    s += '<text x="' + ox + '" y="' + (beta ? oy - 13 : oy + 22) + '" text-anchor="middle" class="rn">' + esc(sp.ln) + "</text>";
+    grow(ox - 15, beta ? oy - 24 : oy, ox + 15, beta ? oy : oy + 24);
+  } else s += hwRing(sp.t, sp.s, sp.n, 0, hl, "", null, grow, 0);
+  const pad = 6, W = bx[2] - bx[0] + 2 * pad, H = bx[3] - bx[1] + 2 * pad;
+  return '<svg class="hwf' + (build ? " build" : "") + '" viewBox="' + f1(bx[0] - pad) + " " + f1(bx[1] - pad) + " " + f1(W) + " " + f1(H) +
+    '" style="width:' + (W / 15).toFixed(2) + "em;height:" + (H / 15).toFixed(2) + 'em" role="img" aria-label="Проекция Хеуорса">' + s + "</svg>";
+}
+const BT = {base: "Азотистое основание", sug: "Сахар или спирт", p: "Фосфат", vit: "Витаминная часть", aa: "Аминокислота", fa: "Углеводородный хвост", x: "Фрагмент", grp: "Группа"};
+function bconn(t, lab, i) {
+  return '<span class="bc" style="--i:' + i + '">' + (lab ? "<small>" + esc(lab) + "</small>" : "") + '<i class="' + (t === "~" ? "me" : t === "=" ? "dbl" : "") + '"></i></span>';
+}
+function bHTML(items, o) {
+  o = o || {};
+  const hl = o.hl || null;
+  let h = '<div class="bf' + (o.build ? " build" : "") + '">', k = 0, prev = false;
+  items.forEach((it, i) => {
+    const t = it[0];
+    if (t === "-" || t === "~" || t === "=") { h += bconn(t, it[1], k++); prev = false; return; }
+    if (prev) h += bconn("-", "", k++);
+    h += '<span class="bk t-' + t + (hl && hl.has(i) ? " df" : "") + '" style="--i:' + (k++) + '" title="' + BT[t] + '"><b>' + esc(it[1]) + "</b>" + (it[2] ? "<small>" + esc(it[2]) + "</small>" : "") + "</span>";
+    prev = true;
+  });
+  return h + "</div>";
+}
+function txHTML(v, o) {
+  const k = v[0], sp = v[2];
+  const inner = k === "v" ? vHTML(sp, o) : k === "b" ? bHTML(sp, o) : k === "rg" ? rgSVG(sp, o.hl, o.build) : hwSVG(sp, o.hl, o.build);
+  return '<div class="txw' + (o.fit ? " txfit" : "") + '">' + inner + "</div>";
+}
+const vkey = v => v[0] + (v[0] === "rg" ? v[2].fam : v[0] === "hw" ? v[2].t : "");
+function lcs(A, B) {
+  const n = A.length, m = B.length, T = [];
+  for (let i = 0; i <= n; i++) T.push(new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) T[i][j] = A[i] === B[j] ? T[i + 1][j + 1] + 1 : Math.max(T[i + 1][j], T[i][j + 1]);
+  const da = new Set(), db = new Set();
+  let i = 0, j = 0;
+  while (i < n && j < m) { if (A[i] === B[j]) { i++; j++; } else if (T[i + 1][j] >= T[i][j + 1]) da.add(i++); else db.add(j++); }
+  while (i < n) da.add(i++);
+  while (j < m) db.add(j++);
+  return [da, db];
+}
+function txDiff(x, y) {
+  const k = x[0];
+  if (k === "v") return lcs(parseV(x[2]).map(r => r.key), parseV(y[2]).map(r => r.key));
+  if (k === "b") return lcs(x[2].map(i => i.join("|")), y[2].map(i => i.join("|")));
+  if (k === "hw") {
+    const a = new Set(), b = new Set();
+    const cmp = (p, q, pre) => p.forEach((s, i) => { if (JSON.stringify(s) !== JSON.stringify(q[i])) { a.add(pre + i); b.add(pre + i); } });
+    if (x[2].t === "pp") { cmp(x[2].a.s, y[2].a.s, "a"); cmp(x[2].b.s, y[2].b.s, "b"); } else cmp(x[2].s, y[2].s, "");
+    return [a, b];
+  }
+  if (k === "rg") {
+    const sk = u => u[0] + "|" + u[3] + "|" + u[4], bk = d => d[0] + "-" + d[1] + "-" + d[2];
+    const side = (p, q) => {
+      const qs = new Set(q.sub.map(sk)), qb = new Set(q.bd.map(bk)), sub = new Set(), bd = new Set();
+      p.sub.forEach((u, i) => { if (!qs.has(sk(u))) sub.add(i); });
+      p.bd.forEach((d, i) => { if (d[2] === 2 && !qb.has(bk(d))) bd.add(i); });
+      return {sub: sub, bd: bd, circ: (p.circ || []).length > (q.circ || []).length};
+    };
+    return [side(x[2], y[2]), side(y[2], x[2])];
+  }
+  return [null, null];
+}
+function txPair(a, b, kind) {
+  const va = TX[a] || [], vb = TX[b] || [];
+  for (const x of va) for (const y of vb) if (vkey(x) === vkey(y) && (!kind || x[0] === kind)) return [x, y, txDiff(x, y)];
+  return null;
+}
+const fitRO = "ResizeObserver" in window ? new ResizeObserver(es => es.forEach(en => fitNow(en.target))) : null;
+function fitNow(box) {
+  const w = box.querySelector(".txfit");
+  if (!w) return;
+  const bw = box.clientWidth - 10, bh = box.clientHeight - 10, iw = w.offsetWidth, ih = w.offsetHeight;
+  if (bw <= 0 || bh <= 0 || !iw || !ih) return;
+  const mx = +box.dataset.fmax || 1.15;
+  w.style.transform = "scale(" + Math.min(mx, bw / iw, bh / ih).toFixed(3) + ")";
+}
+function fitLater(box) {
+  requestAnimationFrame(() => fitNow(box));
+  if (fitRO && !box._fo) { box._fo = 1; fitRO.observe(box); }
+}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => document.querySelectorAll('[data-kind="tx"]').forEach(fitNow));
+let fstyle = lsGet("atlas-fstyle") === "sk" ? "sk" : "tx";
+function viewFor(e) { const v = TX[e.id]; return fstyle === "tx" && v && v.length ? v[0] : "sk"; }
+const lazyIO = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(en => {
+  if (!en.isIntersecting) return;
+  lazyIO.unobserve(en.target);
+  const f = en.target._paint; en.target._paint = null;
+  if (f) f();
+}), {rootMargin: "250px 0px"}) : null;
+function lazy(el, f) { if (lazyIO) { el._paint = f; lazyIO.observe(el); } else f(); }
+
+/* ---------- molecules ---------- */
+let drawers = {};
+function cssv(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function molTheme() {
+  const c = cssv("--m-c");
+  return {C:c,O:cssv("--m-o"),N:cssv("--m-n"),F:cssv("--m-f"),CL:cssv("--m-f"),BR:cssv("--m-o"),I:cssv("--m-i"),
+          P:cssv("--m-p"),S:cssv("--m-s"),B:c,SI:c,H:c,BACKGROUND:cssv("--surface")};
+}
+function getDrawer(w, h, mode) {
+  const k = w + "x" + h + (mode || "");
+  if (!drawers[k]) drawers[k] = new SD.Drawer({width:w, height:h, bondThickness: w > 400 ? 1.4 : 1.1, padding: w > 400 ? 26 : 12, atomVisualization: mode === "ball" ? "allballs" : "default", themes:{atlas: molTheme()}});
+  return drawers[k];
+}
+function fallbackHTML(e) {
+  return '<div class="fb"><span class="fbf">' + fhtml(e) + '</span><span class="fbn">Схема не загрузилась: нужен доступ к cdn.jsdelivr.net</span></div>';
+}
+function insulinSVG(sc) {
+  let s = '<svg class="ph" viewBox="0 0 300 170" role="img" aria-label="Схема инсулина: цепи A и B и дисульфидные связи">';
+  const ax = i => 45 + (i - 1) * 10.5, bx = i => 12 + (i - 1) * 9.3, ay = 62, by = 112;
+  s += '<path d="M' + ax(6) + ' ' + ay + ' C ' + ax(6) + ' 30, ' + ax(11) + ' 30, ' + ax(11) + ' ' + ay + '" fill="none" stroke="var(--m-s)" stroke-width="2"/>';
+  s += '<line x1="' + ax(7) + '" y1="' + ay + '" x2="' + bx(7) + '" y2="' + by + '" stroke="var(--m-s)" stroke-width="2"/>';
+  s += '<line x1="' + ax(20) + '" y1="' + ay + '" x2="' + bx(19) + '" y2="' + by + '" stroke="var(--m-s)" stroke-width="2"/>';
+  for (let i = 1; i <= 21; i++) s += '<circle cx="' + ax(i) + '" cy="' + ay + '" r="4.3" fill="' + sc + '"/>';
+  for (let i = 1; i <= 30; i++) s += '<circle cx="' + bx(i) + '" cy="' + by + '" r="3.9" fill="var(--muted)"/>';
+  s += '<text x="22" y="' + (ay + 4) + '" fill="var(--ink)" font-size="13" font-weight="600">A</text>';
+  s += '<text x="140" y="148" fill="var(--muted)" font-size="11" text-anchor="middle">B-цепь, 30 АК; дисульфиды A7–B7, A20–B19, A6–A11</text>';
+  return s + '</svg>';
+}
+function cobalaminSVG(sc) {
+  let s = '<svg class="ph" viewBox="0 0 300 170" role="img" aria-label="Схема кобаламина: кобальт в корриновом кольце">';
+  s += '<circle cx="150" cy="80" r="52" fill="none" stroke="var(--m-c)" stroke-width="2" stroke-dasharray="6 5"/>';
+  [[150,42],[188,80],[150,118],[112,80]].forEach(p => {
+    s += '<line x1="150" y1="80" x2="' + p[0] + '" y2="' + p[1] + '" stroke="var(--m-c)" stroke-width="1.6"/>';
+    s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="10" fill="var(--surface)"/><text x="' + p[0] + '" y="' + (p[1] + 5) + '" text-anchor="middle" font-size="14" font-weight="600" fill="var(--m-n)">N</text>';
+  });
+  s += '<circle cx="150" cy="80" r="15" fill="' + sc + '"/><text x="150" y="85" text-anchor="middle" font-size="14" font-weight="600" fill="#fff">Co</text>';
+  s += '<text x="150" y="160" text-anchor="middle" font-size="11" fill="var(--muted)">корриновое кольцо (схема)</text>';
+  return s + '</svg>';
+}
+function paint(box, e, w, h, cid, o) {
+  o = o || {};
+  const view = o.view || viewFor(e);
+  box.dataset.painted = "1"; box.dataset.id = e.id; box.dataset.w = w; box.dataset.h = h; box.dataset.cid = cid;
+  if (Array.isArray(view)) {
+    const fit = o.fit !== false;
+    box.dataset.kind = "tx";
+    if (o.fmax) box.dataset.fmax = o.fmax;
+    box.innerHTML = txHTML(view, {hl: o.hl, build: o.build, fit: fit});
+    const w = box.firstElementChild;
+    if (w) { w.setAttribute("role", "img"); w.setAttribute("aria-label", o.anon ? "Учебная формула" : "Учебная формула: " + e.n); }
+    if (fit) fitLater(box);
+    return;
+  }
+  box.dataset.kind = view;
+  if (!e.smi) { box.innerHTML = e.id === "ins" ? insulinSVG(SEC[e.s].c) : cobalaminSVG(SEC[e.s].c); return; }
+  if (!SD) { box.innerHTML = fallbackHTML(e); return; }
+  box.innerHTML = '<canvas id="' + cid + '" width="' + w + '" height="' + h + '" role="img" aria-label="Структурная формула' + (o.anon ? "" : ": " + esc(e.n)) + '"></canvas>';
+  const fail = () => { box.innerHTML = fallbackHTML(e); };
+  try {
+    SD.parse(e.smi, tree => { try { getDrawer(w, h, view).draw(tree, cid, "atlas", false); } catch (err) { fail(); } }, fail);
+  } catch (err) { fail(); }
+}
+function repaintAll() {
+  drawers = {};
+  document.querySelectorAll("[data-painted]").forEach(b => {
+    const e = BY[b.dataset.id];
+    if (e && e.smi && (b.dataset.kind === "sk" || b.dataset.kind === "ball")) paint(b, e, +b.dataset.w, +b.dataset.h, b.dataset.cid, {view: b.dataset.kind});
+  });
+}
+
+
+/* ---------- learning progress ---------- */
+const PROG = {c: {}, star: [], t: 0};
+let progCloud = null, progStatus = "local", progTimer = 0, progSaving = false, progPending = false;
+function progAdopt(d) {
+  if (!d || typeof d !== "object") return;
+  PROG.c = d.c && typeof d.c === "object" ? Object.assign({}, d.c) : {};
+  PROG.star = Array.isArray(d.star) ? d.star.filter(id => BY[id]) : [];
+  PROG.t = +d.t || 0;
+}
+try { const s = lsGet("atlas-progress"); if (s) progAdopt(JSON.parse(s)); } catch (e) {}
+const isStar = id => PROG.star.indexOf(id) >= 0;
+function levelOf(id) { const a = PROG.c["sn:" + id], b = PROG.c["ns:" + id]; return Math.max(a ? a[0] : 0, b ? b[0] : 0); }
+function progChanged() {
+  PROG.t = Date.now();
+  lsSet("atlas-progress", JSON.stringify(PROG));
+  clearTimeout(progTimer);
+  progTimer = setTimeout(progSave, 1500);
+  onProg();
+}
+async function progSave() {
+  if (!progCloud) return;
+  if (progSaving) { progPending = true; return; }
+  progSaving = true;
+  try {
+    await progCloud.set({v: 1, t: PROG.t, c: PROG.c, star: PROG.star});
+    progStatus = "cloud";
+  } catch (err) {
+    const code = err && err.code;
+    if (code === "unavailable" || code === "resource_exhausted") setTimeout(progSave, 2500 + Math.random() * 2500);
+    else { progCloud = null; progStatus = code === "quota_exceeded" ? "quota" : "local"; }
+  }
+  progSaving = false;
+  if (progPending) { progPending = false; progSave(); }
+  renderSaveStatus();
+}
+(async function progInit() {
+  const C = window.claude;
+  if (!C || typeof C.use !== "function") return;
+  try {
+    const both = await Promise.all([C.use("db"), C.use("user")]), db = both[0], user = both[1];
+    if (!db || !user) return;
+    const uid = await user.id();
+    if (!uid) return;
+    const ref = db.doc("data/users/" + uid + "/progress");
+    const snap = await ref.get();
+    progCloud = ref; progStatus = "cloud";
+    const d = snap.exists ? snap.data() : null, dt = d ? +d.t || 0 : 0;
+    if (d && dt > PROG.t) { progAdopt(d); lsSet("atlas-progress", JSON.stringify(PROG)); onProg(); }
+    else if (PROG.t > dt) progSave();
+    renderSaveStatus();
+  } catch (e) { progCloud = null; }
+})();
+function toggleStar(id) {
+  const i = PROG.star.indexOf(id);
+  if (i >= 0) PROG.star.splice(i, 1); else PROG.star.push(id);
+  progChanged();
+}
+function renderSaveStatus() {
+  const el = $("sSave");
+  if (!el) return;
+  el.textContent = progStatus === "cloud" ? "Прогресс и избранное сохраняются в вашем аккаунте и доступны на других устройствах."
+    : progStatus === "quota" ? "Хранилище прогресса заполнено, поэтому изменения сохраняются только в этом браузере."
+    : "Прогресс и избранное сохраняются в этом браузере.";
+}
+function updateCardMeta(e) {
+  const c = e._card; if (!c) return;
+  const lv = levelOf(e.id), st = isStar(e.id);
+  c.querySelector(".cmeta").innerHTML = (st ? '<span class="cstar" aria-label="В избранном">★</span>' : "") +
+    (lv ? '<span class="lvl" aria-label="Уровень ' + lv + ' из 5">' + [1, 2, 3, 4, 5].map(i => "<i" + (i <= lv ? ' class="on"' : "") + "></i>").join("") + "</span>" : "");
+}
+function onProg() {
+  DB.forEach(updateCardMeta);
+  const fn = $("aFavN"); if (fn) fn.textContent = PROG.star.length;
+  if (curId) syncStar();
+  if (favOnly) applyFilter();
+  if (view === "study" && sTab === "srs" && !(ses && ses.cur)) srsRender();
+}
+
+/* ---------- atlas ---------- */
+let secFilter = null, query = "", visible = DB.slice();
+$("lede").textContent = DB.length + " " + plural(DB.length, "вещество", "вещества", "веществ") + " и " + RX.length + " " +
+  plural(RX.length, "реакция", "реакции", "реакций") + " из программы курса биохимии лечебного факультета.";
+
+const counts = {}; DB.forEach(e => counts[e.s] = (counts[e.s] || 0) + 1);
+const chroma = $("chroma"), legend = $("legend");
+SECS.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.className = "seg"; b.type = "button"; b.dataset.sec = s.id;
+  b.style.cssText = "--sc:" + s.c + ";--n:" + counts[s.id] + ";--i:" + i;
+  b.title = s.n + ": " + counts[s.id]; b.setAttribute("aria-label", s.n + ", " + counts[s.id]);
+  b.addEventListener("click", () => setSec(secFilter === s.id ? null : s.id));
+  chroma.appendChild(b);
+});
+function legendBtn(id, label, n, color) {
+  const b = document.createElement("button");
+  b.className = "lg"; b.type = "button"; b.dataset.sec = id || "";
+  if (color) b.style.setProperty("--sc", color);
+  b.innerHTML = '<span class="dot"></span>' + esc(label) + ' <span class="num">' + n + '</span>';
+  return b;
+}
+const allBtn = legendBtn(null, "Все разделы", DB.length, null);
+allBtn.addEventListener("click", () => setSec(null));
+legend.appendChild(allBtn);
+SECS.forEach(s => {
+  const b = legendBtn(s.id, s.n, counts[s.id], s.c);
+  b.addEventListener("click", () => setSec(secFilter === s.id ? null : s.id));
+  legend.appendChild(b);
+});
+
+const io = "IntersectionObserver" in window ? new IntersectionObserver(ents => {
+  ents.forEach(en => { if (en.isIntersecting) { io.unobserve(en.target); const e = BY[en.target.dataset.id]; paint(en.target, e, 260, 180, "t-" + e.id); } });
+}, {rootMargin: "300px 0px"}) : null;
+
+const grid = $("grid");
+DB.forEach(e => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "card"; b.style.setProperty("--sc", SEC[e.s].c);
+  b.innerHTML = '<span class="cmeta"></span><span class="mol" data-id="' + e.id + '"></span><span class="cname">' + esc(e.n) + '</span><span class="cf">' + fhtml(e) + '</span><span class="crx">' + e._rx.length + ' ' + plural(e._rx.length, "реакция", "реакции", "реакций") + '</span>';
+  b.addEventListener("click", () => openDetail(e.id, visible));
+  grid.appendChild(b);
+  e._card = b;
+  const m = b.querySelector(".mol");
+  if (io) io.observe(m); else paint(m, e, 260, 180, "t-" + e.id);
+});
+
+
+let favOnly = false, hideNames = lsGet("atlas-hide") === "1";
+grid.classList.toggle("hidenames", hideNames);
+$("aHide").setAttribute("aria-pressed", String(hideNames));
+$("aHide").addEventListener("click", () => {
+  hideNames = !hideNames; lsSet("atlas-hide", hideNames ? "1" : "0");
+  grid.classList.toggle("hidenames", hideNames); $("aHide").setAttribute("aria-pressed", String(hideNames));
+});
+$("aFav").addEventListener("click", () => { favOnly = !favOnly; $("aFav").setAttribute("aria-pressed", String(favOnly)); applyFilter(); });
+$("aFavN").textContent = PROG.star.length;
+DB.forEach(updateCardMeta);
+
+function applyFilter() {
+  const q = norm(query.trim());
+  const words = q ? q.split(/\s+/) : [];
+  visible = DB.filter(e => (!secFilter || e.s === secFilter) && (!favOnly || isStar(e.id)) && words.every(w => e._s.includes(w)));
+  const vis = new Set(visible.map(e => e.id));
+  DB.forEach(e => { e._card.hidden = !vis.has(e.id); });
+  $("empty").hidden = visible.length > 0;
+  $("count").textContent = (secFilter || q || favOnly) ? "Показано " + visible.length + " из " + DB.length : "";
+  chroma.classList.toggle("filtered", !!secFilter);
+  chroma.querySelectorAll(".seg").forEach(s => s.classList.toggle("on", s.dataset.sec === secFilter));
+  legend.querySelectorAll(".lg").forEach(l => l.setAttribute("aria-pressed", String((l.dataset.sec || null) === secFilter)));
+}
+function setSec(id) { secFilter = id; applyFilter(); }
+$("q").addEventListener("input", ev => { query = ev.target.value; applyFilter(); });
+$("reset").addEventListener("click", () => { query = ""; $("q").value = ""; setSec(null); });
+applyFilter();
+
+/* ---------- detail sheet ---------- */
+let dVi = 0, gcolor = lsGet("atlas-gcolor") !== "0";
+document.body.classList.toggle("nocolor", !gcolor);
+function detailViews(e) {
+  const vs = (TX[e.id] || []).map(v => [v[1], v]);
+  if (e.smi) { vs.push(["Скелетная", "sk"]); vs.push(["Шарики", "ball"]); }
+  else vs.push(["Схема", "sk"]);
+  return vs;
+}
+function defaultVi(e) {
+  if (fstyle === "tx") return 0;
+  const i = detailViews(e).findIndex(v => v[1] === "sk");
+  return i < 0 ? 0 : i;
+}
+function renderDetailMol(e, build) {
+  const vs = detailViews(e);
+  if (dVi >= vs.length) dVi = 0;
+  $("dViews").innerHTML = vs.length > 1 ? vs.map((v, i) => '<button type="button" class="lg" data-vi="' + i + '" aria-pressed="' + (i === dVi) + '">' + esc(v[0]) + "</button>").join("") : "";
+  const v = vs[dVi][1], dm = $("dMol"), isTx = Array.isArray(v);
+  dm.classList.remove("reveal");
+  paint(dm, e, 560, 400, "d-canvas", {view: v, fit: false, build: build !== false});
+  if (!isTx) { void dm.offsetWidth; dm.classList.add("reveal"); }
+  $("dTxTools").hidden = !isTx;
+  const cap = isTx && v[2] && v[2].cap;
+  $("dCap").textContent = cap || ""; $("dCap").hidden = !cap;
+}
+$("dViews").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-vi]"); if (!b || !curId) return;
+  dVi = +b.dataset.vi; renderDetailMol(BY[curId], true);
+});
+$("dReplay").addEventListener("click", () => { if (curId) renderDetailMol(BY[curId], true); });
+$("dColor").setAttribute("aria-pressed", String(gcolor));
+$("dColor").addEventListener("click", () => {
+  gcolor = !gcolor; lsSet("atlas-gcolor", gcolor ? "1" : "0");
+  document.body.classList.toggle("nocolor", !gcolor); $("dColor").setAttribute("aria-pressed", String(gcolor));
+});
+function syncStar() {
+  const on = isStar(curId);
+  $("dStar").setAttribute("aria-pressed", String(on));
+  $("dStar").setAttribute("aria-label", on ? "Убрать из избранного" : "Добавить в избранное");
+}
+$("dStar").addEventListener("click", () => { if (curId) toggleStar(curId); });
+function renderPairs(box, list, focus) {
+  const nm = id => '<a href="#" class="tk' + (id === focus ? " me" : "") + '" data-go="' + id + '">' + esc(BY[id].n) + "</a>";
+  box.innerHTML = list.map(p => '<div class="pair" style="--sc:' + SEC[BY[p[0]].s].c + '"><div class="prs-side"><div class="prs-mol"></div>' + nm(p[0]) +
+    '</div><div class="psep" aria-hidden="true">↔</div><div class="prs-side"><div class="prs-mol"></div>' + nm(p[1]) + '</div><p class="ptxt">' + esc(p[2]) + "</p></div>").join("");
+  box.querySelectorAll(".pair").forEach((el, i) => {
+    const p = list[i];
+    lazy(el, () => {
+      const tp = fstyle === "tx" ? txPair(p[0], p[1], p[3]) : null, ms = el.querySelectorAll(".prs-mol");
+      paint(ms[0], BY[p[0]], 280, 200, "pr" + (++uid), {view: tp ? tp[0] : null, hl: tp ? tp[2][0] : null});
+      paint(ms[1], BY[p[1]], 280, 200, "pr" + (++uid), {view: tp ? tp[1] : null, hl: tp ? tp[2][1] : null});
+    });
+  });
+}
+function renderDetailLearn(e) {
+  const mn = MN[e.id] || [];
+  $("dMnWrap").hidden = !mn.length;
+  $("dMn").innerHTML = mn.map(t => "<li>" + esc(t) + "</li>").join("");
+  const prs = PAIRS.filter(p => p[0] === e.id || p[1] === e.id);
+  $("dPairWrap").hidden = !prs.length;
+  renderPairs($("dPairs"), prs, e.id);
+}
+
+const sheet = $("sheet"), scrim = $("scrim");
+let curId = null, navList = DB, lastFocus = null, closeTimer = null;
+function openDetail(id, list) {
+  const e = BY[id]; if (!e) return;
+  curId = id;
+  navList = (list && list.some(x => x.id === id)) ? list : DB;
+  const s = SEC[e.s];
+  sheet.style.setProperty("--sc", s.c);
+  $("dSec").textContent = s.n;
+  $("dName").textContent = e.n;
+  $("dAlt").textContent = e.a;
+  $("dF").innerHTML = fhtml(e);
+  $("dM").textContent = mass(e);
+  $("dTags").innerHTML = e.t.map(t => '<span class="tag">' + esc(t) + '</span>').join("");
+  dRole = "all"; renderDetailRx(e);
+  $("dD").textContent = e.d;
+  $("dC").textContent = e.c; $("dCwrap").hidden = !e.c;
+  const ps = PATHS.filter(p => pathIds(p).has(id));
+  $("dPwrap").hidden = !ps.length;
+  $("dP").innerHTML = ps.map(p => '<button class="lg" type="button" data-path="' + p.id + '" style="--sc:' + SEC[p.sec].c + '"><span class="dot"></span>' + esc(p.name) + '</button>').join("");
+  dVi = defaultVi(e); renderDetailMol(e, true);
+  renderDetailLearn(e); syncStar();
+  const i = navList.findIndex(x => x.id === id);
+  $("dPrev").disabled = i <= 0; $("dNext").disabled = i >= navList.length - 1;
+  $("dBody").scrollTop = 0;
+  if (sheet.hidden || !sheet.classList.contains("open")) {
+    clearTimeout(closeTimer);
+    lastFocus = document.activeElement;
+    sheet.hidden = false; scrim.hidden = false;
+    document.body.classList.add("locked");
+    void sheet.offsetWidth;
+    sheet.classList.add("open"); scrim.classList.add("open");
+    $("dClose").focus({preventScroll: true});
+  }
+}
+let dRole = "all";
+function renderDetailRx(e) {
+  const order = {p: 0, s: 1, x: 2};
+  const items = e._rx.slice().sort((a, b) => order[a[1]] - order[b[1]]);
+  $("dRxWrap").hidden = !items.length;
+  const c = {all: items.length, p: 0, s: 0, x: 0};
+  items.forEach(x => c[x[1]]++);
+  if (dRole !== "all" && !c[dRole]) dRole = "all";
+  const labs = [["all", "Все"], ["p", "Образуется"], ["s", "Превращается"], ["x", "Связанные"]];
+  $("dRxF").innerHTML = labs.filter(l => c[l[0]]).map(l => '<button type="button" class="lg" data-role="' + l[0] + '" aria-pressed="' + (l[0] === dRole) + '">' + l[1] + ' <span class="num">' + c[l[0]] + '</span></button>').join("");
+  const shown = items.filter(x => dRole === "all" || x[1] === dRole);
+  $("dRx").innerHTML = shown.map(x => rxCard(x[0], e.id)).join("");
+  const first = $("dRx").querySelector("details");
+  if (first) { first.open = true; fillRx(first); }
+}
+$("dRxF").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-role]"); if (!b || !curId) return;
+  dRole = b.dataset.role; renderDetailRx(BY[curId]);
+});
+function closeDetail(restore = true) {
+  sheet.classList.remove("open"); scrim.classList.remove("open");
+  document.body.classList.remove("locked");
+  closeTimer = setTimeout(() => { sheet.hidden = true; scrim.hidden = true; }, REDUCE ? 0 : 340);
+  curId = null;
+  if (restore && lastFocus && document.contains(lastFocus)) lastFocus.focus({preventScroll: true});
+}
+function step(d) {
+  const i = navList.findIndex(x => x.id === curId), j = i + d;
+  if (i >= 0 && j >= 0 && j < navList.length) openDetail(navList[j].id, navList);
+}
+$("dClose").addEventListener("click", () => closeDetail());
+scrim.addEventListener("click", () => closeDetail());
+$("dPrev").addEventListener("click", () => step(-1));
+$("dNext").addEventListener("click", () => step(1));
+$("dP").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-path]"); if (!b) return;
+  const id = curId; closeDetail(false); setView("paths"); renderPath(b.dataset.path, id);
+});
+document.addEventListener("keydown", ev => {
+  if (curId) {
+    if (ev.key === "Escape") { ev.preventDefault(); closeDetail(); }
+    else if (ev.key === "ArrowLeft") step(-1);
+    else if (ev.key === "ArrowRight") step(1);
+    else if (ev.key === "Tab") {
+      const f = [...sheet.querySelectorAll("button:not([disabled]), a[href], summary")].filter(x => x.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+      else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+    }
+    return;
+  }
+  if (ev.key === "/" && view === "atlas" && document.activeElement !== $("q")) { ev.preventDefault(); $("q").focus(); }
+});
+
+/* ---------- pathways ---------- */
+const PATHS = [
+  {id:"glyc", name:"Гликолиз", sec:"carb", kind:"flow", where:"Цитозоль всех клеток",
+   sum:"Глюкоза + 2 NAD⁺ + 2 АДФ + 2 Pᵢ → 2 пируват + 2 NADH + 2 АТФ + 2 H₂O",
+   flow:[
+     {nodes:["glc"]},{enz:"Гексокиназа",chips:["−АТФ"],irr:true},
+     {nodes:["g6p"]},{enz:"Глюкозо-6-фосфатизомераза"},
+     {nodes:["f6p"]},{enz:"Фосфофруктокиназа-1",chips:["−АТФ"],irr:true},
+     {nodes:["f16bp"]},{enz:"Альдолаза"},
+     {nodes:["g3p","dhap"],iso:"⇄ ТФИ ⇄"},{x2:"дальше все реакции идут дважды на молекулу глюкозы"},
+     {enz:"ГА-3-Ф-дегидрогеназа",chips:["+NADH"]},
+     {nodes:["bpg13"]},{enz:"Фосфоглицераткиназа",chips:["+АТФ"]},
+     {nodes:["pg3"]},{enz:"Фосфоглицератмутаза"},
+     {nodes:["pg2"]},{enz:"Енолаза",chips:["−H₂O"]},
+     {nodes:["pep"]},{enz:"Пируваткиназа",chips:["+АТФ"],irr:true},
+     {nodes:["pyr"]}
+   ],
+   steps:[
+     ["Глюкоза → глюкозо-6-фосфат","Гексокиназа (в печени и β-клетках — глюкокиназа)","Необратимо, −АТФ. Гексокиназу ингибирует Г6Ф; глюкокиназа с высокой Km индуцируется инсулином."],
+     ["Глюкозо-6-фосфат ⇄ фруктозо-6-фосфат","Глюкозо-6-фосфатизомераза",""],
+     ["Фруктозо-6-фосфат → фруктозо-1,6-бисфосфат","Фосфофруктокиназа-1","Необратимо, −АТФ, лимитирующая стадия. Активаторы: АМФ, фруктозо-2,6-бисфосфат; ингибиторы: АТФ, цитрат."],
+     ["Фруктозо-1,6-бисфосфат ⇄ ДАФ + ГА-3-Ф","Альдолаза A","В печени работает альдолаза B, она же расщепляет фруктозо-1-фосфат."],
+     ["ДАФ ⇄ глицеральдегид-3-фосфат","Триозофосфатизомераза","С этого момента реакции идут дважды на молекулу глюкозы."],
+     ["ГА-3-Ф + NAD⁺ + Pᵢ ⇄ 1,3-БФГ + NADH","Глицеральдегид-3-фосфатдегидрогеназа","Единственная окислительная реакция гликолиза; NAD⁺ возвращают ЛДГ или челночные системы."],
+     ["1,3-БФГ + АДФ ⇄ 3-фосфоглицерат + АТФ","Фосфоглицераткиназа","Субстратное фосфорилирование."],
+     ["3-Фосфоглицерат ⇄ 2-фосфоглицерат","Фосфоглицератмутаза",""],
+     ["2-Фосфоглицерат ⇄ ФЕП + H₂O","Енолаза","Ингибируется фторидом."],
+     ["ФЕП + АДФ → пируват + АТФ","Пируваткиназа","Необратимо. Активатор — фруктозо-1,6-бисфосфат; печёночная форма инактивируется фосфорилированием (глюкагон)."]
+   ]},
+  {id:"tca", name:"Цикл Кребса", sec:"tca", kind:"cycle", R:235, vb:[-400,-372,800,744], where:"Матрикс митохондрий", center:["Цикл Кребса","матрикс митохондрий"],
+   sum:"Ацетил-КоА + 3 NAD⁺ + FAD + ГДФ + Pᵢ + 2 H₂O → 2 CO₂ + 3 NADH + FADH₂ + ГТФ + КоА; около 10 АТФ на оборот",
+   nodes:[["oaa","Оксалоацетат"],["cit","Цитрат"],["icit","Изоцитрат"],["akg","α-Кетоглутарат"],["succoa","Сукцинил-КоА"],["succ","Сукцинат"],["fum","Фумарат"],["mal","Малат"]],
+   arcs:[{ab:"ЦС"},{ab:"Аконитаза"},{ab:"ИДГ",chips:["NADH","CO₂"]},{ab:"α-КГДГ",chips:["NADH","CO₂"]},{ab:"СКС",chips:["ГТФ"]},{ab:"СДГ",chips:["FADH₂"]},{ab:"Фумараза",chips:["+H₂O"]},{ab:"МДГ",chips:["NADH"]}],
+   ext:[{id:"acoa",label:"Ацетил-КоА",at:0,dir:"in"}],
+   steps:[
+     ["Оксалоацетат + ацетил-КоА → цитрат","Цитратсинтаза","Необратимо. Ингибиторы: АТФ, NADH, сукцинил-КоА, цитрат."],
+     ["Цитрат ⇄ изоцитрат","Аконитаза","Fe–S-белок; блокируется фторцитратом при отравлении фторацетатом."],
+     ["Изоцитрат → α-кетоглутарат + CO₂","Изоцитратдегидрогеназа","NADH. Главный регуляторный фермент: активаторы АДФ и Ca²⁺, ингибиторы АТФ и NADH."],
+     ["α-Кетоглутарат → сукцинил-КоА + CO₂","α-Кетоглутаратдегидрогеназный комплекс","NADH. Кофакторы: ТПФ, липоат, КоА, FAD, NAD⁺. Ингибиторы: сукцинил-КоА, NADH."],
+     ["Сукцинил-КоА → сукцинат","Сукцинил-КоА-синтетаза","Субстратное фосфорилирование: ГТФ (в части тканей — АТФ)."],
+     ["Сукцинат → фумарат","Сукцинатдегидрогеназа","FADH₂. Комплекс II дыхательной цепи; конкурентный ингибитор — малонат."],
+     ["Фумарат + H₂O → L-малат","Фумараза",""],
+     ["L-Малат → оксалоацетат","Малатдегидрогеназа","NADH. ΔG°′ > 0: реакцию тянет вперёд расход оксалоацетата цитратсинтазой."]
+   ]},
+  {id:"urea", name:"Орнитиновый цикл", sec:"nit", kind:"cycle", where:"Гепатоциты: митохондрии и цитозоль", center:["Цикл мочевины","печень"],
+   sum:"NH₃ + HCO₃⁻ + аспартат + 3 АТФ → мочевина + фумарат + 2 АДФ + АМФ; 4 макроэргические связи",
+   nodes:[["orn","Орнитин"],["citr","Цитруллин"],["asa","Аргининосукцинат"],["arg","Аргинин"]],
+   arcs:[{ab:"ОТК"},{ab:"АСС",chips:["АТФ → АМФ"]},{ab:"АСЛ"},{ab:"Аргиназа",chips:["+H₂O"]}],
+   ext:[{id:"cp",label:"Карбамоилфосфат",at:0,dir:"in"},{id:"asp",label:"Аспартат",at:1,dir:"in"},{id:"fum",label:"Фумарат",at:2,dir:"out"},{id:"urea",label:"Мочевина",at:3,dir:"out"}],
+   steps:[
+     ["NH₃ + HCO₃⁻ + 2 АТФ → карбамоилфосфат","Карбамоилфосфатсинтетаза I","Митохондрии. Лимитирующая стадия; обязательный активатор — N-ацетилглутамат."],
+     ["Карбамоилфосфат + орнитин → цитруллин","Орнитинтранскарбамоилаза","Митохондрии; цитруллин выходит в цитозоль."],
+     ["Цитруллин + аспартат → аргининосукцинат","Аргининосукцинатсинтетаза","АТФ → АМФ + PPᵢ. Аспартат даёт второй атом азота мочевины."],
+     ["Аргининосукцинат → аргинин + фумарат","Аргининосукцинатлиаза","Фумарат через малат и оксалоацетат связывает цикл с ЦТК."],
+     ["Аргинин + H₂O → мочевина + орнитин","Аргиназа","Орнитин возвращается в митохондрии."]
+   ]},
+  {id:"trp", name:"Обмен триптофана", sec:"neuro", kind:"graph", where:"Серотониновый и кинурениновый пути", vb:[0,0,840,590],
+   nodes:[{id:"trp",label:"Триптофан",x:420,y:46},{label:"5-Гидрокситриптофан",x:200,y:170},{id:"ser5ht",label:"Серотонин",x:200,y:300},{id:"melat",label:"Мелатонин",x:200,y:430},
+          {id:"kyn",label:"Кинуренин",x:600,y:170},{id:"kyna",label:"Кинуреновая к-та",x:735,y:300},{label:"3-Гидроксикинуренин",x:495,y:300},{id:"quin",label:"Хинолиновая к-та",x:495,y:430},{id:"nad",label:"NAD⁺",x:495,y:550}],
+   edges:[[0,1,"ТрпГ (BH₄)","end"],[1,2,"ДАК (B₆)","start"],[2,3,"AANAT, ASMT","start"],[0,4,"ИДО / ТДО","start"],[4,5,"KAT (B₆)","start"],[4,6,"КМО","end"],[6,7,"Кинурениназа (B₆), 3-HAO","start"],[7,8,"QPRT","start"]],
+   sum:"≈ 95 % триптофана уходит в кинурениновый путь, лишь небольшая часть — в синтез серотонина",
+   steps:[
+     ["Триптофан → 5-гидрокситриптофан","Триптофангидроксилаза (BH₄)","Лимитирующая стадия синтеза серотонина."],
+     ["5-Гидрокситриптофан → серотонин","Декарбоксилаза ароматических L-аминокислот (B₆)",""],
+     ["Серотонин → мелатонин","AANAT и ASMT","Эпифиз, в темноте."],
+     ["Триптофан → N-формилкинуренин → кинуренин","ИДО / ТДО","ИДО индуцируется ИФН-γ, ТДО (печень) — кортизолом."],
+     ["Кинуренин → кинуреновая кислота","Кинуренинаминотрансферазы (B₆)","Астроциты; нейропротекторная ветвь."],
+     ["Кинуренин → 3-гидроксикинуренин","Кинуренин-3-монооксигеназа","Микроглия; ветвь, генерирующая свободные радикалы."],
+     ["3-Гидроксикинуренин → хинолиновая кислота","Кинурениназа (B₆), 3-гидроксиантранилат-диоксигеназа",""],
+     ["Хинолиновая кислота → NAD⁺","Хинолинатфосфорибозилтрансфераза","Синтез NAD⁺ de novo; поэтому при дефиците триптофана и B₆ развивается пеллагра."]
+   ]}
+];
+function pathIds(p) {
+  if (p._ids) return p._ids;
+  const s = new Set();
+  if (p.kind === "flow") p.flow.forEach(r => (r.nodes || []).forEach(i => s.add(i)));
+  if (p.kind === "cycle") { p.nodes.forEach(n => s.add(n[0])); p.ext.forEach(x => s.add(x.id)); }
+  if (p.kind === "graph") p.nodes.forEach(n => n.id && s.add(n.id));
+  return (p._ids = s);
+}
+const NS = "http://www.w3.org/2000/svg";
+function sv(tag, attrs, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+const tw = (s, px) => s.length * px;
+function pnode(parent, x, y, label, id) {
+  const g = sv("g", {class: "pn" + (id && BY[id] ? " link" : " plain"), transform: "translate(" + x + "," + y + ")"}, parent);
+  const w = Math.max(84, tw(label, 7.8) + 30);
+  if (id && BY[id]) g.style.setProperty("--sc", SEC[BY[id].s].c);
+  sv("rect", {x: -w / 2, y: -17, width: w, height: 34, rx: 17}, g);
+  const t = sv("text", {x: 0, y: 5, "text-anchor": "middle"}, g); t.textContent = label;
+  if (id && BY[id]) {
+    g.dataset.id = id;
+    g.setAttribute("tabindex", "0"); g.setAttribute("role", "button"); g.setAttribute("aria-label", label + ": открыть карточку");
+    g.addEventListener("click", () => openDetail(id));
+    g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); openDetail(id); } });
+  }
+  return {g, w};
+}
+function chip(parent, x, y, label) {
+  const g = sv("g", {class: "chipt"}, parent);
+  const w = tw(label, 7.2) + 14;
+  sv("rect", {x: x - w / 2, y: y - 10, width: w, height: 20, rx: 10}, g);
+  const t = sv("text", {x: x, y: y + 4, "text-anchor": "middle"}, g); t.textContent = label;
+}
+function defs(svg) {
+  const d = sv("defs", {}, svg);
+  const m = sv("marker", {id: "ah", viewBox: "0 0 10 10", refX: "8.5", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse"}, d);
+  sv("path", {d: "M0,0 L10,5 L0,10 z", class: "arrowhead"}, m);
+}
+function drawCycle(p, svg) {
+  const R = p.R || 200, n = p.nodes.length, rad = a => a * Math.PI / 180;
+  const ang = i => -90 + i * 360 / n;
+  const pt = (r, a) => [r * Math.cos(rad(a)), r * Math.sin(rad(a))];
+  const widths = p.nodes.map(nd => Math.max(84, tw(nd[1], 7.8) + 30));
+  const halfAlong = (i) => { const a = rad(ang(i)); return Math.abs(Math.sin(a)) * widths[i] / 2 + Math.abs(Math.cos(a)) * 17 + 9; };
+  const gArcs = sv("g", {}, svg), gFlow = sv("g", {}, svg), gTok = sv("g", {}, svg), gLab = sv("g", {}, svg), gNodes = sv("g", {}, svg);
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    const a1 = ang(i) + halfAlong(i) / R * 180 / Math.PI;
+    const a2 = ang(i) + 360 / n - halfAlong(j) / R * 180 / Math.PI;
+    const [x1, y1] = pt(R, a1), [x2, y2] = pt(R, a2);
+    const d = "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " A" + R + " " + R + " 0 0 1 " + x2.toFixed(1) + " " + y2.toFixed(1);
+    sv("path", {d, class: "arc", "marker-end": "url(#ah)"}, gArcs);
+    sv("path", {d, class: "flowl"}, gFlow);
+    const mid = ang(i) + 180 / n, arc = p.arcs[i] || {};
+    const [ex, ey] = pt(R - 30, mid);
+    const t = sv("text", {x: ex.toFixed(1), y: (ey + 4).toFixed(1), "text-anchor": "middle", class: "enzt"}, gLab); t.textContent = arc.ab || "";
+    const cl = arc.chips || [], [ccx, ccy] = pt(R - 72, mid);
+    cl.forEach((c, k) => chip(gLab, ccx, ccy + k * 24 - (cl.length - 1) * 12, c));
+  }
+  p.ext.forEach(x => {
+    const mid = ang(x.at) + 180 / n;
+    const [nx, ny] = pt(R + 108, mid);
+    const [ax, ay] = pt(R + 6, mid);
+    const w = Math.max(84, tw(x.label, 7.8) + 30);
+    const ux = ax - nx, uy = ay - ny, L = Math.hypot(ux, uy);
+    const tt = Math.min((w / 2 + 4) / Math.abs(ux || 1e-6), 21 / Math.abs(uy || 1e-6));
+    const sx = nx + ux / L * Math.min(tt * L, L - 6) * 1, sy = ny + uy / L * Math.min(tt * L, L - 6);
+    const line = x.dir === "in" ? [sx, sy, ax, ay] : [ax, ay, sx, sy];
+    sv("path", {d: "M" + line[0].toFixed(1) + " " + line[1].toFixed(1) + " L" + line[2].toFixed(1) + " " + line[3].toFixed(1), class: "arc", "marker-end": "url(#ah)"}, gArcs);
+    sv("path", {d: "M" + line[0].toFixed(1) + " " + line[1].toFixed(1) + " L" + line[2].toFixed(1) + " " + line[3].toFixed(1), class: "flowl"}, gFlow);
+    pnode(gNodes, nx, ny, x.label, x.id);
+  });
+  p.nodes.forEach((nd, i) => { const [x, y] = pt(R, ang(i)); pnode(gNodes, x, y, nd[1], nd[0]); });
+  const t1 = sv("text", {x: 0, y: -4, "text-anchor": "middle", class: "ctitle"}, gLab); t1.textContent = p.center[0];
+  const t2 = sv("text", {x: 0, y: 20, "text-anchor": "middle", class: "csub"}, gLab); t2.textContent = p.center[1];
+  if (!REDUCE) {
+    const c = sv("circle", {r: 6, class: "token"}, gTok);
+    sv("animateMotion", {dur: (n * 2.2) + "s", repeatCount: "indefinite", path: "M0 " + (-R) + " A" + R + " " + R + " 0 1 1 0 " + R + " A" + R + " " + R + " 0 1 1 0 " + (-R)}, c);
+  }
+}
+function drawGraph(p, svg) {
+  const gE = sv("g", {}, svg), gF = sv("g", {}, svg), gL = sv("g", {}, svg), gN = sv("g", {}, svg);
+  const W = p.nodes.map(nd => Math.max(84, tw(nd.label, 7.8) + 30));
+  p.edges.forEach(([a, b, lab, anchor]) => {
+    const A = p.nodes[a], B = p.nodes[b];
+    const dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy);
+    const clip = (wd) => Math.min((wd / 2 + 6) / Math.abs(dx || 1e-6), 23 / Math.abs(dy || 1e-6));
+    const t1 = clip(W[a]), t2 = clip(W[b]);
+    const x1 = A.x + dx * t1, y1 = A.y + dy * t1, x2 = B.x - dx * t2, y2 = B.y - dy * t2;
+    const d = "M" + x1.toFixed(1) + " " + y1.toFixed(1) + " L" + x2.toFixed(1) + " " + y2.toFixed(1);
+    sv("path", {d, class: "arc", "marker-end": "url(#ah)"}, gE);
+    sv("path", {d, class: "flowl"}, gF);
+    const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2;
+    const t = sv("text", {x: (mx + (anchor === "end" ? -12 : 12)).toFixed(1), y: (my + 4).toFixed(1), "text-anchor": anchor, class: "enzt"}, gL);
+    t.textContent = lab;
+  });
+  p.nodes.forEach(nd => pnode(gN, nd.x, nd.y, nd.label, nd.id));
+}
+function drawFlow(p, box) {
+  const wrap = document.createElement("div"); wrap.className = "flow";
+  let k = 0;
+  p.flow.forEach(r => {
+    if (r.nodes) {
+      const row = document.createElement("div"); row.className = "frow";
+      r.nodes.forEach((id, i) => {
+        if (i && r.iso) { const s = document.createElement("span"); s.className = "iso"; s.textContent = r.iso; row.appendChild(s); }
+        const b = document.createElement("button"); b.type = "button"; b.className = "fnode"; b.dataset.id = id;
+        b.style.setProperty("--sc", SEC[BY[id].s].c); b.textContent = BY[id].n;
+        b.addEventListener("click", () => openDetail(id));
+        row.appendChild(b);
+      });
+      wrap.appendChild(row);
+    } else if (r.x2) {
+      const d = document.createElement("div"); d.className = "x2"; d.textContent = "×2: " + r.x2; wrap.appendChild(d);
+    } else {
+      const s = document.createElement("div"); s.className = "fstep" + (r.irr ? " irr" : "");
+      s.innerHTML = '<div class="fchips">' + (r.chips || []).map(c => '<span class="chip">' + esc(c) + '</span>').join("") + '</div>' +
+        '<div class="fline"><i style="--d:' + (k * 0.22).toFixed(2) + 's"></i></div>' +
+        '<div class="finfo"><b>' + esc(r.enz) + '</b>' + (r.irr ? '<br>необратимо' : '') + '</div>';
+      wrap.appendChild(s); k++;
+    }
+  });
+  box.appendChild(wrap);
+}
+let curPath = null;
+const pTabs = $("pTabs");
+PATHS.forEach(p => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "lg"; b.dataset.path = p.id; b.style.setProperty("--sc", SEC[p.sec].c);
+  b.innerHTML = '<span class="dot"></span>' + esc(p.name);
+  b.addEventListener("click", () => renderPath(p.id));
+  pTabs.appendChild(b);
+});
+function renderPath(id, hl) {
+  const p = PATHS.find(x => x.id === id); if (!p) return;
+  curPath = id;
+  pTabs.querySelectorAll(".lg").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.path === id)));
+  const box = $("pDiag"); box.innerHTML = "";
+  box.style.setProperty("--pc", SEC[p.sec].c);
+  document.querySelector(".pside").style.setProperty("--pc", SEC[p.sec].c);
+  if (p.kind === "flow") drawFlow(p, box);
+  else {
+    const vb = p.vb || [-370, -335, 740, 670];
+    const svg = sv("svg", {viewBox: vb.join(" "), role: "img", "aria-label": "Схема: " + p.name}, box);
+    if (p.kind === "graph") svg.style.minWidth = "640px";
+    defs(svg);
+    if (p.kind === "cycle") drawCycle(p, svg); else drawGraph(p, svg);
+  }
+  $("pTitle").textContent = p.name;
+  $("pWhere").textContent = p.where;
+  $("pSum").textContent = p.sum;
+  $("pSteps").innerHTML = p.steps.map(s => '<li><div><div class="eq">' + esc(s[0]) + '</div><div class="enz">' + esc(s[1]) + '</div>' + (s[2] ? '<div class="note">' + esc(s[2]) + '</div>' : '') + '</div></li>').join("");
+  if (hl) {
+    const n = box.querySelector('[data-id="' + hl + '"]');
+    if (n) { n.classList.add("hl"); setTimeout(() => n.scrollIntoView({block: "center", inline: "center", behavior: REDUCE ? "auto" : "smooth"}), 60); }
+  }
+}
+
+/* ---------- reactions view ---------- */
+const rxAll = $("rxAll"), rxEcBox = $("rxEc");
+let rxEcF = null, rxQ = "";
+rxAll.innerHTML = RX.map((r, i) => rxCard(i, null)).join("");
+const rxEls = [...rxAll.children];
+const ecCounts = {}; RX.forEach(r => { ecCounts[r.c] = (ecCounts[r.c] || 0) + 1; });
+function ecBtn(c, label, n, color) {
+  const b = legendBtn(null, label, n, color);
+  b.dataset.ec = c === null ? "" : String(c);
+  b.addEventListener("click", () => { rxEcF = (c === null || rxEcF === c) ? null : c; rxFilter(); });
+  rxEcBox.appendChild(b);
+}
+ecBtn(null, "Все", RX.length, null);
+[1, 2, 3, 4, 5, 6, 7, 8, 0, 9].forEach(c => { if (ecCounts[c]) ecBtn(c, ECP[c], ecCounts[c], EC[c][1]); });
+function rxFilter() {
+  const words = norm(rxQ.trim()).split(/\s+/).filter(Boolean);
+  let n = 0;
+  RX.forEach((r, i) => { const ok = (rxEcF === null || r.c === rxEcF) && words.every(w => r._s.includes(w)); rxEls[i].hidden = !ok; if (ok) n++; });
+  $("rxCount").textContent = (rxEcF !== null || words.length)
+    ? "Показано " + n + " из " + RX.length + (n ? "" : ". Попробуйте другое слово или сбросьте класс.")
+    : "Нажмите на реакцию, чтобы увидеть схему превращения, кофакторы и клиническое значение.";
+  rxEcBox.querySelectorAll(".lg").forEach(l => l.setAttribute("aria-pressed", String(l.dataset.ec === (rxEcF === null ? "" : String(rxEcF)))));
+}
+$("rq").addEventListener("input", ev => { rxQ = ev.target.value; rxFilter(); });
+rxFilter();
+
+/* ---------- study ---------- */
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+const sBody = $("sBody"), sTabs = $("sTabs");
+let sTab = "srs";
+[["srs", "Повторение"], ["build", "Собери формулу"], ["pairs", "Не перепутай"], ["cheat", "Шпаргалки"]].forEach(([k, l]) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "lg"; b.dataset.st = k; b.textContent = l;
+  b.addEventListener("click", () => sOpen(k));
+  sTabs.appendChild(b);
+});
+function sOpen(k) {
+  sTab = k;
+  sTabs.querySelectorAll(".lg").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.st === k)));
+  ({srs: srsRender, build: bRender, pairs: pairsRender, cheat: cheatRender})[k]();
+}
+function secChips(sel, onChange, countFn) {
+  const w = document.createElement("div"); w.className = "legend";
+  SECS.forEach(s => {
+    const n = countFn(s.id); if (!n) return;
+    const b = legendBtn(s.id, s.n, n, s.c);
+    b.setAttribute("aria-pressed", String(sel.has(s.id)));
+    b.addEventListener("click", () => {
+      if (sel.has(s.id)) { if (sel.size > 1) sel.delete(s.id); } else sel.add(s.id);
+      b.setAttribute("aria-pressed", String(sel.has(s.id)));
+      onChange();
+    });
+    w.appendChild(b);
+  });
+  return w;
+}
+const sTile = (v, lab, f) => '<div class="st"><b>' + v + "</b><span>" + lab + "</span>" + (f !== undefined ? '<div class="bar"><i style="width:' + Math.round(f * 100) + '%"></i></div>' : "") + "</div>";
+
+/* spaced repetition */
+const CT = {sn: "Формула → название", ns: "Название → формула", re: "Реакция → фермент", rp: "Продукт реакции"};
+const INT = [0, 1, 3, 7, 16, 35];
+const today = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 864e5);
+function hashS(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+RX.forEach(r => { r._k = hashS(r.e + "|" + r.s.map(tokName).join("+") + ">" + r.p.map(tokName).join("+")); });
+const rxSecOf = r => { const a = mainTok(r.s)[1] || mainTok(r.p)[1]; return a ? BY[a].s : null; };
+const rxIds = r => r.s.concat(r.p).map(t => t[1]).filter(Boolean).concat(r.x);
+const RXE = RX.filter(r => r.c >= 1 && r.c <= 7 && r.e.length <= 70 && rxSecOf(r));
+const RXQ = RX.filter(r => { const a = mainTok(r.s)[1], b = mainTok(r.p)[1]; return a && b && a !== b; });
+const sSel = new Set(["aa", "carb", "tca"]), sTypes = new Set(["sn", "ns"]);
+let sFav = false, sNew = 10, ses = null;
+function cardPool() {
+  const out = [], fav = id => !sFav || isStar(id);
+  DB.forEach(e => {
+    if (!sSel.has(e.s) || !fav(e.id)) return;
+    if (sTypes.has("sn")) out.push({t: "sn", id: e.id, key: "sn:" + e.id});
+    if (sTypes.has("ns")) out.push({t: "ns", id: e.id, key: "ns:" + e.id});
+  });
+  if (sTypes.has("re")) RXE.forEach(r => { if (sSel.has(rxSecOf(r)) && (!sFav || rxIds(r).some(isStar))) out.push({t: "re", r: r, key: "re:" + r._k}); });
+  if (sTypes.has("rp")) RXQ.forEach(r => { const p = BY[mainTok(r.p)[1]]; if (sSel.has(p.s) && (!sFav || rxIds(r).some(isStar))) out.push({t: "rp", r: r, key: "rp:" + r._k}); });
+  return out;
+}
+function poolStats(pool) {
+  const now = today(); let due = 0, fresh = 0, learned = 0, tom = 0;
+  pool.forEach(c => { const st = PROG.c[c.key]; if (!st) fresh++; else { if (st[1] <= now) due++; else if (st[1] === now + 1) tom++; if (st[0] >= 3) learned++; } });
+  return {due: due, fresh: fresh, learned: learned, tom: tom, total: pool.length};
+}
+function srsRender() {
+  if (ses && ses.cur) { srsCard(); return; }
+  const pool = cardPool(), st = poolStats(pool), nNew = Math.min(st.fresh, sNew), total = Math.min(st.due, 60) + nNew;
+  let sum = "";
+  if (ses && ses.done) {
+    sum = '<div class="scard" style="margin-bottom:16px"><p class="sq">Сессия завершена: верно ' + ses.ok + ", ошибок " + ses.bad + ".</p>" +
+      '<p class="muted" style="margin:0">' + (st.due ? "Ещё к повторению сегодня: " + st.due + "." : st.tom ? "Завтра к повторению: " + st.tom + " " + plural(st.tom, "карточка", "карточки", "карточек") + "." : "На сегодня повторять нечего.") + "</p></div>";
+  }
+  sBody.innerHTML = sum + '<div class="sgrp"><span class="slab">Разделы</span><div id="sSecs"></div></div>' +
+    '<div class="sgrp"><span class="slab">Типы карточек</span><div class="legend" id="sTypesB"></div></div>' +
+    '<div class="sgrp"><span class="slab">Новых карточек за сессию</span><div class="legend" id="sNewB"></div></div>' +
+    '<div class="sstats">' + sTile(st.due, "к повторению сегодня") + sTile(st.fresh, "новых карточек в выборке") + sTile(st.learned + " из " + st.total, "выучено (уровень 3 и выше)", st.total ? st.learned / st.total : 0) + "</div>" +
+    '<div class="tactions"><button class="btn primary" type="button" id="sGo"' + (total ? "" : " disabled") + ">" + (total ? "Начать: " + total + " " + plural(total, "карточка", "карточки", "карточек") : "Всё повторено") + "</button></div>" +
+    '<p class="muted" style="font-size:14px;margin:10px 0 0;max-width:70ch">Карточки, на которые вы ответили верно, возвращаются через 1, 3, 7, 16 и 35 дней. Ошибка сбрасывает карточку на начало, и она повторяется в той же сессии.</p>' +
+    '<p class="ssave" id="sSave"></p>';
+  $("sSecs").appendChild(secChips(sSel, srsRender, sid => DB.filter(e => e.s === sid).length));
+  const tb = $("sTypesB");
+  Object.keys(CT).forEach(k => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "lg"; b.textContent = CT[k];
+    b.setAttribute("aria-pressed", String(sTypes.has(k)));
+    b.addEventListener("click", () => { if (sTypes.has(k)) { if (sTypes.size > 1) sTypes.delete(k); } else sTypes.add(k); srsRender(); });
+    tb.appendChild(b);
+  });
+  const fb = document.createElement("button"); fb.type = "button"; fb.className = "lg"; fb.textContent = "★ Только избранное";
+  fb.setAttribute("aria-pressed", String(sFav));
+  fb.addEventListener("click", () => { sFav = !sFav; srsRender(); });
+  tb.appendChild(fb);
+  const nb = $("sNewB");
+  [0, 5, 10, 20].forEach(n => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "lg"; b.textContent = n ? String(n) : "Без новых";
+    b.setAttribute("aria-pressed", String(sNew === n));
+    b.addEventListener("click", () => { sNew = n; srsRender(); });
+    nb.appendChild(b);
+  });
+  $("sGo").addEventListener("click", srsStart);
+  renderSaveStatus();
+}
+function srsStart() {
+  const pool = cardPool(), now = today();
+  const due = shuffle(pool.filter(c => PROG.c[c.key] && PROG.c[c.key][1] <= now)).slice(0, 60);
+  const fresh = shuffle(pool.filter(c => !PROG.c[c.key])).slice(0, sNew);
+  const q = due.concat(fresh);
+  if (!q.length) return;
+  ses = {q: q, n: q.length, ok: 0, bad: 0, answered: 0, cur: null, miss: {}, rq: {}};
+  srsNext();
+}
+function srsNext() {
+  if (!ses) return;
+  ses.cur = ses.q.shift() || null; ses.ans = false;
+  if (!ses.cur) { ses.done = true; srsRender(); return; }
+  srsCard();
+  const top = sBody.getBoundingClientRect().top;
+  if (top < 0) sBody.scrollIntoView({block: "start", behavior: REDUCE ? "auto" : "smooth"});
+}
+function srsGrade(ok) {
+  const c = ses.cur, st = PROG.c[c.key], box = st ? st[0] : 0;
+  ses.answered++;
+  if (ok) {
+    ses.ok++;
+    const nb = ses.miss[c.key] ? 1 : Math.min(5, box + 1);
+    PROG.c[c.key] = [nb, today() + INT[nb]];
+  } else {
+    ses.bad++; ses.miss[c.key] = 1;
+    PROG.c[c.key] = [0, today()];
+    ses.rq[c.key] = (ses.rq[c.key] || 0) + 1;
+    if (ses.rq[c.key] <= 2) ses.q.splice(Math.min(3, ses.q.length), 0, c);
+  }
+  progChanged();
+}
+function distrIds(e, n) {
+  const own = TX[e.id] && fstyle === "tx" ? vkey(TX[e.id][0]) : null;
+  const same = DB.filter(x => x.id !== e.id && x.s === e.s);
+  let pool = own ? same.filter(x => TX[x.id] && vkey(TX[x.id][0]) === own) : same;
+  if (pool.length < n) pool = pool.concat(shuffle(same.filter(x => pool.indexOf(x) < 0)));
+  if (pool.length < n) pool = pool.concat(shuffle(DB.filter(x => x.id !== e.id && pool.indexOf(x) < 0)));
+  return shuffle(pool.slice(0, Math.max(n, 6))).slice(0, n);
+}
+function enzDistr(r, n) {
+  const sec = rxSecOf(r), seen = new Set([r.e]), out = [];
+  shuffle(RXE.filter(x => rxSecOf(x) === sec)).concat(shuffle(RXE.slice())).forEach(x => { if (out.length < n && !seen.has(x.e)) { seen.add(x.e); out.push(x.e); } });
+  return out;
+}
+function srsCard() {
+  const c = ses.cur, st = PROG.c[c.key], left = ses.q.length + 1, done = ses.answered;
+  const head = '<div class="shead"><span>' + CT[c.t] + "</span><span>" + (st ? "уровень " + st[0] + " из 5" : "новая карточка") + "</span>" +
+    '<span class="sbar" aria-hidden="true"><i style="width:' + Math.round(done / (done + left) * 100) + '%"></i></span><span>осталось ' + left + '</span><button class="btn sm" type="button" id="sStop">Завершить</button></div>';
+  let h = "";
+  if (c.t === "sn") {
+    const e = BY[c.id];
+    h = '<div class="scard" style="--sc:' + SEC[e.s].c + '"><p class="sq">Что это за вещество?</p><div class="tmol" id="sMol"></div>' +
+      '<div class="sans" id="sAns" hidden><div class="tn">' + esc(e.n) + '</div><div class="tm">' + esc(e.a) + " · " + esc(SEC[e.s].n) + "</div>" +
+      (MN[e.id] ? '<p class="mnx">' + esc(MN[e.id][0]) + "</p>" : "") + "</div>" +
+      '<div class="tactions" id="sAct"><button class="btn primary" type="button" id="sMain">Показать ответ</button></div></div>';
+  } else if (c.t === "ns") {
+    const e = BY[c.id];
+    c.opts = c.opts || shuffle([e].concat(distrIds(e, 3))).map(x => x.id);
+    h = '<div class="scard" style="--sc:' + SEC[e.s].c + '"><p class="sq">Выберите формулу: <b>' + esc(e.n) + '</b></p><div class="sopts">' +
+      c.opts.map((id, i) => '<button type="button" class="sopt" data-key="' + (i + 1) + '" data-id="' + id + '" aria-label="Вариант ' + (i + 1) + '"><span class="okey">' + (i + 1) + '</span><span class="omol"></span></button>').join("") +
+      '</div><div class="sfb" id="sFb" hidden></div><div class="tactions" id="sAct"></div></div>';
+  } else if (c.t === "re") {
+    const r = c.r;
+    c.opts = c.opts || shuffle([r.e].concat(enzDistr(r, 3)));
+    h = '<div class="scard"><p class="sq">Какой фермент катализирует реакцию?</p><div class="seq">' + eqHTML(r, null) + "</div>" + (r.l ? '<p class="sloc">' + esc(r.l) + "</p>" : "") +
+      '<div class="sopts">' + c.opts.map((t, i) => '<button type="button" class="sopt txt" data-key="' + (i + 1) + '" data-v="' + i + '"><span class="okey">' + (i + 1) + "</span>" + esc(t) + "</button>").join("") +
+      '</div><div class="sfb" id="sFb" hidden></div><div class="tactions" id="sAct"></div></div>';
+  } else {
+    const r = c.r, p = BY[mainTok(r.p)[1]];
+    c.opts = c.opts || shuffle([p].concat(distrIds(p, 4).filter(x => x.id !== mainTok(r.s)[1]).slice(0, 3))).map(x => x.id);
+    h = '<div class="scard"><p class="sq">Что образуется в этой реакции?</p><div class="rxc" id="sRx"></div>' +
+      '<div class="sopts">' + c.opts.map((id, i) => '<button type="button" class="sopt txt" data-key="' + (i + 1) + '" data-id="' + id + '"><span class="okey">' + (i + 1) + "</span>" + esc(BY[id].n) + "</button>").join("") +
+      '</div><div class="sfb" id="sFb" hidden></div><div class="tactions" id="sAct"></div></div>';
+  }
+  sBody.innerHTML = head + h;
+  $("sStop").addEventListener("click", () => { ses.done = true; ses.cur = null; srsRender(); });
+  if (c.t === "sn") {
+    const e = BY[c.id];
+    paint($("sMol"), e, 560, 360, "s-canvas", {fmax: 1.8, anon: true});
+    $("sMain").addEventListener("click", () => {
+      $("sAns").hidden = false;
+      $("sAct").innerHTML = '<button class="btn" type="button" data-key="1" id="sNo">Не вспомнил</button><button class="btn primary" type="button" data-key="2" id="sYes">Вспомнил</button><button class="btn" type="button" id="sOpen">Открыть карточку</button>';
+      $("sNo").addEventListener("click", () => { srsGrade(false); srsNext(); });
+      $("sYes").addEventListener("click", () => { srsGrade(true); srsNext(); });
+      $("sOpen").addEventListener("click", () => openDetail(e.id));
+      $("sYes").focus({preventScroll: true});
+    });
+    return;
+  }
+  if (c.t === "ns") sBody.querySelectorAll(".sopt").forEach(b => paint(b.querySelector(".omol"), BY[b.dataset.id], 300, 200, "so" + (++uid), {anon: true}));
+  if (c.t === "rp") rxScheme($("sRx"), c.r, true);
+  sBody.querySelectorAll(".sopt").forEach(b => b.addEventListener("click", () => srsPick(b)));
+}
+function srsPick(btn) {
+  const c = ses.cur;
+  if (ses.ans) return;
+  ses.ans = true;
+  let ok, right;
+  if (c.t === "re") { ok = c.opts[+btn.dataset.v] === c.r.e; right = c.opts.indexOf(c.r.e); }
+  else { const want = c.t === "ns" ? c.id : mainTok(c.r.p)[1]; ok = btn.dataset.id === want; right = c.opts.indexOf(want); }
+  const bs = sBody.querySelectorAll(".sopt");
+  bs.forEach((b, i) => { b.disabled = true; if (i === right) b.classList.add("right"); });
+  if (!ok) btn.classList.add("wrong");
+  srsGrade(ok);
+  let fb = ok ? '<span class="ok">Верно.</span> ' : '<span class="bad">Неверно.</span> ';
+  let openId;
+  if (c.t === "ns") { const e = BY[c.id]; openId = e.id; if (MN[e.id]) fb += esc(MN[e.id][0]); }
+  else if (c.t === "re") { const r = c.r; openId = mainTok(r.s)[1]; fb += "<b>" + esc(r.e) + "</b>" + (r.f ? ". Кофакторы: " + esc(r.f) : "") + "." + (r.n ? " " + esc(r.n) : ""); }
+  else {
+    const r = c.r, host = $("sRx"), ps = host.querySelector('[data-side="p"]'), tp = host._tp;
+    openId = mainTok(r.p)[1];
+    fillSide(ps, mainTok(r.p), tp ? {view: tp[1], hl: tp[2][1]} : null);
+    ps.querySelector(".rs-mol").classList.add("pop");
+    fb += "Продукт — <b>" + esc(BY[openId].n) + "</b>." + (r.n ? " " + esc(r.n) : "");
+  }
+  $("sFb").innerHTML = fb; $("sFb").hidden = false;
+  $("sAct").innerHTML = '<button class="btn primary" type="button" id="sMain">Дальше</button><button class="btn" type="button" id="sOpen">Открыть карточку</button>';
+  $("sMain").addEventListener("click", srsNext);
+  $("sOpen").addEventListener("click", () => openDetail(openId));
+  $("sMain").focus({preventScroll: true});
+}
+document.addEventListener("keydown", ev => {
+  if (view !== "study" || sTab !== "srs" || !ses || !ses.cur || curId || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  const tg = ev.target, k = ev.key;
+  if (tg && (tg.tagName === "INPUT" || tg.tagName === "TEXTAREA")) return;
+  if (/^[1-4]$/.test(k)) {
+    const b = sBody.querySelector('[data-key="' + k + '"]');
+    if (b && !b.disabled) { ev.preventDefault(); b.click(); }
+  } else if ((k === "Enter" || k === " ") && !(tg && tg.tagName === "BUTTON")) {
+    const b = $("sMain"); if (b) { ev.preventDefault(); b.click(); }
+  }
+});
+
+/* build a formula */
+const bSel = new Set(["aa"]);
+let bCur = null;
+const BPOOL = DB.filter(e => (TX[e.id] || []).some(v => v[0] === "v" && v[2].split(" / ").length >= 3));
+function bPick() {
+  const pool = BPOOL.filter(e => bSel.has(e.s));
+  if (!pool.length) return null;
+  let e = pool[Math.floor(Math.random() * pool.length)];
+  if (pool.length > 1 && bCur && e.id === bCur.id) e = pool[(pool.indexOf(e) + 1) % pool.length];
+  const v = TX[e.id].find(x => x[0] === "v"), raw = v[2].split(" / "), rows = parseV(v[2]);
+  return {id: e.id, raw: raw, rows: rows, k: 0, err: 0, chips: shuffle(rows.map((r, i) => i)), used: new Set()};
+}
+function rowChip(r) {
+  const body = r.raw.replace(/^[*=~]+/, "");
+  return (r.bond === 2 ? '<span class="bmark" title="Двойная связь со строкой выше">‖ двойная</span>' : r.bond === 3 ? '<span class="bmark" title="Макроэргическая связь со строкой выше">~ макроэрг</span>' : "") + vHTML(body, {});
+}
+function bRender() {
+  if (!bCur || !bSel.has(BY[bCur.id].s)) bCur = bPick();
+  sBody.innerHTML = '<div class="sgrp"><span class="slab">Разделы</span><div id="bSecs"></div></div><div id="bWrap"></div>';
+  $("bSecs").appendChild(secChips(bSel, () => { bCur = bPick(); bDraw(); }, sid => BPOOL.filter(e => e.s === sid).length));
+  bDraw();
+}
+function bDraw() {
+  const w = $("bWrap");
+  if (!w) return;
+  if (!bCur) { w.innerHTML = '<p class="muted">В выбранных разделах нет развёрнутых формул.</p>'; return; }
+  const e = BY[bCur.id], n = bCur.rows.length, done = bCur.k >= n;
+  w.style.setProperty("--sc", SEC[e.s].c);
+  w.innerHTML = '<p class="sq" style="margin-bottom:2px">Соберите формулу сверху вниз</p><h3 class="bname">' + esc(e.n) + '</h3><p class="bprog" aria-live="polite">Строк: ' + bCur.k + " из " + n + (bCur.err ? " · ошибок: " + bCur.err : "") + "</p>" +
+    '<div class="bgrid"><div class="btarget">' + (bCur.k ? vHTML(bCur.raw.slice(0, bCur.k).join(" / "), {last: true}) : '<span class="muted" style="font-size:15px">Нажимайте на строки справа в правильном порядке, начиная с верхней.</span>') + "</div>" +
+    '<div class="bchips">' + (done ? "" : bCur.chips.filter(i => !bCur.used.has(i)).map(i => '<button type="button" class="bchip" data-ri="' + i + '">' + rowChip(bCur.rows[i]) + "</button>").join("")) + "</div></div>" +
+    '<div class="tactions">' + (done
+      ? '<p class="bdone">' + (bCur.err ? "Собрано, ошибок: " + bCur.err + "." : "Собрано без ошибок.") + '</p><button class="btn primary" type="button" id="bNext">Следующая формула</button><button class="btn" type="button" id="bOpen">Открыть карточку</button>'
+      : '<button class="btn" type="button" id="bHint">Подсказка</button><button class="btn" type="button" id="bSolve">Показать ответ</button><button class="btn" type="button" id="bSkip">Другая формула</button>') + "</div>";
+  w.querySelectorAll(".bchip").forEach(b => b.addEventListener("click", () => {
+    const i = +b.dataset.ri;
+    if (bCur.rows[i].key === bCur.rows[bCur.k].key) { bCur.used.add(i); bCur.k++; bDraw(); }
+    else {
+      bCur.err++;
+      w.querySelector(".bprog").textContent = "Строк: " + bCur.k + " из " + n + " · ошибок: " + bCur.err;
+      b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake");
+    }
+  }));
+  if (done) {
+    $("bNext").addEventListener("click", () => { bCur = bPick(); bDraw(); });
+    $("bOpen").addEventListener("click", () => openDetail(bCur.id));
+  } else {
+    $("bHint").addEventListener("click", () => {
+      const want = bCur.rows[bCur.k].key, b = [...w.querySelectorAll(".bchip")].find(x => bCur.rows[+x.dataset.ri].key === want);
+      if (b) { b.classList.remove("hint"); void b.offsetWidth; b.classList.add("hint"); }
+    });
+    $("bSolve").addEventListener("click", () => { bCur.err += n - bCur.k; bCur.k = n; bCur.rows.forEach((r, i) => bCur.used.add(i)); bDraw(); });
+    $("bSkip").addEventListener("click", () => { bCur = bPick(); bDraw(); });
+  }
+}
+
+/* pairs */
+const pSel = new Set(SECS.map(s => s.id));
+function pairsRender() {
+  sBody.innerHTML = '<div class="sgrp"><span class="slab">Разделы</span><div id="pSecs"></div></div><p class="muted" id="pNote" style="margin:0 0 12px;max-width:70ch"></p><div class="pairs big" id="pList"></div>';
+  $("pSecs").appendChild(secChips(pSel, pairsList, sid => PAIRS.filter(p => BY[p[0]].s === sid).length));
+  pairsList();
+}
+function pairsList() {
+  const list = PAIRS.filter(p => pSel.has(BY[p[0]].s));
+  $("pNote").textContent = (fstyle === "tx" ? "Жёлтым выделено то, чем различаются учебные формулы. " : "") + "Пар: " + list.length + ".";
+  renderPairs($("pList"), list, null);
+}
+
+/* cheat sheets */
+function aaTile(e) {
+  const m = /\((\w{3}), (\w)\)/.exec(e.a) || [];
+  const ess = e.t.indexOf("незаменимая") >= 0 ? '<span class="bdg n" title="Незаменимая">Н</span>' : "";
+  const fate = e.t.indexOf("кетогенная") >= 0 ? "К" : e.t.indexOf("смешанная") >= 0 ? "Г+К" : "Г";
+  return '<button type="button" class="card aat" data-id="' + e.id + '" style="--sc:' + SEC[e.s].c + '"><span class="mol"></span><span class="cname">' + esc(e.n) +
+    '</span><span class="cf">' + (m[1] || "") + " · " + (m[2] || "") + ess + '<span class="bdg" title="Судьба углеродного скелета">' + fate + "</span></span></button>";
+}
+function cheatRender() {
+  const C = CHEAT, link = (id, t) => '<a href="#" class="tk" data-go="' + id + '">' + esc(t) + "</a>";
+  let h = '<div class="cheat"><h3>Аминокислоты</h3><p class="muted">Группы по свойствам радикала. Н — незаменимая; Г — гликогенная, К — кетогенная, Г+К — смешанная.</p>';
+  C.aa.forEach(g => { h += "<h4>" + esc(g[0]) + '</h4><div class="aag">' + g[1].map(id => aaTile(BY[id])).join("") + "</div>"; });
+  h += '<ul class="mnl">' + C.aamn.map(t => "<li>" + esc(t) + "</li>").join("") + "</ul>";
+  h += '<h3>Витамины</h3><div class="tblw"><table class="ctab"><thead><tr><th>Витамин</th><th>Активная форма</th><th>Что делает</th><th>Недостаточность</th></tr></thead><tbody>' +
+    C.vit.map(v => "<tr><td>" + link(v[1], v[0]) + ' <span class="muted">' + esc(BY[v[1]].n.replace(/\s*\(.*\)$/, "")) + "</span></td><td>" + esc(v[2]) + "</td><td>" + esc(v[3]) + "</td><td>" + esc(v[4]) + "</td></tr>").join("") +
+    '</tbody></table></div><ul class="mnl">' + C.vitmn.map(t => "<li>" + esc(t) + "</li>").join("") + "</ul>";
+  h += '<h3>Наследственные ферментопатии</h3><div class="tblw"><table class="ctab"><thead><tr><th>Болезнь</th><th>Дефектный фермент</th><th>Что накапливается, признаки</th></tr></thead><tbody>' +
+    C.dis.map(d => "<tr><td>" + link(d[1], d[0]) + "</td><td>" + esc(d[2]) + "</td><td>" + esc(d[3]) + "</td></tr>").join("") + "</tbody></table></div></div>";
+  sBody.innerHTML = h;
+  sBody.querySelectorAll(".aat").forEach(t => {
+    const e = BY[t.dataset.id];
+    lazy(t, () => paint(t.querySelector(".mol"), e, 220, 150, "aa-" + e.id));
+    t.addEventListener("click", () => openDetail(e.id));
+  });
+}
+
+/* ---------- animations ---------- */
+const rnd = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const lnk = (id, txt) => '<a href="#" class="tk" data-go="' + id + '">' + txt + '</a>';
+const fmt1 = v => v.toFixed(1).replace(".", ",");
+function anShell(box, a) {
+  box.innerHTML = '<div class="an-top"><h2>' + esc(a.name) + '</h2><p>' + a.desc + '</p></div>' +
+    '<div class="an-grid"><div class="an-stage"></div><aside class="an-side"><div class="an-stats"></div><p class="an-cap" aria-live="polite"></p></aside></div><div class="an-ctrl"></div>';
+  return {stage: box.querySelector(".an-stage"), stats: box.querySelector(".an-stats"), cap: box.querySelector(".an-cap"), ctrl: box.querySelector(".an-ctrl")};
+}
+function anLoop(step) {
+  let raf = 0, last = 0, on = !REDUCE;
+  const f = ts => { const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0; last = ts; if (on && !document.hidden) step(dt); raf = requestAnimationFrame(f); };
+  raf = requestAnimationFrame(f);
+  return {stop: () => cancelAnimationFrame(raf), get on() { return on; }, set on(v) { on = v; }};
+}
+function cGroup(ctrl, label) {
+  const g = document.createElement("div"); g.className = "an-g";
+  g.innerHTML = (label ? "<span>" + esc(label) + "</span>" : "") + '<div class="row"></div>';
+  ctrl.appendChild(g); return g.querySelector(".row");
+}
+function cBtn(row, label, fn, cls) {
+  const b = document.createElement("button"); b.type = "button"; b.className = cls || "btn"; b.textContent = label;
+  b.addEventListener("click", () => fn(b)); row.appendChild(b); return b;
+}
+function cToggle(row, label, val, fn) {
+  const b = cBtn(row, label, () => { const v = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(v)); fn(v); }, "lg");
+  b.setAttribute("aria-pressed", String(val)); return b;
+}
+function cRadio(row, opts, val, fn) {
+  const bs = opts.map(o => { const b = cBtn(row, o[1], () => { bs.forEach(x => x.setAttribute("aria-pressed", String(x === b))); fn(o[0]); }, "lg"); b.setAttribute("aria-pressed", String(o[0] === val)); return b; });
+  return {set(v) { bs.forEach((x, i) => x.setAttribute("aria-pressed", String(opts[i][0] === v))); }};
+}
+function cSlider(ctrl, label, min, max, step, val, fmt, fn) {
+  const w = document.createElement("div"); w.className = "sl";
+  const id = "sl" + (++uid);
+  w.innerHTML = '<label for="' + id + '"><span>' + esc(label) + '</span><output></output></label><input id="' + id + '" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + val + '">';
+  ctrl.appendChild(w);
+  const inp = w.querySelector("input"), out = w.querySelector("output");
+  const upd = () => { out.textContent = fmt(+inp.value); fn(+inp.value); };
+  inp.addEventListener("input", upd); out.textContent = fmt(val);
+  return {set(v) { inp.value = v; upd(); }, off(v) { inp.disabled = v; w.classList.toggle("off", v); }};
+}
+function playCtrl(ctrl, loop, reset, speedFn) {
+  const row = cGroup(ctrl, "Воспроизведение");
+  const pb = cBtn(row, loop.on ? "Пауза" : "Запустить", () => { loop.on = !loop.on; pb.textContent = loop.on ? "Пауза" : "Продолжить"; }, "btn primary");
+  if (reset) cBtn(row, "Сначала", reset);
+  if (speedFn) cRadio(cGroup(ctrl, "Скорость"), [[0.5, "×0,5"], [1, "×1"], [2, "×2"]], 1, speedFn);
+  return pb;
+}
+function statBox(box, items) {
+  box.innerHTML = items.map(it => '<div class="st"><b data-k="' + it[0] + '">—</b><span>' + it[1] + '</span>' + (it[2] ? '<div class="bar"><i data-b="' + it[0] + '"></i></div>' : '') + '</div>').join("");
+  const o = {};
+  items.forEach(it => { o[it[0]] = v => { box.querySelector('[data-k="' + it[0] + '"]').textContent = v; }; if (it[2]) o[it[0] + "B"] = f => { box.querySelector('[data-b="' + it[0] + '"]').style.width = clamp(f, 0, 1) * 100 + "%"; }; });
+  return o;
+}
+function svgText(parent, x, y, s, cls, an) { const t = sv("text", {x: x, y: y, class: cls || "svt", "text-anchor": an || "start"}, parent); t.textContent = s; return t; }
+
+/* --- 1. дыхательная цепь --- */
+function mountETC(box, a) {
+  const ui = anShell(box, a);
+  const svg = sv("svg", {viewBox: "0 0 900 470", class: "an-svg", role: "img", "aria-label": "Анимация дыхательной цепи и АТФ-синтазы"}, ui.stage);
+  const T = (x, y, s, c, an) => svgText(svg, x, y, s, c, an);
+  sv("rect", {x: 0, y: 0, width: 900, height: 150, class: "etc-ims"}, svg);
+  sv("rect", {x: 0, y: 150, width: 900, height: 100, class: "etc-mem"}, svg);
+  sv("rect", {x: 0, y: 250, width: 900, height: 220, class: "etc-mat"}, svg);
+  for (let x = 6; x < 900; x += 13) { sv("circle", {cx: x, cy: 156, r: 4.5, class: "lip"}, svg); sv("circle", {cx: x, cy: 244, r: 4.5, class: "lip"}, svg); }
+  T(14, 26, "Межмембранное пространство"); T(14, 458, "Матрикс");
+  sv("path", {d: "M108 144 H154 Q166 144 166 156 V244 Q166 252 158 254 V324 Q158 336 146 336 H116 Q104 336 104 324 V254 Q96 252 96 244 V156 Q96 144 108 144 Z", class: "cx"}, svg);
+  sv("rect", {x: 250, y: 198, width: 62, height: 104, rx: 12, class: "cx"}, svg);
+  sv("rect", {x: 384, y: 136, width: 74, height: 128, rx: 12, class: "cx"}, svg);
+  sv("circle", {cx: 520, cy: 116, r: 15, class: "cx"}, svg);
+  sv("rect", {x: 552, y: 136, width: 66, height: 128, rx: 12, class: "cx"}, svg);
+  [[215, 214], [338, 196]].forEach(([x, y]) => { sv("circle", {cx: x, cy: y, r: 11, class: "qd"}, svg); T(x, y + 4, "Q", "cxs", "middle"); });
+  sv("rect", {x: 830, y: 172, width: 14, height: 176, rx: 7, class: "cx"}, svg);
+  sv("ellipse", {cx: 780, cy: 200, rx: 46, ry: 22, class: "cx"}, svg);
+  const gRot = sv("g", {}, svg);
+  const stripes = []; for (let i = 0; i < 10; i++) stripes.push(sv("line", {class: "stripe", y1: 187, y2: 213}, gRot));
+  sv("line", {x1: 780, y1: 222, x2: 780, y2: 312, class: "stalk"}, svg);
+  const gam = sv("line", {x1: 780, y1: 300, x2: 796, y2: 300, class: "gam"}, svg);
+  sv("circle", {cx: 780, cy: 352, r: 44, class: "cx"}, svg);
+  for (let k = 0; k < 6; k++) sv("circle", {cx: 780 + 25 * Math.cos(k * Math.PI / 3), cy: 352 + 25 * Math.sin(k * Math.PI / 3), r: 13, class: k % 2 ? "fa" : "fb"}, svg);
+  T(780, 356, "F₁", "cxs", "middle"); T(716, 340, "V", "cxl", "middle");
+  T(131, 196, "I", "cxl", "middle"); T(131, 214, "NADH-ДГ", "cxs", "middle");
+  T(281, 246, "II", "cxl", "middle"); T(281, 264, "СДГ", "cxs", "middle");
+  T(421, 196, "III", "cxl", "middle"); T(421, 214, "bc₁", "cxs", "middle");
+  T(520, 120, "c", "cxs", "middle");
+  T(585, 196, "IV", "cxl", "middle"); T(585, 214, "ЦО", "cxs", "middle");
+  T(100, 414, "NADH → NAD⁺", "svt b", "middle"); T(270, 414, "Сукцинат → фумарат", "svt b", "middle");
+  T(615, 378, "½O₂ + 2H⁺ → H₂O", "svt b", "middle"); T(780, 452, "АДФ + Pᵢ → АТФ", "svt b", "middle");
+  const blk = {};
+  [["I", 166, 146], ["III", 458, 138], ["IV", 618, 138], ["V", 826, 182]].forEach(([k, x, y]) => {
+    const g = sv("g", {class: "blk", opacity: 0}, svg); sv("circle", {cx: x, cy: y, r: 12}, g); svgText(g, x, y + 5, "✕", "", "middle"); blk[k] = g;
+  });
+  const dyn = sv("g", {}, svg);
+  const P_NADH = [[100, 388], [131, 300, "I"], [150, 214], [205, 214], [338, 198], [400, 205], [421, 200, "III"], [470, 130], [520, 116, "c"], [585, 160, "IV"], [604, 340, "O2"]];
+  const P_SUC = [[255, 388], [281, 300, "II"], [281, 222], [338, 198], [400, 205], [421, 200, "III"], [470, 130], [520, 116, "c"], [585, 160, "IV"], [604, 340, "O2"]];
+  let sub = "nadh", speed = 1, inh = {rot: false, ant: false, cn: false, oli: false, dnp: false};
+  let parts = [], pool = [], fl = [], pairs = 0, atp = 0, heat = 0, synH = 0, rot = 0, rotT = 0, emT = 0, synT = 0, leakT = 0, stT = 0;
+  const isBlk = tag => (tag === "I" && inh.rot) || (tag === "III" && inh.ant) || (tag === "IV" && inh.cn);
+  function walk(el, pts, sp, onDone, onWp) { parts.push({el: el, pts: pts, i: 0, x: pts[0][0], y: pts[0][1], sp: sp, onDone: onDone, onWp: onWp, stuck: null}); }
+  function toPool(el, x, y) {
+    if (pool.length >= 70) { el.remove(); return; }
+    pool.push({el: el, x: x, y: y, vx: rnd(-30, 30), vy: rnd(-40, -5)});
+  }
+  function pump(x, n) {
+    for (let k = 0; k < n; k++) {
+      const x0 = x - 16 + k * (32 / Math.max(1, n - 1)), el = sv("circle", {r: 4.3, class: "hh"}, dyn);
+      walk(el, [[x0, 330 + rnd(0, 14)], [x0, 252], [x0, 140]], rnd(110, 150), p => toPool(p.el, p.x, p.y));
+    }
+  }
+  function float(el, x, y, vx, vy, life, grow) { fl.push({el: el, x: x, y: y, vx: vx, vy: vy, life: life, max: life, grow: grow}); }
+  function evE(tag) {
+    if (isBlk(tag)) return false;
+    if (tag === "I") pump(131, 4); else if (tag === "III") pump(421, 4); else if (tag === "IV") pump(585, 2);
+    else if (tag === "O2") { pairs++; const t = svgText(dyn, 604, 352, "H₂O", "wt", "middle"); float(t, 604, 352, rnd(-10, 10), 22, 1.3); }
+    return true;
+  }
+  function spawnE() { walk(sv("circle", {r: 6.5, class: "ee"}, dyn), sub === "nadh" ? P_NADH : P_SUC, 175, p => p.el.remove(), evE); }
+  function takeSyn() {
+    let bi = 0, bd = 1e9; pool.forEach((h, i) => { const d = Math.abs(h.x - 780); if (d < bd) { bd = d; bi = i; } });
+    const h = pool.splice(bi, 1)[0];
+    walk(h.el, [[h.x, h.y], [772, 128], [780, 205], [780, 318]], 170, p => {
+      p.el.remove(); synH++; rotT += 36;
+      if (synH % 4 === 0) { atp++; const t = svgText(dyn, 780, 404, "АТФ", "atpt", "middle"); float(t, 780 + rnd(-40, 40), 404, rnd(-15, 15), 26, 1.5); }
+    });
+  }
+  function leak() {
+    const h = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+    walk(h.el, [[h.x, h.y], [h.x, 158], [h.x, 254]], 150, p => {
+      p.el.remove(); heat++;
+      float(sv("circle", {cx: p.x, cy: 200, r: 4, class: "glow"}, dyn), p.x, 200, 0, 0, 0.9, true);
+    });
+  }
+  function reset() {
+    parts.concat(pool, fl).forEach(p => p.el.remove());
+    parts = []; pool = []; fl = []; pairs = atp = heat = synH = 0; rot = rotT = emT = synT = leakT = 0;
+    for (let i = 0; i < 12; i++) toPool(sv("circle", {r: 4.3, class: "hh"}, dyn), rnd(40, 860), rnd(40, 130));
+  }
+  const st = statBox(ui.stats, [["pairs", "пар e⁻ дошло до O₂"], ["grad", "H⁺ в межмембранном пространстве", true], ["atp", "молекул АТФ"], ["po", "АТФ на пару e⁻ (P/O)"], ["heat", "H⁺ ушло в тепло"]]);
+  function cap() {
+    let s;
+    if (inh.cn) s = "Цианид (а также CO и азид) блокирует цитохромоксидазу: электроны не доходят до O₂, цепь и синтез АТФ останавливаются полностью. Это тканевая гипоксия при нормальном pO₂ крови.";
+    else if (inh.ant) s = "Антимицин A блокирует комплекс III: электроны не попадают на цитохром c, цепь стоит и от NADH, и от сукцината.";
+    else if (inh.rot && sub === "nadh") s = "Ротенон и амитал блокируют комплекс I: электроны NADH не входят в цепь. Переключите субстрат на сукцинат — он входит через комплекс II в обход блока.";
+    else if (inh.oli && inh.dnp) s = "Разобщитель снимает дыхательный контроль даже при заблокированной АТФ-синтазе: электроны снова текут, энергия градиента рассеивается теплом.";
+    else if (inh.oli) s = "Олигомицин закрывает протонный канал F₀: градиент растёт, и перенос электронов тормозится. Так выглядит дыхательный контроль.";
+    else if (inh.dnp) s = "2,4-Динитрофенол переносит H⁺ через мембрану в обход АТФ-синтазы: дыхание ускоряется, АТФ почти не образуется, энергия уходит в тепло. Так же работает термогенин бурого жира.";
+    else s = sub === "nadh" ? "Комплексы I, III и IV перекачивают 4 + 4 + 2 = 10 H⁺ на пару электронов NADH. АТФ-синтазе нужно около 4 H⁺ на молекулу АТФ, поэтому P/O ≈ 2,5."
+      : "Сукцинат окисляется комплексом II (FAD → FADH₂), который протоны не перекачивает. На пару электронов приходится 6 H⁺, поэтому P/O ≈ 1,5.";
+    if (inh.rot && sub === "suc" && !inh.cn && !inh.ant) s = "Ротенон не мешает: сукцинат отдаёт электроны через комплекс II в обход блока. " + s;
+    ui.cap.textContent = s;
+    blk.I.setAttribute("opacity", inh.rot ? 1 : 0); blk.III.setAttribute("opacity", inh.ant ? 1 : 0);
+    blk.IV.setAttribute("opacity", inh.cn ? 1 : 0); blk.V.setAttribute("opacity", inh.oli ? 1 : 0);
+  }
+  function step(dt) {
+    const d = dt * speed;
+    const blocked = inh.cn || inh.ant || (sub === "nadh" && inh.rot);
+    if (!blocked) { emT += d * Math.max(0, 1 - pool.length / 44); if (emT >= 1.05) { emT = 0; spawnE(); } }
+    if (!inh.oli && pool.length > 5) synT += d * (pool.length - 5) * 0.34; else synT = 0;
+    while (synT >= 1 && pool.length) { synT -= 1; takeSyn(); }
+    if (inh.dnp && pool.length > 1) leakT += d * pool.length * 0.2; else leakT = 0;
+    while (leakT >= 1 && pool.length) { leakT -= 1; leak(); }
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      if (p.stuck) { if (p.onWp(p.stuck) === false) continue; p.stuck = null; }
+      let mv = p.sp * d;
+      while (mv > 0 && p.i < p.pts.length - 1) {
+        const tx = p.pts[p.i + 1][0], ty = p.pts[p.i + 1][1], dx = tx - p.x, dy = ty - p.y, L = Math.hypot(dx, dy);
+        if (L <= mv) { p.x = tx; p.y = ty; mv -= L; p.i++; const tag = p.pts[p.i][2]; if (tag && p.onWp && p.onWp(tag) === false) { p.stuck = tag; break; } }
+        else { p.x += dx / L * mv; p.y += dy / L * mv; mv = 0; }
+      }
+      p.el.setAttribute("cx", p.x.toFixed(1)); p.el.setAttribute("cy", p.y.toFixed(1));
+      if (!p.stuck && p.i >= p.pts.length - 1) { parts.splice(i, 1); p.onDone(p); }
+    }
+    for (const h of pool) {
+      h.vx = (h.vx + rnd(-90, 90) * dt) * 0.985; h.vy = (h.vy + rnd(-90, 90) * dt) * 0.985;
+      h.x += h.vx * d; h.y += h.vy * d;
+      if (h.x < 20 || h.x > 880) { h.vx = -h.vx; h.x = clamp(h.x, 20, 880); }
+      if (h.y < 38 || h.y > 136) { h.vy = -h.vy; h.y = clamp(h.y, 38, 136); }
+      h.el.setAttribute("cx", h.x.toFixed(1)); h.el.setAttribute("cy", h.y.toFixed(1));
+    }
+    for (let i = fl.length - 1; i >= 0; i--) {
+      const f = fl[i]; f.life -= d; f.x += f.vx * d; f.y += f.vy * d;
+      if (f.life <= 0) { f.el.remove(); fl.splice(i, 1); continue; }
+      const k = f.life / f.max;
+      if (f.grow) { f.el.setAttribute("r", (4 + (1 - k) * 18).toFixed(1)); f.el.setAttribute("opacity", (k * 0.8).toFixed(2)); }
+      else { f.el.setAttribute("x", f.x.toFixed(1)); f.el.setAttribute("y", f.y.toFixed(1)); f.el.setAttribute("opacity", Math.min(1, k * 1.6).toFixed(2)); }
+    }
+    rot += (rotT - rot) * Math.min(1, d * 5);
+    const rr = rot * Math.PI / 180;
+    stripes.forEach((s, i) => { const an = rr + i * Math.PI / 5, x = (780 + 44 * Math.cos(an)).toFixed(1); s.setAttribute("x1", x); s.setAttribute("x2", x); s.setAttribute("opacity", Math.sin(an) > 0 ? 0.9 : 0.2); });
+    gam.setAttribute("x2", (780 + 18 * Math.cos(rr)).toFixed(1)); gam.setAttribute("y2", (300 + 7 * Math.sin(rr)).toFixed(1));
+    stT += dt;
+    if (stT > 0.2) {
+      stT = 0; st.pairs(pairs); st.grad(pool.length); st.gradB(pool.length / 44); st.atp(atp);
+      st.po(pairs >= 3 ? fmt1(atp / pairs) : "—"); st.heat(heat);
+    }
+  }
+  reset();
+  const loop = anLoop(step);
+  playCtrl(ui.ctrl, loop, reset, v => { speed = v; });
+  cRadio(cGroup(ui.ctrl, "Субстрат"), [["nadh", "NADH"], ["suc", "Сукцинат (FADH₂)"]], sub, v => { sub = v; cap(); });
+  const ir = cGroup(ui.ctrl, "Ингибиторы и разобщитель");
+  [["rot", "Ротенон"], ["ant", "Антимицин A"], ["cn", "Цианид"], ["oli", "Олигомицин"], ["dnp", "2,4-Динитрофенол"]].forEach(([k, l]) => cToggle(ir, l, false, v => { inh[k] = v; cap(); }));
+  cap(); step(0);
+  return {stop: loop.stop};
+}
+
+/* --- 2. кинетика --- */
+function mountKin(box, a) {
+  const ui = anShell(box, a);
+  ui.stage.classList.add("kin-stage");
+  const sB = sv("svg", {viewBox: "0 0 420 310", class: "an-svg kin-box", role: "img", "aria-label": "Ферменты связывают субстрат и ингибитор"}, ui.stage);
+  const sM = sv("svg", {viewBox: "0 0 420 290", class: "an-svg", role: "img", "aria-label": "Кривая Михаэлиса–Ментен"}, ui.stage);
+  const sL = sv("svg", {viewBox: "0 0 420 290", class: "an-svg", role: "img", "aria-label": "График Лайнуивера–Берка"}, ui.stage);
+  let S = 4, Km = 2, type = "none", al = 1.5, speed = 1, prods = 0;
+  const app = () => { const f = 1 + al; return type === "comp" ? [Km * f, 1] : type === "non" ? [Km, 1 / f] : type === "unc" ? [Km / f, 1 / f] : [Km, 1]; };
+  let [Kd, Vd] = app(), Kb = Km, ymx = 3;
+  const MX = s => 48 + s / 20 * 357, MY = v => 246 - v / 1.1 * 226;
+  sv("line", {x1: 48, y1: 246, x2: 405, y2: 246, class: "axis"}, sM); sv("line", {x1: 48, y1: 246, x2: 48, y2: 14, class: "axis"}, sM);
+  [0, 5, 10, 15, 20].forEach(s => svgText(sM, MX(s), 262, String(s), "tick", "middle"));
+  [[0, "0"], [0.5, "50"], [1, "100"]].forEach(([v, l]) => svgText(sM, 42, MY(v) + 4, l, "tick", "end"));
+  svgText(sM, 405, 284, "[S], мМ", "tick", "end"); svgText(sM, 54, 12, "v, % от Vmax", "tick");
+  const mRef = sv("path", {class: "cv ref"}, sM), mCur = sv("path", {class: "cv"}, sM);
+  const gV = sv("line", {class: "guide"}, sM), gK = sv("line", {class: "guide"}, sM), gK2 = sv("line", {class: "guide"}, sM);
+  const tV = svgText(sM, 400, 0, "Vmax", "tick", "end"), tK = svgText(sM, 0, 240, "Km", "tick", "middle");
+  const mPt = sv("circle", {r: 6, class: "pt"}, sM);
+  const LX = x => 48 + (x + 2) / 6 * 357;
+  sv("line", {x1: 48, y1: 246, x2: 405, y2: 246, class: "axis"}, sL); sv("line", {x1: LX(0), y1: 246, x2: LX(0), y2: 14, class: "axis"}, sL);
+  [-2, -1, 0, 1, 2, 3, 4].forEach(x => svgText(sL, LX(x), 262, String(x).replace("-", "−"), "tick", "middle"));
+  svgText(sL, 405, 284, "1/[S], мМ⁻¹", "tick", "end"); svgText(sL, LX(0) + 6, 12, "1/v", "tick");
+  const yT = [0.5, 1].map(f => svgText(sL, LX(0) - 6, 0, "", "tick", "end"));
+  const lRef = sv("path", {class: "cv ref"}, sL), lCur = sv("path", {class: "cv"}, sL);
+  const lY = sv("circle", {r: 5, class: "pt"}, sL), lX = sv("circle", {r: 5, class: "pt"}, sL), lS = sv("circle", {r: 6, class: "pt"}, sL);
+  const gFree = sv("g", {}, sB), gEnz = sv("g", {}, sB), gProd = sv("g", {}, sB);
+  const EZ = [[80, 95], [210, 95], [340, 95], [80, 222], [210, 222], [340, 222]].map(([cx, cy]) => {
+    const g = sv("g", {}, gEnz), r = 28, an = 28 * Math.PI / 180;
+    const body = sv("path", {d: "M" + cx + " " + cy + " L" + (cx + r * Math.cos(an)).toFixed(1) + " " + (cy - r * Math.sin(an)).toFixed(1) + " A" + r + " " + r + " 0 1 0 " + (cx + r * Math.cos(an)).toFixed(1) + " " + (cy + r * Math.sin(an)).toFixed(1) + " Z", class: "enzb"}, g);
+    return {cx: cx, cy: cy, body: body, sA: sv("circle", {r: 8, class: "ls", opacity: 0}, g), iA: sv("circle", {r: 8, class: "li", opacity: 0}, g), iB: sv("circle", {r: 8, class: "li", opacity: 0}, g), st: "E", t: rnd(0, 0.6), f: 1, ox: 0, oy: 0};
+  });
+  svgText(sB, 14, 300, "● субстрат", "tick"); svgText(sB, 100, 300, "● ингибитор", "tick"); svgText(sB, 196, 300, "● продукт", "tick");
+  sB.querySelectorAll("text")[0].style.fill = "var(--m-n)"; sB.querySelectorAll("text")[1].style.fill = "#D52B45"; sB.querySelectorAll("text")[2].style.fill = "var(--m-f)";
+  let free = [], pr = [];
+  function sample() {
+    const s = S / Km, q = type === "none" ? 0 : al;
+    const w = type === "comp" ? [["E", 1], ["ES", s], ["EI", q]] : type === "non" ? [["E", 1], ["ES", s], ["EI", q], ["ESI", s * q]] : type === "unc" ? [["E", 1], ["ES", s], ["ESI", s * q]] : [["E", 1], ["ES", s]];
+    let r = Math.random() * w.reduce((x, y) => x + y[1], 0);
+    for (const [k, v] of w) { r -= v; if (r <= 0) return k; }
+    return "E";
+  }
+  function sync(kind, n) {
+    const cur = free.filter(p => p.k === kind);
+    for (let i = cur.length; i < n; i++) free.push({k: kind, el: sv("circle", {r: 5, class: kind === "s" ? "ls" : "li", opacity: 0.75}, gFree), x: rnd(10, 410), y: rnd(10, 280), vx: rnd(-40, 40), vy: rnd(-40, 40)});
+    for (let i = n; i < cur.length; i++) { cur[i].el.remove(); free.splice(free.indexOf(cur[i]), 1); }
+  }
+  function curvePath(K, V, X, Y) { let d = ""; for (let s = 0; s <= 20.001; s += 0.25) d += (d ? " L" : "M") + X(s).toFixed(1) + " " + Y(V * s / (K + s)).toFixed(1); return d; }
+  function lbPath(K, V) {
+    const x0 = Math.max(-2, -1 / K), Y = y => 246 - y / ymx * 226;
+    return "M" + LX(x0).toFixed(1) + " " + Y(K / V * x0 + 1 / V).toFixed(1) + " L" + LX(4).toFixed(1) + " " + Y(K / V * 4 + 1 / V).toFixed(1);
+  }
+  const st = statBox(ui.stats, [["v", "скорость, % от Vmax", true], ["km", "Km кажущаяся, мМ"], ["vm", "Vmax кажущаяся, %"], ["pr", "образовано продукта"]]);
+  const TXT = {
+    none: "Без ингибитора кривая — гипербола: при [S] = Km скорость равна половине Vmax, при [S] ≫ Km фермент насыщен и скорость почти не растёт.",
+    comp: "Конкурентный ингибитор похож на субстрат и занимает активный центр. Km растёт, Vmax прежняя: избыток субстрата вытесняет ингибитор. Прямые Лайнуивера–Берка пересекаются на оси ординат. Примеры: " + lnk("succ", "малонат и СДГ") + ", " + lnk("hmgcoa", "статины и ГМГ-КоА-редуктаза") + ", " + lnk("mtx", "метотрексат и ДГФР") + ".",
+    non: "Неконкурентный ингибитор связывается вне активного центра и с E, и с ES. Vmax снижается, Km не меняется; прямые пересекаются на оси абсцисс. Повышение [S] ингибирование не снимает.",
+    unc: "Бесконкурентный ингибитор связывается только с комплексом ES. Снижаются и Vmax, и Km; прямые параллельны. Пример — ионы лития и инозитолмонофосфатаза."
+  };
+  function cap() { ui.cap.innerHTML = TXT[type]; }
+  let stT = 0;
+  function step(dt) {
+    const d = dt * speed, [Kt, Vt] = app();
+    const k = Math.min(1, dt * 6);
+    Kd += (Kt - Kd) * k; Vd += (Vt - Vd) * k; Kb += (Km - Kb) * k;
+    const ytar = Math.max(Kb * 4 + 1, Kd / Vd * 4 + 1 / Vd, 2) * 1.1; ymx += (ytar - ymx) * k;
+    mRef.setAttribute("d", curvePath(Kb, 1, MX, MY)); mCur.setAttribute("d", curvePath(Kd, Vd, MX, MY));
+    gV.setAttribute("x1", 48); gV.setAttribute("x2", 405); gV.setAttribute("y1", MY(Vd)); gV.setAttribute("y2", MY(Vd));
+    tV.setAttribute("y", MY(Vd) - 5);
+    const kx = MX(Math.min(20, Kd));
+    gK.setAttribute("x1", kx); gK.setAttribute("x2", kx); gK.setAttribute("y1", 246); gK.setAttribute("y2", MY(Vd / 2));
+    gK2.setAttribute("x1", 48); gK2.setAttribute("x2", kx); gK2.setAttribute("y1", MY(Vd / 2)); gK2.setAttribute("y2", MY(Vd / 2));
+    tK.setAttribute("x", kx); tK.setAttribute("y", 240);
+    mPt.setAttribute("cx", MX(S)); mPt.setAttribute("cy", MY(Vd * S / (Kd + S)));
+    const LY = y => 246 - y / ymx * 226;
+    lRef.setAttribute("d", lbPath(Kb, 1)); lCur.setAttribute("d", lbPath(Kd, Vd));
+    yT.forEach((t, i) => { const v = ymx * [0.5, 1][i]; t.setAttribute("y", LY(v) + 4); t.textContent = v < 10 ? fmt1(v) : String(Math.round(v)); });
+    lY.setAttribute("cx", LX(0)); lY.setAttribute("cy", LY(1 / Vd));
+    const xi = -1 / Kd; lX.setAttribute("opacity", xi >= -2 ? 1 : 0); lX.setAttribute("cx", LX(Math.max(-2, xi))); lX.setAttribute("cy", 246);
+    const sx = 1 / S; lS.setAttribute("opacity", sx <= 4 ? 1 : 0); lS.setAttribute("cx", LX(Math.min(4, sx))); lS.setAttribute("cy", LY(Kd / Vd * Math.min(4, sx) + 1 / Vd));
+    sync("s", Math.round(clamp(S * 2.2, 0, 40))); sync("i", type === "none" ? 0 : Math.round(al * 5));
+    for (const p of free) {
+      p.vx = (p.vx + rnd(-120, 120) * dt) * 0.98; p.vy = (p.vy + rnd(-120, 120) * dt) * 0.98;
+      p.x += p.vx * d; p.y += p.vy * d;
+      if (p.x < 6 || p.x > 414) { p.vx = -p.vx; p.x = clamp(p.x, 6, 414); }
+      if (p.y < 6 || p.y > 284) { p.vy = -p.vy; p.y = clamp(p.y, 6, 284); }
+      p.el.setAttribute("cx", p.x.toFixed(1)); p.el.setAttribute("cy", p.y.toFixed(1));
+    }
+    for (const z of EZ) {
+      z.t -= d;
+      if (z.t <= 0) {
+        if (z.st === "ES") { prods++; pr.push({el: sv("circle", {r: 6, class: "lp"}, gProd), x: z.cx + 16, y: z.cy, vx: rnd(50, 100), vy: rnd(-50, 50), life: 0.9}); }
+        z.st = sample(); z.t = rnd(0.5, 0.9); z.f = 0;
+        const an = rnd(0, Math.PI * 2); z.ox = Math.cos(an) * 55; z.oy = Math.sin(an) * 55;
+      }
+      z.f = Math.min(1, z.f + d * 4);
+      const k2 = 1 - ease(z.f), hasS = z.st === "ES" || z.st === "ESI", inM = z.st === "EI" && type === "comp", allo = (z.st === "EI" && type === "non") || z.st === "ESI";
+      z.sA.setAttribute("cx", (z.cx + 14 + z.ox * k2).toFixed(1)); z.sA.setAttribute("cy", (z.cy + z.oy * k2).toFixed(1)); z.sA.setAttribute("opacity", hasS ? 1 : 0);
+      z.iA.setAttribute("cx", (z.cx + 14 + z.ox * k2).toFixed(1)); z.iA.setAttribute("cy", (z.cy + z.oy * k2).toFixed(1)); z.iA.setAttribute("opacity", inM ? 1 : 0);
+      z.iB.setAttribute("cx", (z.cx - 30 - z.ox * k2 * 0.5).toFixed(1)); z.iB.setAttribute("cy", (z.cy + z.oy * k2).toFixed(1)); z.iB.setAttribute("opacity", allo ? 1 : 0);
+      z.body.classList.toggle("inact", allo);
+    }
+    for (let i = pr.length - 1; i >= 0; i--) {
+      const p = pr[i]; p.life -= d; p.x += p.vx * d; p.y += p.vy * d;
+      if (p.life <= 0) { p.el.remove(); pr.splice(i, 1); continue; }
+      p.el.setAttribute("cx", p.x.toFixed(1)); p.el.setAttribute("cy", p.y.toFixed(1)); p.el.setAttribute("opacity", Math.min(1, p.life * 2).toFixed(2));
+    }
+    stT += dt;
+    if (stT > 0.2) {
+      stT = 0; const v = Vt * S / (Kt + S);
+      st.v(Math.round(v * 100) + " %"); st.vB(v); st.km(fmt1(Kt)); st.vm(Math.round(Vt * 100) + " %"); st.pr(prods);
+    }
+  }
+  const loop = anLoop(step);
+  playCtrl(ui.ctrl, loop, null, v => { speed = v; });
+  const g1 = cGroup(ui.ctrl, "Параметры");
+  cSlider(g1, "[S], мМ", 0.2, 20, 0.1, S, fmt1, v => { S = v; });
+  cSlider(g1, "Km фермента, мМ", 0.5, 8, 0.1, Km, fmt1, v => { Km = v; });
+  const iSl = cSlider(g1, "[I] / Ki", 0, 4, 0.1, al, fmt1, v => { al = v; });
+  cRadio(cGroup(ui.ctrl, "Тип ингибирования"), [["none", "Нет"], ["comp", "Конкурентное"], ["non", "Неконкурентное"], ["unc", "Бесконкурентное"]], type, v => { type = v; iSl.off(v === "none"); cap(); });
+  iSl.off(true); cap(); step(0.5);
+  return {stop: loop.stop};
+}
+
+/* --- 3. гемоглобин --- */
+function mountHb(box, a) {
+  const ui = anShell(box, a);
+  ui.stage.classList.add("hb-stage");
+  const sC = sv("svg", {viewBox: "0 0 560 360", class: "an-svg", role: "img", "aria-label": "Кривая диссоциации оксигемоглобина"}, ui.stage);
+  const sT = sv("svg", {viewBox: "0 0 260 260", class: "an-svg hb-tet", role: "img", "aria-label": "Молекула гемоглобина, связывающая кислород"}, ui.stage);
+  let prot = "hba", pH = 7.4, pco2 = 40, bpg = 5, temp = 37, po2 = 60;
+  const X = p => 52 + p / 120 * 488, Y = y => 316 - y / 100 * 296;
+  const sat = (p, P50, n) => p <= 0 ? 0 : 100 / (1 + Math.pow(P50 / p, n));
+  function par() {
+    if (prot === "mb") return [2.8, 1];
+    const base = prot === "hbf" ? 19.5 : 26.8, kb = prot === "hbf" ? 0.4 : 1;
+    const lg = Math.log10(base) - 0.48 * (pH - 7.4) + 0.06 * Math.log10(pco2 / 40) + 0.024 * (temp - 37) + 0.025 * kb * (bpg - 5);
+    return [Math.pow(10, lg), 2.7];
+  }
+  let [P50, nH] = par();
+  sv("line", {x1: 52, y1: 316, x2: 540, y2: 316, class: "axis"}, sC); sv("line", {x1: 52, y1: 316, x2: 52, y2: 18, class: "axis"}, sC);
+  [0, 20, 40, 60, 80, 100, 120].forEach(p => svgText(sC, X(p), 334, String(p), "tick", "middle"));
+  [0, 25, 50, 75, 100].forEach(y => svgText(sC, 44, Y(y) + 4, String(y), "tick", "end"));
+  svgText(sC, 540, 354, "pO₂, мм рт. ст.", "tick", "end"); svgText(sC, 58, 14, "Насыщение гемоглобина, %", "tick");
+  [[40, "вены"], [100, "артерии"]].forEach(([p, l]) => { sv("line", {x1: X(p), y1: 316, x2: X(p), y2: 24, class: "vline"}, sC); svgText(sC, X(p) + 4, 34, l, "tick"); });
+  let ref = ""; for (let p = 0; p <= 120; p += 1) ref += (ref ? " L" : "M") + X(p).toFixed(1) + " " + Y(sat(p, 26.8, 2.7)).toFixed(1);
+  sv("path", {d: ref, class: "cv ref"}, sC);
+  const cur = sv("path", {class: "cv"}, sC);
+  const g50a = sv("line", {class: "guide"}, sC), g50b = sv("line", {class: "guide"}, sC), t50 = svgText(sC, 0, 0, "", "tick");
+  const p40 = sv("circle", {r: 5, class: "pt"}, sC), p100 = sv("circle", {r: 5, class: "pt"}, sC);
+  const t40 = svgText(sC, 0, 0, "", "svt b"), t100 = svgText(sC, 0, 0, "", "svt b");
+  const pl = sv("line", {class: "guide"}, sC), pp = sv("circle", {r: 7, class: "pt"}, sC);
+  const gO = sv("g", {}, sT), gTet = sv("g", {}, sT);
+  const fo = []; for (let i = 0; i < 18; i++) fo.push({el: sv("circle", {r: 3.2, class: "o2", opacity: 0}, gO), x: rnd(5, 255), y: rnd(5, 255), vx: rnd(-30, 30), vy: rnd(-30, 30)});
+  let subs = [], bpgEl = null, R = 0, cd = 0, order = [0, 1, 3, 2];
+  function build() {
+    gTet.innerHTML = ""; subs = [];
+    const mb = prot === "mb";
+    const L = mb ? [["Mb", 130, 130]] : prot === "hbf" ? [["α₁", 88, 88], ["γ₁", 172, 88], ["γ₂", 88, 172], ["α₂", 172, 172]] : [["α₁", 88, 88], ["β₁", 172, 88], ["β₂", 88, 172], ["α₂", 172, 172]];
+    const sz = mb ? 96 : 74;
+    L.forEach(([lab, cx, cy], i) => {
+      const g = sv("g", {}, gTet);
+      sv("rect", {x: cx - sz / 2, y: cy - sz / 2, width: sz, height: sz, rx: 22, class: "subt"}, g);
+      const ov = sv("rect", {x: cx - sz / 2, y: cy - sz / 2, width: sz, height: sz, rx: 22, class: "subr", opacity: 0}, g);
+      const dx = mb ? 0 : Math.sign(cx - 130), dy = mb ? 0 : Math.sign(cy - 130);
+      const hx = cx + dx * 12, hy = cy + dy * 10;
+      svgText(g, cx - dx * 14, cy - dy * 14 + 5, lab, "cxs", "middle");
+      sv("rect", {x: hx - 12, y: hy - 5, width: 24, height: 10, rx: 3, class: "heme"}, g);
+      const o = sv("g", {opacity: 0}, g); sv("circle", {cx: -4, cy: 0, r: 4.5, class: "o2"}, o); sv("circle", {cx: 4, cy: 0, r: 4.5, class: "o2"}, o);
+      subs.push({g: g, ov: ov, o: o, cx: cx, cy: cy, hx: hx, hy: hy - 10, dx: dx || 1, dy: dy || -1, b: false, f: 0, sg: i % 2 ? 1 : -1});
+    });
+    bpgEl = mb ? null : sv("polygon", {points: "130,116 144,130 130,144 116,130", class: "bpg"}, gTet);
+    R = 0;
+  }
+  const st = statBox(ui.stats, [["p50", "P50, мм рт. ст."], ["yc", "насыщение при выбранном pO₂"], ["ya", "в артериях (pO₂ 100)"], ["yv", "в венах (pO₂ 40)"], ["del", "отдаётся тканям", true]]);
+  function cap() {
+    const tp = par()[0];
+    if (prot === "mb") { ui.cap.innerHTML = "Миоглобин связывает одну молекулу O₂: кривая гиперболическая, P50 ≈ 2,8 мм рт. ст. Он забирает кислород у гемоглобина и отдаёт его только при глубокой гипоксии работающей мышцы."; return; }
+    let s = prot === "hbf" ? "Фетальный гемоглобин (α₂γ₂) слабо связывает " + lnk("bpg23", "2,3-БФГ") + ", поэтому его сродство к O₂ выше и плод забирает кислород из крови матери. " : "";
+    if (tp > 28.5) s += "Кривая сдвинута вправо: сродство к O₂ снижено, тканям отдаётся больше кислорода. Причины: ацидоз и CO₂ (эффект Бора), рост " + lnk("bpg23", "2,3-БФГ") + ", повышение температуры.";
+    else if (tp < 25) s += "Кривая сдвинута влево: сродство к O₂ повышено, кислород хуже отдаётся тканям. Причины: алкалоз, гипокапния, гипотермия, недостаток 2,3-БФГ, HbF, карбоксигемоглобин.";
+    else s += "Норма: P50 около 27 мм рт. ст. S-образная форма отражает кооперативность: связывание O₂ переводит тетрамер из T- в R-состояние и облегчает присоединение следующих молекул. 2,3-БФГ стабилизирует T-форму.";
+    ui.cap.innerHTML = s;
+  }
+  let stT = 0;
+  function step(dt) {
+    const [tp, tn] = par(), k = Math.min(1, dt * 5);
+    P50 += (tp - P50) * k; nH += (tn - nH) * k;
+    let d = ""; for (let p = 0; p <= 120; p += 1) d += (d ? " L" : "M") + X(p).toFixed(1) + " " + Y(sat(p, P50, nH)).toFixed(1);
+    cur.setAttribute("d", d);
+    g50a.setAttribute("x1", 52); g50a.setAttribute("x2", X(Math.min(120, P50))); g50a.setAttribute("y1", Y(50)); g50a.setAttribute("y2", Y(50));
+    g50b.setAttribute("x1", X(Math.min(120, P50))); g50b.setAttribute("x2", X(Math.min(120, P50))); g50b.setAttribute("y1", Y(50)); g50b.setAttribute("y2", 316);
+    t50.setAttribute("x", X(Math.min(120, P50)) + 6); t50.setAttribute("y", Y(50) + 16); t50.textContent = "P50 ≈ " + fmt1(P50);
+    const y40 = sat(40, P50, nH), y100 = sat(100, P50, nH), yc = sat(po2, P50, nH);
+    p40.setAttribute("cx", X(40)); p40.setAttribute("cy", Y(y40)); p100.setAttribute("cx", X(100)); p100.setAttribute("cy", Y(y100));
+    t40.setAttribute("x", X(40) + 8); t40.setAttribute("y", Y(y40) + 18); t40.textContent = Math.round(y40) + " %";
+    t100.setAttribute("x", X(100) - 8); t100.setAttribute("y", Y(y100) + 20); t100.setAttribute("text-anchor", "end"); t100.textContent = Math.round(y100) + " %";
+    pl.setAttribute("x1", X(po2)); pl.setAttribute("x2", X(po2)); pl.setAttribute("y1", 316); pl.setAttribute("y2", Y(yc));
+    pp.setAttribute("cx", X(po2)); pp.setAttribute("cy", Y(yc));
+    const nf = Math.round(po2 / 7);
+    fo.forEach((o, i) => {
+      o.vx = (o.vx + rnd(-60, 60) * dt) * 0.98; o.vy = (o.vy + rnd(-60, 60) * dt) * 0.98; o.x += o.vx * dt; o.y += o.vy * dt;
+      if (o.x < 4 || o.x > 256) { o.vx = -o.vx; o.x = clamp(o.x, 4, 256); }
+      if (o.y < 4 || o.y > 256) { o.vy = -o.vy; o.y = clamp(o.y, 4, 256); }
+      o.el.setAttribute("cx", o.x.toFixed(1)); o.el.setAttribute("cy", o.y.toFixed(1)); o.el.setAttribute("opacity", i < nf ? 0.55 : 0);
+    });
+    const mb = prot === "mb", tgt = mb ? (yc >= 50 ? 1 : 0) : Math.round(yc / 25);
+    const ord = mb ? [0] : order;
+    let c = subs.filter(s => s.b).length;
+    cd -= dt;
+    if (cd <= 0 && c < tgt) { const s = subs[ord.find(i => !subs[i].b)]; s.b = true; s.f = 0; cd = 0.28; c++; }
+    else if (cd <= 0 && c > tgt) { const s = subs[ord.slice().reverse().find(i => subs[i].b)]; s.b = false; s.f = 0; cd = 0.28; c--; }
+    const Rt = mb ? 0 : [0, 0.12, 0.45, 0.85, 1][c];
+    R += (Rt - R) * Math.min(1, dt * 3);
+    subs.forEach(s => {
+      s.f = Math.min(1, s.f + dt * 3.5); const e = ease(s.f), off = mb ? 0 : 8 * (1 - R);
+      s.g.setAttribute("transform", "translate(" + (s.dx * off).toFixed(1) + " " + (s.dy * off).toFixed(1) + ") rotate(" + (mb ? 0 : s.sg * 6 * (1 - R)).toFixed(1) + " " + s.cx + " " + s.cy + ")");
+      s.ov.setAttribute("opacity", (mb ? (s.b ? 0.8 : 0) : R).toFixed(2));
+      const fx = s.b ? 1 - e : e, ox = s.hx + s.dx * 60 * fx, oy = s.hy + s.dy * 60 * fx;
+      s.o.setAttribute("transform", "translate(" + ox.toFixed(1) + " " + oy.toFixed(1) + ")");
+      s.o.setAttribute("opacity", (s.b ? e : 1 - e).toFixed(2));
+    });
+    if (bpgEl) bpgEl.setAttribute("opacity", ((1 - R) * (prot === "hbf" ? 0.35 : 1) * clamp(bpg / 5, 0.15, 1)).toFixed(2));
+    stT += dt;
+    if (stT > 0.2) {
+      stT = 0; st.p50(fmt1(P50)); st.yc(Math.round(yc) + " %"); st.ya(Math.round(y100) + " %"); st.yv(Math.round(y40) + " %");
+      st.del(Math.round(y100 - y40) + " %"); st.delB((y100 - y40) / 100);
+    }
+  }
+  build();
+  const loop = anLoop(step);
+  playCtrl(ui.ctrl, loop, null, null);
+  const sl = [];
+  cRadio(cGroup(ui.ctrl, "Белок"), [["hba", "HbA взрослых"], ["hbf", "HbF плода"], ["mb", "Миоглобин"]], prot, v => { prot = v; build(); sl.forEach(s => s.off(v === "mb")); cap(); });
+  const pr = cGroup(ui.ctrl, "Ситуации");
+  const preset = (a2, b, c, dd) => { sl[0].set(a2); sl[1].set(b); sl[2].set(c); sl[3].set(dd); };
+  cBtn(pr, "Норма", () => preset(7.4, 40, 5, 37), "lg");
+  cBtn(pr, "Работающая мышца", () => preset(7.25, 60, 5, 39), "lg");
+  cBtn(pr, "Высокогорье", () => preset(7.45, 30, 7.5, 37), "lg");
+  cBtn(pr, "Кровь после хранения", () => preset(7.4, 40, 1, 37), "lg");
+  const g = cGroup(ui.ctrl, "Условия");
+  sl.push(cSlider(g, "pH", 7, 7.8, 0.01, pH, v => v.toFixed(2).replace(".", ","), v => { pH = v; cap(); }));
+  sl.push(cSlider(g, "pCO₂, мм рт. ст.", 20, 80, 1, pco2, v => String(v), v => { pco2 = v; cap(); }));
+  sl.push(cSlider(g, "2,3-БФГ, ммоль/л", 0.5, 10, 0.1, bpg, fmt1, v => { bpg = v; cap(); }));
+  sl.push(cSlider(g, "Температура, °C", 34, 42, 0.1, temp, fmt1, v => { temp = v; cap(); }));
+  cSlider(g, "pO₂ для модели, мм рт. ст.", 0, 120, 1, po2, v => String(v), v => { po2 = v; });
+  cap(); step(0.3);
+  return {stop: loop.stop};
+}
+
+/* --- 4. β-окисление --- */
+function mountBox(box, a) {
+  const ui = anShell(box, a);
+  const svg = sv("svg", {viewBox: "0 0 860 380", class: "an-svg", role: "img", "aria-label": "Анимация β-окисления жирной кислоты"}, ui.stage);
+  svgText(svg, 812, 40, "в дыхательную цепь", "tick", "middle");
+  const dyn = sv("g", {}, svg);
+  let n0 = 16, n, k, s, p, ac, fadh, nadh, prop, done, speed = 1, once = false, pb;
+  const NAMES = {12: "Лауриновая кислота (C12)", 14: "Миристиновая кислота (C14)", 16: "Пальмитиновая кислота (C16)", 18: "Стеариновая кислота (C18)", 17: "Гептадекановая кислота (C17)"};
+  const total = () => n0 % 2 ? (n0 - 3) / 2 : n0 / 2 - 1;
+  function init() { n = n0; k = 0; s = 1; p = 0; ac = fadh = nadh = prop = 0; done = false; cap(); }
+  const pos = (i, sh) => [650 - (i - 1) * 34 + (i >= 3 ? sh : 0), 150 + (i % 2 === 0 ? 24 : 0)];
+  const pile = j => [72 + (j % 7) * 112, 300 + Math.floor(j / 7) * 36];
+  const L = (x1, y1, x2, y2, o, cls) => '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" class="bond' + (cls || "") + '" opacity="' + o.toFixed(2) + '"/>';
+  const Tx = (x, y, t, cls, o, an) => '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" class="' + cls + '" text-anchor="' + (an || "middle") + '" opacity="' + (o === undefined ? 1 : o).toFixed(2) + '">' + t + '</text>';
+  const chip = (x, y, t, o, cls) => { const w = t.length * 7.4 + 16; return '<g class="chipb' + (cls || "") + '" opacity="' + o.toFixed(2) + '"><rect x="' + (x - w / 2).toFixed(1) + '" y="' + (y - 12).toFixed(1) + '" width="' + w.toFixed(1) + '" height="24" rx="12"/><text x="' + x.toFixed(1) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="middle">' + t + '</text></g>'; };
+  const lerp = (a2, b, t) => a2 + (b - a2) * t;
+  function render() {
+    let h = "";
+    for (let j = 0; j < ac; j++) { const [x, y] = pile(j); h += chip(x, y, "Ацетил-КоА", 1); }
+    if (prop) { const [x, y] = pile(ac); h += chip(x, y, "Пропионил-КоА", 1, " pr"); }
+    if (done) { dyn.innerHTML = h; return; }
+    const q = s === 4 ? clamp((p - 0.35) / 0.65, 0, 1) : 0, eq = ease(q), sh = 68 * eq;
+    const c1 = pos(1, 0), sl = pile(ac), fx = (sl[0] - c1[0] - 20) * eq, fy = (sl[1] - c1[1]) * eq, fo = 1 - clamp((q - 0.75) / 0.25, 0, 1);
+    const P = i => { const [x, y] = pos(i, sh); return i <= 2 && s === 4 ? [x + fx, y + fy] : [x, y]; };
+    for (let i = 1; i < n; i++) {
+      const [x1, y1] = P(i), [x2, y2] = P(i + 1);
+      let o = 1; if (i === 2 && s === 4) o = Math.max(0, 1 - q * 5);
+      h += L(x1, y1, x2, y2, i === 1 && s === 4 ? fo : o, i <= 2 ? " hi" : "");
+    }
+    const [x1, y1] = P(1), [x2, y2] = P(2), [x3, y3] = P(3);
+    const dbl = s === 1 ? p : s === 2 ? 1 - p : 0;
+    if (dbl > 0) { const dx = x2 - x3, dy = y2 - y3, l = Math.hypot(dx, dy), nx = -dy / l * 6, ny = dx / l * 6; h += L(x3 + nx + dx * 0.15, y3 + ny + dy * 0.15, x2 + nx - dx * 0.15, y2 + ny - dy * 0.15, dbl); }
+    const fo1 = s === 4 ? fo : 1;
+    h += L(x1 - 2.5, y1, x1 - 2.5, y1 - 24, fo1) + L(x1 + 2.5, y1, x1 + 2.5, y1 - 24, fo1) + Tx(x1, y1 - 30, "O", "ol", fo1);
+    h += L(x1, y1, x1 + 22, y1, fo1) + Tx(x1 + 26, y1 + 5, "S‑КоА", "sl2", fo1, "start");
+    const oh = s === 2 ? p : s === 3 ? 1 - p : 0, ko = s === 3 ? p : s === 4 ? 1 : 0;
+    if (oh > 0) h += L(x3, y3, x3, y3 - 24, oh) + Tx(x3, y3 - 30, "OH", "ol", oh);
+    if (ko > 0) h += L(x3 - 2.5, y3, x3 - 2.5, y3 - 24, ko) + L(x3 + 2.5, y3, x3 + 2.5, y3 - 24, ko) + Tx(x3, y3 - 30, "O", "ol", ko);
+    if (s === 4) { const ns = clamp((p - 0.3) / 0.3, 0, 1); if (ns > 0) h += L(x3, y3, x3 + 22, y3, ns) + Tx(x3 + 26, y3 + 5, "S‑КоА", "sl2", ns, "start"); }
+    for (let i = 1; i <= n; i++) { const [x, y] = P(i); h += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="4.5" class="cc' + (i <= 2 ? " hi" : "") + '" opacity="' + (i <= 2 && s === 4 ? fo : 1).toFixed(2) + '"/>'; }
+    const [xn, yn] = P(n); h += Tx(xn - 9, yn + 4, "CH₃", "tick", 1, "end");
+    if (s < 4) h += Tx(x2, y2 + 22, "α", "tick") + Tx(x3, y3 + 26, "β", "tick");
+    const mx = (x2 + x3) / 2, top = 112;
+    if (s === 1) { if (p < 0.5) { const t = ease(p / 0.5); h += chip(lerp(440, mx, t), lerp(36, top, t), "FAD", 1); } else { const t = ease((p - 0.5) / 0.5); h += chip(lerp(mx, 812, t), lerp(top, 22, t), "FADH₂", 1 - clamp((t - 0.8) / 0.2, 0, 1)); } }
+    if (s === 2 && p < 0.7) { const t = ease(clamp(p / 0.55, 0, 1)); h += chip(lerp(x3 + 80, x3 + 30, t), lerp(36, y3 - 44, t), "H₂O", 1 - clamp((p - 0.55) / 0.15, 0, 1)); }
+    if (s === 3) { if (p < 0.5) { const t = ease(p / 0.5); h += chip(lerp(440, x3 + 30, t), lerp(36, y3 - 44, t), "NAD⁺", 1); } else { const t = ease((p - 0.5) / 0.5); h += chip(lerp(x3 + 30, 812, t), lerp(y3 - 44, 22, t), "NADH", 1 - clamp((t - 0.8) / 0.2, 0, 1)); } }
+    if (s === 4 && p < 0.4) { const t = ease(clamp(p / 0.3, 0, 1)); h += chip(lerp(x3 + 60, x3 + 50, t), lerp(36, y3 - 46, t), "КоА‑SH", 1 - clamp((p - 0.3) / 0.1, 0, 1)); }
+    dyn.innerHTML = h;
+  }
+  const STEP = ["",
+    "Шаг 1. " + lnk("fad", "Ацил-КоА-дегидрогеназа") + ": FAD забирает два атома водорода, между α- и β-углеродом возникает транс-двойная связь.",
+    "Шаг 2. Еноил-КоА-гидратаза присоединяет воду: у β-углерода появляется OH-группа.",
+    "Шаг 3. 3-Гидроксиацил-КоА-дегидрогеназа: " + lnk("nad", "NAD⁺") + " окисляет OH-группу до кетогруппы.",
+    "Шаг 4. Тиолаза: КоА-SH разрывает связь между α- и β-углеродом. Отделяется " + lnk("acoa", "ацетил-КоА") + ", цепь укорачивается на два атома."];
+  const atpN = () => ac * 10 + fadh * 1.5 + nadh * 2.5 - 2;
+  function cap() {
+    if (done) {
+      ui.cap.innerHTML = esc(NAMES[n0]) + ": " + total() + " циклов → " + ac + " ацетил-КоА, " + fadh + " FADH₂, " + nadh + " NADH" + (prop ? ", 1 пропионил-КоА" : "") +
+        ". " + ac + "×10 + " + fadh + "×1,5 + " + nadh + "×2,5 − 2 = " + fmt1(atpN()).replace(",0", "") + " АТФ." +
+        (prop ? " Пропионил-КоА карбоксилируется (" + lnk("biot", "биотин") + ") и через метилмалонил-КоА (" + lnk("b12", "B₁₂") + ") превращается в " + lnk("succoa", "сукцинил-КоА") + "." : "");
+    } else ui.cap.innerHTML = STEP[s];
+  }
+  const st = statBox(ui.stats, [["cyc", "циклов β-окисления", true], ["ac", "ацетил-КоА"], ["fadh", "FADH₂"], ["nadh", "NADH"], ["atp", "АТФ в итоге (−2 на активацию)"]]);
+  function upd() { st.cyc(k + " из " + total()); st.cycB(k / total()); st.ac(ac); st.fadh(fadh); st.nadh(nadh); st.atp(done ? fmt1(atpN()).replace(",0", "") : "…"); }
+  function finish() {
+    if (s === 1) fadh++; else if (s === 3) nadh++; else if (s === 4) { ac++; n -= 2; k++; }
+    s = s % 4 + 1; p = 0;
+    if (s === 1 && n <= 3) { if (n === 2) ac++; else prop = 1; done = true; }
+    cap(); upd();
+    if (once) { once = false; loop.on = false; if (pb) pb.textContent = "Продолжить"; }
+  }
+  function step(dt) {
+    if (!done) { p += dt * speed / 1.7; if (p >= 1) finish(); }
+    render();
+  }
+  init();
+  const loop = anLoop(step);
+  pb = playCtrl(ui.ctrl, loop, () => { init(); upd(); render(); }, v => { speed = v; });
+  cBtn(ui.ctrl.querySelector(".an-g .row"), "Один шаг", () => { if (done) return; once = true; if (!loop.on) { loop.on = true; pb.textContent = "Пауза"; } });
+  cRadio(cGroup(ui.ctrl, "Жирная кислота"), [[12, "C12"], [14, "C14"], [16, "C16 пальмитат"], [18, "C18 стеарат"], [17, "C17 нечётная"]], n0, v => { n0 = v; init(); upd(); render(); });
+  upd(); render();
+  return {stop: loop.stop};
+}
+
+/* --- 5. цАМФ-каскад --- */
+function mountCamp(box, a) {
+  const ui = anShell(box, a);
+  const svg = sv("svg", {viewBox: "0 0 860 500", class: "an-svg", role: "img", "aria-label": "Анимация каскада цАМФ и мобилизации гликогена"}, ui.stage);
+  const T = (x, y, s, c, an) => svgText(svg, x, y, s, c, an);
+  sv("rect", {x: 0, y: 0, width: 860, height: 72, class: "cp-out"}, svg);
+  sv("rect", {x: 0, y: 72, width: 860, height: 26, class: "etc-mem"}, svg);
+  sv("rect", {x: 0, y: 98, width: 860, height: 402, class: "cp-in"}, svg);
+  for (let x = 6; x < 860; x += 13) { sv("circle", {cx: x, cy: 76, r: 4, class: "lip"}, svg); sv("circle", {cx: x, cy: 94, r: 4, class: "lip"}, svg); }
+  T(14, 24, "Кровь"); T(14, 490, "Гепатоцит");
+  const arrows = ["M134 96 L198 110", "M240 110 L326 100", "M360 126 L398 158", "M330 228 L300 250", "M330 300 L330 332", "M330 368 L330 404", "M630 420 L692 362"].map(d => sv("path", {d: d, class: "arr2", opacity: 0}, svg));
+  sv("rect", {x: 108, y: 44, width: 24, height: 76, rx: 9, class: "cx"}, svg);
+  T(120, 140, "Рецептор", "svt", "middle");
+  const gbg = sv("circle", {cx: 212, cy: 114, r: 9, class: "icn"}, svg);
+  const ga = sv("circle", {cx: 232, cy: 114, r: 12, class: "pkc", opacity: 0.35}, svg);
+  T(222, 150, "Gs", "svt", "middle");
+  const ac = sv("rect", {x: 330, y: 68, width: 60, height: 56, rx: 12, class: "icn"}, svg);
+  T(360, 101, "АЦ", "svt b", "middle"); T(360, 142, "аденилатциклаза", "svt", "middle");
+  T(612, 196, "цАМФ", "svt b");
+  T(20, 277, "ПКА"); T(20, 356, "Киназа фосфорилазы"); T(20, 430, "Гликогенфосфорилаза");
+  const pka = [190, 290, 390, 490].map(x => { const g = sv("g", {}, svg); const r = sv("rect", {x: x - 18, y: 256, width: 36, height: 24, rx: 7, class: "icn"}, g); const c1 = sv("circle", {r: 7, class: "pkc"}, g), c2 = sv("circle", {r: 7, class: "pkc"}, g); return {x: x, r: r, c1: c1, c2: c2, f: 0}; });
+  const badge = (g, x, y) => { const b = sv("g", {class: "pbad", opacity: 0}, g); sv("circle", {cx: x, cy: y, r: 7}, b); svgText(b, x, y + 3, "P", "", "middle"); return b; };
+  const phk = [], gp = [];
+  for (let i = 0; i < 6; i++) { const x = 190 + i * 80, g = sv("g", {}, svg); phk.push({c: sv("circle", {cx: x, cy: 350, r: 13, class: "icn"}, g), b: badge(g, x + 11, 339)}); }
+  for (let i = 0; i < 8; i++) { const x = 190 + i * 60, g = sv("g", {}, svg); gp.push({c: sv("circle", {cx: x, cy: 425, r: 12, class: "icn"}, g), b: badge(g, x + 10, 415)}); }
+  for (let i = 0; i < 26; i++) { const r = 6 + Math.sqrt(i) * 9, an = i * 2.4; sv("circle", {cx: 730 + r * Math.cos(an), cy: 320 + r * Math.sin(an) * 0.8, r: 7, class: "gly"}, svg); }
+  T(730, 386, "Гликоген", "svt b", "middle"); T(740, 492, "глюкозо-1-фосфат → глюкоза → кровь", "svt", "middle");
+  const dyn = sv("g", {}, svg);
+  const hor = []; for (let i = 0; i < 6; i++) hor.push(sv("circle", {r: 6, class: "hor", opacity: 0, cx: 40 + i * 30, cy: 30 + (i % 2) * 14}, dyn));
+  const cam = []; for (let i = 0; i < 40; i++) cam.push({el: sv("circle", {r: 4, class: "cam", opacity: 0}, dyn), x: rnd(270, 600), y: rnd(160, 226), vx: rnd(-40, 40), vy: rnd(-40, 40)});
+  let H = 0, G = 0, C = 0, P = 0, K = 0, F = 0, glc = 0, emit = 0, parts = [], sust = false, caf = false, chol = false, ins = false, stT = 0;
+  const st = statBox(ui.stats, [["g", "Gαs·ГТФ", true], ["c", "цАМФ", true], ["p", "активная ПКА", true], ["k", "киназа фосфорилазы a", true], ["f", "фосфорилаза a", true], ["glc", "выделено глюкозы"]]);
+  function cap() {
+    let s = "Один гормон активирует много молекул Gαs, каждая аденилатциклаза синтезирует много цАМФ, каждая ПКА фосфорилирует много киназ, и так далее. Сигнал усиливается на каждом уровне, поэтому немного " + lnk("epi", "адреналина") + " быстро освобождает много " + lnk("glc", "глюкозы") + ". " + lnk("camp", "цАМФ") + " разрушается фосфодиэстеразой, Gαs выключает себя сам, гидролизуя ГТФ.";
+    if (chol) s += " Холерный токсин АДФ-рибозилирует Gαs: ГТФаза не работает, сигнал не выключается (в энтероцитах это вызывает секрецию Cl⁻ и диарею).";
+    if (caf) s += " Кофеин и теофиллин ингибируют фосфодиэстеразу — цАМФ живёт дольше.";
+    if (ins) s += " " + lnk("ins", "Инсулин") + " активирует фосфодиэстеразу и протеинфосфатазу-1: цАМФ быстро разрушается, ферменты дефосфорилируются, гликогенолиз выключается.";
+    ui.cap.innerHTML = s;
+  }
+  function reset() { H = G = C = P = K = F = glc = 0; parts.forEach(q => q.el.remove()); parts = []; }
+  function step(dt) {
+    const kPDE = 0.6 * (caf ? 0.25 : 1) * (ins ? 3 : 1), kGT = chol ? 0 : 0.8, kPP = 0.3 * (ins ? 3 : 1);
+    H = sust ? 1 : Math.max(0, H - 0.25 * H * dt);
+    G = clamp(G + (1.5 * H * (1 - G) + (chol ? 0.15 * (1 - G) : 0) - kGT * G) * dt, 0, 1);
+    C = Math.max(0, C + (2 * G - kPDE * C) * dt);
+    P += (C * C / (1 + C * C) - P) * Math.min(1, dt * 3);
+    K = clamp(K + (1.2 * P * (1 - K) - kPP * K) * dt, 0, 1);
+    F = clamp(F + (1.2 * K * (1 - F) - kPP * F) * dt, 0, 1);
+    hor.forEach((h, i) => h.setAttribute("opacity", i < Math.round(H * 6) ? 1 : 0));
+    ga.setAttribute("cx", (232 + 60 * G).toFixed(1)); ga.setAttribute("cy", (114 - 8 * G).toFixed(1)); ga.setAttribute("opacity", (0.35 + 0.65 * G).toFixed(2));
+    gbg.classList.toggle("on", G > 0.3); ac.classList.toggle("on", G > 0.3);
+    const nc = Math.round(clamp(C / 3, 0, 1) * 40);
+    cam.forEach((c, i) => {
+      c.vx = (c.vx + rnd(-90, 90) * dt) * 0.98; c.vy = (c.vy + rnd(-90, 90) * dt) * 0.98; c.x += c.vx * dt; c.y += c.vy * dt;
+      if (c.x < 260 || c.x > 600) { c.vx = -c.vx; c.x = clamp(c.x, 260, 600); }
+      if (c.y < 158 || c.y > 228) { c.vy = -c.vy; c.y = clamp(c.y, 158, 228); }
+      c.el.setAttribute("cx", c.x.toFixed(1)); c.el.setAttribute("cy", c.y.toFixed(1)); c.el.setAttribute("opacity", i < nc ? 0.9 : 0);
+    });
+    const np = Math.round(P * 4);
+    pka.forEach((q, i) => {
+      q.f += ((i < np ? 1 : 0) - q.f) * Math.min(1, dt * 4);
+      q.c1.setAttribute("cx", (q.x - 8 - 16 * q.f).toFixed(1)); q.c1.setAttribute("cy", (290 + 10 * q.f).toFixed(1));
+      q.c2.setAttribute("cx", (q.x + 8 + 16 * q.f).toFixed(1)); q.c2.setAttribute("cy", (290 + 10 * q.f).toFixed(1));
+      q.r.classList.toggle("on", q.f > 0.5);
+    });
+    phk.forEach((q, i) => { const on = i < Math.round(K * 6); q.c.classList.toggle("on", on); q.b.setAttribute("opacity", on ? 1 : 0); });
+    gp.forEach((q, i) => { const on = i < Math.round(F * 8); q.c.classList.toggle("on", on); q.b.setAttribute("opacity", on ? 1 : 0); });
+    [H, G, G, C / 3, P, K, F].forEach((v, i) => arrows[i].setAttribute("opacity", clamp(v * 1.4, 0, 1).toFixed(2)));
+    emit += F * 10 * dt;
+    while (emit >= 1) {
+      emit -= 1; glc++;
+      const an = rnd(0, Math.PI * 2), x = 730 + 40 * Math.cos(an), y = 320 + 32 * Math.sin(an);
+      parts.push({el: sv("circle", {r: 4.5, class: "glc"}, dyn), pts: [[x, y], [x + rnd(-20, 20), 440], [rnd(800, 850), 470]], i: 0, x: x, y: y});
+    }
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const q = parts[i]; let mv = 130 * dt;
+      while (mv > 0 && q.i < q.pts.length - 1) {
+        const tx = q.pts[q.i + 1][0], ty = q.pts[q.i + 1][1], dx = tx - q.x, dy = ty - q.y, L2 = Math.hypot(dx, dy);
+        if (L2 <= mv) { q.x = tx; q.y = ty; mv -= L2; q.i++; } else { q.x += dx / L2 * mv; q.y += dy / L2 * mv; mv = 0; }
+      }
+      q.el.setAttribute("cx", q.x.toFixed(1)); q.el.setAttribute("cy", q.y.toFixed(1));
+      if (q.i >= q.pts.length - 1) { q.el.remove(); parts.splice(i, 1); }
+    }
+    stT += dt;
+    if (stT > 0.2) {
+      stT = 0; st.g(Math.round(G * 100) + " %"); st.gB(G); st.c(Math.round(clamp(C / 3, 0, 1) * 100) + " %"); st.cB(C / 3);
+      st.p(Math.round(P * 100) + " %"); st.pB(P); st.k(Math.round(K * 100) + " %"); st.kB(K); st.f(Math.round(F * 100) + " %"); st.fB(F); st.glc(glc);
+    }
+  }
+  const loop = anLoop(step);
+  const row = cGroup(ui.ctrl, "Сигнал");
+  cBtn(row, "Ввести адреналин", () => { H = 1; if (!loop.on) { loop.on = true; pb.textContent = "Пауза"; } }, "btn primary");
+  cToggle(row, "Постоянная стимуляция", false, v => { sust = v; });
+  const pb = playCtrl(ui.ctrl, loop, reset, null);
+  const mr = cGroup(ui.ctrl, "Модификаторы");
+  cToggle(mr, "Кофеин", false, v => { caf = v; cap(); });
+  cToggle(mr, "Холерный токсин", false, v => { chol = v; cap(); });
+  cToggle(mr, "Инсулин", false, v => { ins = v; cap(); });
+  H = 1; cap(); step(0);
+  return {stop: loop.stop};
+}
+
+const ANIMS = [
+  {id: "etc", name: "Дыхательная цепь и АТФ-синтаза", short: "Дыхательная цепь", ac: "#E0601B", mount: mountETC,
+   desc: "Электроны от " + lnk("nad", "NADH") + " и " + lnk("succ", "сукцината") + " идут к O₂, комплексы I, III и IV перекачивают протоны, ротор " + lnk("atp", "АТФ") + "-синтазы вращается за счёт градиента. Включайте ингибиторы и разобщитель и смотрите, где останавливается поток."},
+  {id: "kin", name: "Кинетика ферментов", short: "Кинетика ферментов", ac: "#3865DF", mount: mountKin,
+   desc: "Слева ферменты связывают субстрат и выпускают продукт, справа те же условия на графиках Михаэлиса–Ментен и Лайнуивера–Берка. Меняйте концентрацию субстрата и тип ингибирования."},
+  {id: "hb", name: "Кривая диссоциации оксигемоглобина", short: "Гемоглобин и O₂", ac: "#D52B45", mount: mountHb,
+   desc: "Меняйте pH, pCO₂, " + lnk("bpg23", "2,3-БФГ") + " и температуру: кривая сдвигается, а тетрамер справа переходит между T- и R-состоянием. Пунктир — нормальная кривая взрослого гемоглобина."},
+  {id: "box", name: "β-Окисление жирных кислот", short: "β-Окисление", ac: "#7A5ADB", mount: mountBox,
+   desc: "Цепь " + lnk("palm", "пальмитоил-КоА") + " в митохондриях укорачивается на два атома углерода за цикл из четырёх реакций. Попробуйте кислоту с нечётным числом атомов углерода."},
+  {id: "camp", name: "Каскад цАМФ и распад гликогена", short: "Каскад цАМФ", ac: "#B23FA7", mount: mountCamp,
+   desc: "Адреналин или глюкагон запускают в гепатоците каскад: Gs → аденилатциклаза → " + lnk("camp", "цАМФ") + " → протеинкиназа A → киназа фосфорилазы → гликогенфосфорилаза → глюкоза."}
+];
+let anCur = "etc", anInst = null;
+const anList = $("anList"), anBox = $("anBox");
+ANIMS.forEach(a => {
+  const b = legendBtn(null, a.short, "", a.ac);
+  b.querySelector(".num").remove(); b.dataset.an = a.id;
+  b.addEventListener("click", () => anOpen(a.id));
+  anList.appendChild(b);
+});
+function anOpen(id) {
+  if (anInst) anInst.stop();
+  const a = ANIMS.find(x => x.id === id); anCur = id;
+  anList.querySelectorAll(".lg").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.an === id)));
+  anBox.style.setProperty("--ac", a.ac);
+  anInst = a.mount(anBox, a);
+}
+function anStop() { if (anInst) { anInst.stop(); anInst = null; } }
+
+/* ---------- views & theme ---------- */
+let view = "atlas";
+function setView(v) {
+  view = v;
+  document.querySelectorAll(".views [role=tab]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.view === v)));
+  $("v-atlas").hidden = v !== "atlas"; $("v-rx").hidden = v !== "rx"; $("v-paths").hidden = v !== "paths"; $("v-study").hidden = v !== "study"; $("v-anim").hidden = v !== "anim";
+  if (v === "anim") { if (!anInst) anOpen(anCur); } else anStop();
+  if (v === "paths" && !curPath) renderPath("tca");
+  if (v === "study") sOpen(sTab);
+}
+document.querySelectorAll(".views [role=tab]").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+function setFstyle(v) {
+  if (v === fstyle) return;
+  fstyle = v; lsSet("atlas-fstyle", v);
+  document.querySelectorAll("[data-fs]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.fs === v)));
+  DB.forEach(e => { const m = e._card.querySelector(".mol"); if (m.dataset.painted) paint(m, e, 260, 180, "t-" + e.id); });
+  if (curId) { const e = BY[curId]; dVi = defaultVi(e); renderDetailMol(e, false); renderDetailLearn(e); }
+  document.querySelectorAll(".rx-body[data-done]").forEach(b => { b.removeAttribute("data-done"); const d = b.closest("details"); if (d && d.open) fillRx(d); });
+  if (view === "study") sOpen(sTab);
+}
+document.querySelectorAll("[data-fs]").forEach(b => {
+  b.setAttribute("aria-pressed", String(b.dataset.fs === fstyle));
+  b.addEventListener("click", () => setFstyle(b.dataset.fs));
+});
+document.documentElement.lang = "ru";
+
+const MODES = ["auto", "light", "dark"], MLAB = {auto: "Тема: авто", light: "Тема: светлая", dark: "Тема: тёмная"};
+let mode = "auto";
+$("themeBtn").addEventListener("click", () => {
+  mode = MODES[(MODES.indexOf(mode) + 1) % 3];
+  if (mode === "auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", mode);
+  $("themeBtn").textContent = MLAB[mode];
+  repaintAll();
+});
+const mq = window.matchMedia("(prefers-color-scheme: dark)");
+const onScheme = () => { if (mode === "auto") repaintAll(); };
+if (mq.addEventListener) mq.addEventListener("change", onScheme); else if (mq.addListener) mq.addListener(onScheme);
+</script>
+</body>
+</html>
