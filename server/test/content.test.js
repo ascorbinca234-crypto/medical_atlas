@@ -71,9 +71,14 @@ test('каждый собранный пакет синтаксически ко
     assert.ok(vm.runInContext('Object.keys(DRUGS).length<273',ctx));
    }
    if(atlas==='micro') {
-    const ctx=vm.createContext({window:{},localStorage:{getItem:()=>null}});
-    vm.runInContext(fs.readFileSync(path.join(root,'micro-atlas/src/core.js'),'utf8')+'\n'+code,ctx);
-    assert.ok(vm.runInContext('PG.length<103 && QS.length<205',ctx));
+    const ctx=vm.createContext({window:{},document:{addEventListener(){}},localStorage:{getItem:()=>null}});
+    const src=path.join(root,'micro-atlas/src');
+    vm.runInContext(['core.js','runtime.js'].map(f=>fs.readFileSync(path.join(src,f),'utf8')).join('\n')+'\n'+code,ctx);
+    assert.ok(vm.runInContext('TH.length<=1',ctx),'Each package contains at most one leaf topic: '+id);
+    if(id.startsWith('pg-'))assert.equal(vm.runInContext('PG.length',ctx),1);
+    if(id.startsWith('gallery-'))assert.ok(vm.runInContext('PH.length<=12',ctx));
+    if(/^g\d|^p\d/.test(id))assert.ok(vm.runInContext('QS.length<440',ctx));
+    if(id==='questions')assert.equal(vm.runInContext('QS.length',ctx),440);
    }
   }
  }
