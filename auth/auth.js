@@ -141,8 +141,6 @@
     });
   }
   function bootAtlas(atlas, appId) {
-    // A protected package may replace the body, including the public app element.
-    var appCode = appId && document.getElementById(appId).textContent;
     var owner = user(), full = false, expiresAt = 0, catalog = window.MA_TOPICS || { topics: [], aliases: {} };
     var ids = catalog.topics.map(function (t) { return t.id; });
     function selected(previous) {
@@ -233,7 +231,7 @@
       window.MA_STATE.auth = allowed ? 'ok' : r.status;
       if (atlas === 'micro' && r.status === 'error') window.MICRO_LOAD_ERROR = true;
       if (allowed) { full = true; expiresAt = r.expiresAt; run(r.code); }
-      if (appCode) run(appCode);
+      if (appId) run(document.getElementById(appId).textContent);
       // Legacy biochemistry packages create their navigation before returning.
       // Remove entitlement markers only; loading another package still goes through the API.
       if (atlas === 'biochem' && hasAtlasAccess(atlas)) {

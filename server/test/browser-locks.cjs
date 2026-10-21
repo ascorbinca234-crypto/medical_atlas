@@ -50,13 +50,17 @@ const root = path.resolve(__dirname, '../..');
     }
     await visit('micro', 'g1'); assert.equal(await locks('micro'), true);
     await signIn('admin');
-    for (const [atlas, hash] of [['micro','g6'],['micro','g1'],['farma','k-adr'],['farma','k-gen'],['farma',''],['pathophys','inflammation'],['pathophys','disease'],['pathophys',''],['biochem','topic/sec-aa']]) {
+    for (const [atlas, hash] of [['micro','g6'],['micro','g1'],['farma','k-adr'],['farma','k-gen'],['farma',''],['pathophys','inflammation'],['pathophys','disease'],['pathophys','']]) {
       await visit(atlas, hash);
       assert.equal(await page.evaluate(a => window.MA.hasAtlasAccess(a), atlas), true);
       assert.equal(await locks(atlas), false, atlas + ' ' + hash + ' still has a lock');
       if (atlas === 'micro') assert.match(await page.locator('.brand').textContent(), /Полный доступ/);
       console.log(atlas + ' #' + hash + ': unlocked');
     }
+    await page.goto(origin + '/biochem-atlas/');
+    await page.locator('#grid .card').first().waitFor();
+    assert.equal(await page.locator('#grid .card').count(), 131);
+    assert.equal(await page.locator('.lock-ico').count(), 0);
     // An unloaded lesson remains a stub; its content still requires server delivery.
     await visit('micro','g6');
     assert.equal(await page.evaluate(() => TMAP.g3.locked), true);
@@ -87,6 +91,6 @@ const root = path.resolve(__dirname, '../..');
     await page.waitForFunction(() => document.querySelector('.nav')?.textContent.includes('🔒'));
     assert.equal(await page.evaluate(() => window.MA.hasAtlasAccess('micro')), false);
     assert.deepEqual(errors, []);
-    console.log('All four atlases: admin navigation unlocked on free/paid pages; topic API loading retained; subject subscription, expiry, logout and mobile menu passed.');
+    console.log('Protected atlases: access, topic API, expiry and logout passed. Original biochemistry: all 131 cards available.');
   } finally {await browser.close(); await new Promise(r => server.close(r));}
 })().catch(e => {console.error(e); process.exitCode = 1;});

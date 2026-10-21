@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Public: two basic notes. --full: validate and package the complete private atlas."""
-import argparse, html, json, os, re, sys
+"""Build the original complete atlas. --full also preserves legacy topic API packages."""
+import argparse, json, os, re, sys
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
@@ -93,14 +93,13 @@ def main():
         topic_build.biochem(data, style, markup, app, (PRIV / 'src/locked.js').read_text())
         print('Полная биохимия:', len(data['substances.json']), 'веществ,', len(data['reactions.json']), 'реакций')
     template = (ROOT / 'src/template.html').read_text()
-    catalog = json.loads((ROOT / 'topics.json').read_text())
-    template = template.replace('<script src="../auth/config.js"></script>', '<script>window.MA_TOPICS=' + encode(catalog) + ';</script>\n<script src="../auth/config.js"></script>')
-    cards = ''.join('<a class="card topic-card" data-biochem-topic="'+html.escape(t['id'], quote=True)+'" href="#topic/'+html.escape(t['id'], quote=True)+'"'+(' hidden' if not t['id'].startswith('sec-') else '')+'><span class="cname">'+html.escape(t['title'])+'</span><span class="topic-meta">По подписке →</span></a>' for t in catalog['topics'])
-    template = template.replace('<!--TOPICS-->', cards).replace('<!--APP-->', (ROOT / 'src/app.js').read_text())
-    demo = json.loads((ROOT / 'data/demo.json').read_text())
-    if [x['id'] for x in demo] != ['amino-acids', 'monosaccharides']: sys.exit('Нужны ровно два базовых конспекта')
-    if '<script' in str(demo).lower(): sys.exit('Недопустимая разметка конспекта')
-    notes = ''.join('<article class="free-note" id="'+x['id']+'" hidden><a class="home-link" href="#atlas">← Все разделы</a><div class="eyebrow">Открытый конспект '+str(i+1)+'</div><h2>'+x['title']+'</h2>'+x['html']+'</article>' for i,x in enumerate(demo))
-    (ROOT / 'index.html').write_text(template.replace('<!--NOTES-->', notes))
-    print('Публичная биохимия: два базовых конспекта')
+    data = {n: json.loads((ROOT / 'data' / n).read_text()) for n in NAMES}
+    problems = check(data)
+    if problems: sys.exit('\n'.join(problems))
+    def inject(match):
+        text = json.dumps(data[match.group(1)], ensure_ascii=False, separators=(',', ':'))
+        if '</script' in text.lower(): sys.exit('Недопустимый тег script в данных')
+        return text
+    (ROOT / 'index.html').write_text(re.sub(r'/\*@([a-z]+\.json)\*/', inject, template))
+    print('Исходная биохимия:', len(data['substances.json']), 'веществ,', len(data['reactions.json']), 'реакций')
 if __name__ == '__main__': main()
