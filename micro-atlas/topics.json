@@ -2,528 +2,1026 @@
   "topics": [
     {
       "id": "g1",
-      "title": "Морфология микроорганизмов"
+      "title": "Морфология микроорганизмов",
+      "route": "g1"
     },
     {
       "id": "g2",
-      "title": "Физиология микроорганизмов"
+      "title": "Физиология микроорганизмов",
+      "route": "g2"
     },
     {
       "id": "g3",
-      "title": "Морфология и физиология грибов"
+      "title": "Морфология и физиология грибов",
+      "route": "g3"
     },
     {
       "id": "g4",
-      "title": "Неживые участники регуляции жизни"
+      "title": "Неживые участники регуляции жизни",
+      "route": "g4"
     },
     {
       "id": "g5",
-      "title": "Генетика микроорганизмов"
+      "title": "Генетика микроорганизмов",
+      "route": "g5"
     },
     {
       "id": "g6",
-      "title": "Экология микроорганизмов. Микробиота человека"
+      "title": "Экология микроорганизмов",
+      "route": "g6"
     },
     {
       "id": "g7",
-      "title": "Микробиота полости рта"
+      "title": "Микробиота полости рта",
+      "route": "g7"
     },
     {
       "id": "g8",
-      "title": "Противомикробные препараты"
+      "title": "Противомикробные препараты",
+      "route": "g8"
     },
     {
       "id": "g9",
-      "title": "Патогенность и вирулентность"
+      "title": "Патогенность и вирулентность",
+      "route": "g9"
     },
     {
       "id": "g10",
-      "title": "Повреждающее действие факторов иммунной системы"
+      "title": "Повреждающее действие факторов иммунной системы",
+      "route": "g10"
+    },
+    {
+      "id": "g11",
+      "title": "Микробиота человека",
+      "route": "g11"
     },
     {
       "id": "p1",
-      "title": "Принципы диагностики инфекционных заболеваний"
+      "title": "Принципы диагностики инфекционных заболеваний",
+      "route": "p1"
     },
     {
       "id": "p2",
-      "title": "Аэробные возбудители гнойно-воспалительных и раневых инфекций"
+      "title": "Аэробные возбудители гнойно-воспалительных и раневых инфекций",
+      "route": "p2"
     },
     {
       "id": "p3",
-      "title": "Анаэробные возбудители гнойно-воспалительных и раневых инфекций"
+      "title": "Анаэробные возбудители гнойно-воспалительных и раневых инфекций",
+      "route": "p3"
     },
     {
       "id": "p4",
-      "title": "Возбудители кариеса, заболеваний эндодонта и пародонта"
+      "title": "Возбудители кариеса, заболеваний эндодонта и пародонта",
+      "route": "p4"
     },
     {
       "id": "p5",
-      "title": "Возбудители бактериальных респираторных инфекций"
+      "title": "Возбудители бактериальных респираторных инфекций",
+      "route": "p5"
     },
     {
       "id": "p6",
-      "title": "Возбудители бактериальных кишечных инфекций"
+      "title": "Возбудители бактериальных кишечных инфекций",
+      "route": "p6"
     },
     {
       "id": "p7",
-      "title": "Возбудители урогенитальных инфекций"
+      "title": "Возбудители урогенитальных инфекций",
+      "route": "p7"
     },
     {
       "id": "p8",
-      "title": "Возбудители микозов"
+      "title": "Возбудители микозов",
+      "route": "p8"
     },
     {
       "id": "p9",
-      "title": "Возбудители зооантропонозов"
+      "title": "Возбудители зооантропонозов",
+      "route": "p9"
     },
     {
       "id": "p10",
-      "title": "Возбудители трансмиссивных инфекций"
+      "title": "Возбудители трансмиссивных инфекций",
+      "route": "p10"
     },
     {
       "id": "p11",
-      "title": "Особенности диагностики вирусных инфекций"
+      "title": "Особенности диагностики вирусных инфекций",
+      "route": "p11"
     },
     {
       "id": "p12",
-      "title": "Вирусы — возбудители заболеваний человека"
+      "title": "Возбудители респираторных вирусных инфекций",
+      "route": "p12"
+    },
+    {
+      "id": "p13",
+      "title": "Возбудители нейровирусных инфекций",
+      "route": "p13"
+    },
+    {
+      "id": "p14",
+      "title": "Возбудители кишечных вирусных инфекций",
+      "route": "p14"
+    },
+    {
+      "id": "p15",
+      "title": "Возбудители вирусных гепатитов",
+      "route": "p15"
+    },
+    {
+      "id": "p16",
+      "title": "Вирусы иммунодефицита человека",
+      "route": "p16"
+    },
+    {
+      "id": "p17",
+      "title": "Возбудители герпесвирусных инфекций",
+      "route": "p17"
+    },
+    {
+      "id": "p18",
+      "title": "Онкогенные вирусы",
+      "route": "p18"
+    },
+    {
+      "id": "z1",
+      "title": "Зачёт 1. Морфология и физиология микроорганизмов",
+      "route": "z1"
+    },
+    {
+      "id": "z2",
+      "title": "Зачёт 2. Вирусы и прионы, генетика, микробиота и экология",
+      "route": "z2"
+    },
+    {
+      "id": "z3",
+      "title": "Зачёт 3. Противомикробные препараты, патогенность и иммунопатология",
+      "route": "z3"
+    },
+    {
+      "id": "z4",
+      "title": "Зачёт 4. Диагностика; гнойно-раневые, стоматологические и респираторные бактериальные инфекции",
+      "route": "z4"
+    },
+    {
+      "id": "z5",
+      "title": "Зачёт 5. Микозы, урогенитальные инфекции, зооантропонозы, трансмиссивные инфекции",
+      "route": "z5"
+    },
+    {
+      "id": "z6",
+      "title": "Зачёт 6. Бактериальные кишечные инфекции",
+      "route": "z6"
+    },
+    {
+      "id": "z7",
+      "title": "Зачёт 7. Вирусные инфекции",
+      "route": "z7"
     },
     {
       "id": "pg-staph-aureus",
-      "title": "Staphylococcus aureus"
+      "title": "Staphylococcus aureus",
+      "route": "pathogens/staph-aureus"
     },
     {
       "id": "pg-staph-epi",
-      "title": "Staphylococcus epidermidis"
+      "title": "Staphylococcus epidermidis",
+      "route": "pathogens/staph-epi"
     },
     {
       "id": "pg-strep-pyo",
-      "title": "Streptococcus pyogenes"
+      "title": "Streptococcus pyogenes",
+      "route": "pathogens/strep-pyo"
     },
     {
       "id": "pg-strep-agal",
-      "title": "Streptococcus agalactiae"
+      "title": "Streptococcus agalactiae",
+      "route": "pathogens/strep-agal"
     },
     {
       "id": "pg-strep-pneumo",
-      "title": "Streptococcus pneumoniae"
+      "title": "Streptococcus pneumoniae",
+      "route": "pathogens/strep-pneumo"
     },
     {
       "id": "pg-strep-viridans",
-      "title": "Streptococcus spp. (группа viridans)"
+      "title": "Streptococcus spp. (группа viridans)",
+      "route": "pathogens/strep-viridans"
     },
     {
       "id": "pg-strep-mutans",
-      "title": "Streptococcus mutans"
+      "title": "Streptococcus mutans",
+      "route": "pathogens/strep-mutans"
     },
     {
       "id": "pg-enterococcus",
-      "title": "Enterococcus faecalis"
+      "title": "Enterococcus faecalis",
+      "route": "pathogens/enterococcus"
     },
     {
       "id": "pg-aerococcus",
-      "title": "Aerococcus urinae"
+      "title": "Aerococcus urinae",
+      "route": "pathogens/aerococcus"
     },
     {
       "id": "pg-parvimonas",
-      "title": "Parvimonas micra"
+      "title": "Parvimonas micra",
+      "route": "pathogens/parvimonas"
     },
     {
       "id": "pg-coryne-diph",
-      "title": "Corynebacterium diphtheriae"
+      "title": "Corynebacterium diphtheriae",
+      "route": "pathogens/coryne-diph"
     },
     {
       "id": "pg-listeria",
-      "title": "Listeria monocytogenes"
+      "title": "Listeria monocytogenes",
+      "route": "pathogens/listeria"
     },
     {
       "id": "pg-bacillus-anthracis",
-      "title": "Bacillus anthracis"
+      "title": "Bacillus anthracis",
+      "route": "pathogens/bacillus-anthracis"
     },
     {
       "id": "pg-bacillus-cereus",
-      "title": "Bacillus cereus"
+      "title": "Bacillus cereus",
+      "route": "pathogens/bacillus-cereus"
     },
     {
       "id": "pg-lactobacillus",
-      "title": "Lactobacillus spp."
+      "title": "Lactobacillus spp.",
+      "route": "pathogens/lactobacillus"
     },
     {
       "id": "pg-bifidobacterium",
-      "title": "Bifidobacterium spp."
+      "title": "Bifidobacterium spp.",
+      "route": "pathogens/bifidobacterium"
     },
     {
       "id": "pg-cutibacterium",
-      "title": "Cutibacterium acnes"
+      "title": "Cutibacterium acnes",
+      "route": "pathogens/cutibacterium"
     },
     {
       "id": "pg-actino-israelii",
-      "title": "Actinomyces israelii"
+      "title": "Actinomyces israelii",
+      "route": "pathogens/actino-israelii"
     },
     {
       "id": "pg-nocardia",
-      "title": "Nocardia spp."
+      "title": "Nocardia spp.",
+      "route": "pathogens/nocardia"
     },
     {
       "id": "pg-clost-perf",
-      "title": "Clostridium perfringens"
+      "title": "Clostridium perfringens",
+      "route": "pathogens/clost-perf"
     },
     {
       "id": "pg-clost-tetani",
-      "title": "Clostridium tetani"
+      "title": "Clostridium tetani",
+      "route": "pathogens/clost-tetani"
     },
     {
       "id": "pg-clost-botul",
-      "title": "Clostridium botulinum"
+      "title": "Clostridium botulinum",
+      "route": "pathogens/clost-botul"
     },
     {
       "id": "pg-clost-diff",
-      "title": "Clostridioides difficile"
+      "title": "Clostridioides difficile",
+      "route": "pathogens/clost-diff"
     },
     {
       "id": "pg-neis-gon",
-      "title": "Neisseria gonorrhoeae"
+      "title": "Neisseria gonorrhoeae",
+      "route": "pathogens/neis-gon"
     },
     {
       "id": "pg-neis-men",
-      "title": "Neisseria meningitidis"
+      "title": "Neisseria meningitidis",
+      "route": "pathogens/neis-men"
     },
     {
       "id": "pg-veillonella",
-      "title": "Veillonella parvula"
+      "title": "Veillonella parvula",
+      "route": "pathogens/veillonella"
     },
     {
       "id": "pg-e-coli",
-      "title": "Escherichia coli"
+      "title": "Escherichia coli",
+      "route": "pathogens/e-coli"
     },
     {
       "id": "pg-klebsiella",
-      "title": "Klebsiella pneumoniae"
+      "title": "Klebsiella pneumoniae",
+      "route": "pathogens/klebsiella"
     },
     {
       "id": "pg-salm-typhi",
-      "title": "Salmonella Typhi"
+      "title": "Salmonella Typhi",
+      "route": "pathogens/salm-typhi"
     },
     {
       "id": "pg-salm-nts",
-      "title": "Salmonella enterica"
+      "title": "Salmonella enterica",
+      "route": "pathogens/salm-nts"
     },
     {
       "id": "pg-shigella",
-      "title": "Shigella spp."
+      "title": "Shigella spp.",
+      "route": "pathogens/shigella"
     },
     {
       "id": "pg-yersinia-ent",
-      "title": "Yersinia enterocolitica"
+      "title": "Yersinia enterocolitica",
+      "route": "pathogens/yersinia-ent"
     },
     {
       "id": "pg-vibrio-cholerae",
-      "title": "Vibrio cholerae"
+      "title": "Vibrio cholerae",
+      "route": "pathogens/vibrio-cholerae"
     },
     {
       "id": "pg-vibrio-vuln",
-      "title": "Vibrio vulnificus"
+      "title": "Vibrio vulnificus",
+      "route": "pathogens/vibrio-vuln"
     },
     {
       "id": "pg-pseudomonas",
-      "title": "Pseudomonas aeruginosa"
+      "title": "Pseudomonas aeruginosa",
+      "route": "pathogens/pseudomonas"
     },
     {
       "id": "pg-acinetobacter",
-      "title": "Acinetobacter baumannii"
+      "title": "Acinetobacter baumannii",
+      "route": "pathogens/acinetobacter"
     },
     {
       "id": "pg-h-influenzae",
-      "title": "Haemophilus influenzae"
+      "title": "Haemophilus influenzae",
+      "route": "pathogens/h-influenzae"
     },
     {
       "id": "pg-bordetella",
-      "title": "Bordetella pertussis"
+      "title": "Bordetella pertussis",
+      "route": "pathogens/bordetella"
     },
     {
       "id": "pg-legionella",
-      "title": "Legionella pneumophila"
+      "title": "Legionella pneumophila",
+      "route": "pathogens/legionella"
     },
     {
       "id": "pg-pasteurella",
-      "title": "Pasteurella multocida"
+      "title": "Pasteurella multocida",
+      "route": "pathogens/pasteurella"
     },
     {
       "id": "pg-bacteroides",
-      "title": "Bacteroides fragilis"
+      "title": "Bacteroides fragilis",
+      "route": "pathogens/bacteroides"
     },
     {
       "id": "pg-prevotella",
-      "title": "Prevotella intermedia"
+      "title": "Prevotella intermedia",
+      "route": "pathogens/prevotella"
     },
     {
       "id": "pg-porph-ging",
-      "title": "Porphyromonas gingivalis"
+      "title": "Porphyromonas gingivalis",
+      "route": "pathogens/porph-ging"
     },
     {
       "id": "pg-tannerella",
-      "title": "Tannerella forsythia"
+      "title": "Tannerella forsythia",
+      "route": "pathogens/tannerella"
     },
     {
       "id": "pg-fuso-nucl",
-      "title": "Fusobacterium nucleatum"
+      "title": "Fusobacterium nucleatum",
+      "route": "pathogens/fuso-nucl"
     },
     {
       "id": "pg-aggreg-actino",
-      "title": "Aggregatibacter actinomycetemcomitans"
+      "title": "Aggregatibacter actinomycetemcomitans",
+      "route": "pathogens/aggreg-actino"
     },
     {
       "id": "pg-eikenella",
-      "title": "Eikenella corrodens"
+      "title": "Eikenella corrodens",
+      "route": "pathogens/eikenella"
     },
     {
       "id": "pg-campylobacter",
-      "title": "Campylobacter spp."
+      "title": "Campylobacter spp.",
+      "route": "pathogens/campylobacter"
     },
     {
       "id": "pg-helicobacter",
-      "title": "Helicobacter pylori"
+      "title": "Helicobacter pylori",
+      "route": "pathogens/helicobacter"
     },
     {
       "id": "pg-gardnerella",
-      "title": "Gardnerella vaginalis"
+      "title": "Gardnerella vaginalis",
+      "route": "pathogens/gardnerella"
     },
     {
       "id": "pg-myco-tb",
-      "title": "Mycobacterium tuberculosis"
+      "title": "Mycobacterium tuberculosis",
+      "route": "pathogens/myco-tb"
     },
     {
       "id": "pg-myco-leprae",
-      "title": "Mycobacterium leprae"
+      "title": "Mycobacterium leprae",
+      "route": "pathogens/myco-leprae"
     },
     {
       "id": "pg-trepo-pallidum",
-      "title": "Treponema pallidum"
+      "title": "Treponema pallidum",
+      "route": "pathogens/trepo-pallidum"
     },
     {
       "id": "pg-trepo-denticola",
-      "title": "Treponema denticola"
+      "title": "Treponema denticola",
+      "route": "pathogens/trepo-denticola"
     },
     {
       "id": "pg-borrelia",
-      "title": "Borrelia burgdorferi sensu lato"
+      "title": "Borrelia burgdorferi sensu lato",
+      "route": "pathogens/borrelia"
     },
     {
       "id": "pg-leptospira",
-      "title": "Leptospira interrogans"
+      "title": "Leptospira interrogans",
+      "route": "pathogens/leptospira"
     },
     {
       "id": "pg-chlam-trach",
-      "title": "Chlamydia trachomatis"
+      "title": "Chlamydia trachomatis",
+      "route": "pathogens/chlam-trach"
     },
     {
       "id": "pg-chlam-pneu",
-      "title": "Chlamydia pneumoniae"
+      "title": "Chlamydia pneumoniae",
+      "route": "pathogens/chlam-pneu"
     },
     {
       "id": "pg-myco-genit",
-      "title": "Mycoplasma genitalium"
+      "title": "Mycoplasma genitalium",
+      "route": "pathogens/myco-genit"
     },
     {
       "id": "pg-mycoplasma-pneu",
-      "title": "Mycoplasma pneumoniae"
+      "title": "Mycoplasma pneumoniae",
+      "route": "pathogens/mycoplasma-pneu"
     },
     {
       "id": "pg-rick-prow",
-      "title": "Rickettsia spp."
+      "title": "Rickettsia spp.",
+      "route": "pathogens/rick-prow"
     },
     {
       "id": "pg-coxiella",
-      "title": "Coxiella burnetii"
+      "title": "Coxiella burnetii",
+      "route": "pathogens/coxiella"
     },
     {
       "id": "pg-yersinia-pestis",
-      "title": "Yersinia pestis"
+      "title": "Yersinia pestis",
+      "route": "pathogens/yersinia-pestis"
     },
     {
       "id": "pg-francisella",
-      "title": "Francisella tularensis"
+      "title": "Francisella tularensis",
+      "route": "pathogens/francisella"
     },
     {
       "id": "pg-brucella",
-      "title": "Brucella spp."
+      "title": "Brucella spp.",
+      "route": "pathogens/brucella"
     },
     {
       "id": "pg-candida-albicans",
-      "title": "Candida albicans"
+      "title": "Candida albicans",
+      "route": "pathogens/candida-albicans"
     },
     {
       "id": "pg-candida-auris",
-      "title": "Candida auris"
+      "title": "Candida auris",
+      "route": "pathogens/candida-auris"
     },
     {
       "id": "pg-crypto-neoformans",
-      "title": "Cryptococcus neoformans"
+      "title": "Cryptococcus neoformans",
+      "route": "pathogens/crypto-neoformans"
     },
     {
       "id": "pg-aspergillus-fum",
-      "title": "Aspergillus fumigatus"
+      "title": "Aspergillus fumigatus",
+      "route": "pathogens/aspergillus-fum"
     },
     {
       "id": "pg-mucorales",
-      "title": "Mucorales"
+      "title": "Mucorales",
+      "route": "pathogens/mucorales"
     },
     {
       "id": "pg-pneumocystis",
-      "title": "Pneumocystis jirovecii"
+      "title": "Pneumocystis jirovecii",
+      "route": "pathogens/pneumocystis"
     },
     {
       "id": "pg-trichophyton",
-      "title": "Dermatophytes"
+      "title": "Dermatophytes",
+      "route": "pathogens/trichophyton"
     },
     {
       "id": "pg-malassezia",
-      "title": "Malassezia furfur"
+      "title": "Malassezia furfur",
+      "route": "pathogens/malassezia"
     },
     {
       "id": "pg-trichomonas",
-      "title": "Trichomonas vaginalis"
+      "title": "Trichomonas vaginalis",
+      "route": "pathogens/trichomonas"
     },
     {
       "id": "pg-plasmodium",
-      "title": "Plasmodium spp."
+      "title": "Plasmodium spp.",
+      "route": "pathogens/plasmodium"
     },
     {
       "id": "pg-influenza",
-      "title": "Вирусы гриппа A, B, C"
+      "title": "Вирусы гриппа A, B, C",
+      "route": "pathogens/influenza"
     },
     {
       "id": "pg-sars-cov-2",
-      "title": "SARS-CoV-2"
+      "title": "SARS-CoV-2",
+      "route": "pathogens/sars-cov-2"
     },
     {
       "id": "pg-rsv",
-      "title": "Респираторно-синцитиальный вирус"
+      "title": "Респираторно-синцитиальный вирус",
+      "route": "pathogens/rsv"
     },
     {
       "id": "pg-measles",
-      "title": "Вирус кори"
+      "title": "Вирус кори",
+      "route": "pathogens/measles"
     },
     {
       "id": "pg-mumps",
-      "title": "Вирус эпидемического паротита"
+      "title": "Вирус эпидемического паротита",
+      "route": "pathogens/mumps"
     },
     {
       "id": "pg-rubella",
-      "title": "Вирус краснухи"
+      "title": "Вирус краснухи",
+      "route": "pathogens/rubella"
     },
     {
       "id": "pg-polio",
-      "title": "Полиовирусы и энтеровирусы"
+      "title": "Полиовирусы и энтеровирусы",
+      "route": "pathogens/polio"
     },
     {
       "id": "pg-coxsackie",
-      "title": "Вирусы Коксаки"
+      "title": "Вирусы Коксаки",
+      "route": "pathogens/coxsackie"
     },
     {
       "id": "pg-rotavirus",
-      "title": "Ротавирусы"
+      "title": "Ротавирусы",
+      "route": "pathogens/rotavirus"
     },
     {
       "id": "pg-norovirus",
-      "title": "Норовирусы"
+      "title": "Норовирусы",
+      "route": "pathogens/norovirus"
     },
     {
       "id": "pg-hav",
-      "title": "Вирус гепатита A"
+      "title": "Вирус гепатита A",
+      "route": "pathogens/hav"
     },
     {
       "id": "pg-hbv",
-      "title": "Вирус гепатита B"
+      "title": "Вирус гепатита B",
+      "route": "pathogens/hbv"
     },
     {
       "id": "pg-hcv",
-      "title": "Вирус гепатита C"
+      "title": "Вирус гепатита C",
+      "route": "pathogens/hcv"
     },
     {
       "id": "pg-hdv",
-      "title": "Вирус гепатита D"
+      "title": "Вирус гепатита D",
+      "route": "pathogens/hdv"
     },
     {
       "id": "pg-hev",
-      "title": "Вирус гепатита E"
+      "title": "Вирус гепатита E",
+      "route": "pathogens/hev"
     },
     {
       "id": "pg-hsv",
-      "title": "Вирусы простого герпеса 1 и 2"
+      "title": "Вирусы простого герпеса 1 и 2",
+      "route": "pathogens/hsv"
     },
     {
       "id": "pg-vzv",
-      "title": "Вирус ветряной оспы и опоясывающего лишая"
+      "title": "Вирус ветряной оспы и опоясывающего лишая",
+      "route": "pathogens/vzv"
     },
     {
       "id": "pg-ebv",
-      "title": "Вирус Эпштейна—Барр"
+      "title": "Вирус Эпштейна—Барр",
+      "route": "pathogens/ebv"
     },
     {
       "id": "pg-cmv",
-      "title": "Цитомегаловирус"
+      "title": "Цитомегаловирус",
+      "route": "pathogens/cmv"
     },
     {
       "id": "pg-hhv8",
-      "title": "Герпесвирус человека 8"
+      "title": "Герпесвирус человека 8",
+      "route": "pathogens/hhv8"
     },
     {
       "id": "pg-hpv",
-      "title": "Вирусы папилломы человека"
+      "title": "Вирусы папилломы человека",
+      "route": "pathogens/hpv"
     },
     {
       "id": "pg-htlv",
-      "title": "T-лимфотропный вирус человека 1"
+      "title": "T-лимфотропный вирус человека 1",
+      "route": "pathogens/htlv"
     },
     {
       "id": "pg-hiv",
-      "title": "Вирус иммунодефицита человека"
+      "title": "Вирус иммунодефицита человека",
+      "route": "pathogens/hiv"
     },
     {
       "id": "pg-rabies",
-      "title": "Вирус бешенства"
+      "title": "Вирус бешенства",
+      "route": "pathogens/rabies"
     },
     {
       "id": "pg-variola",
-      "title": "Вирус натуральной оспы"
+      "title": "Вирус натуральной оспы",
+      "route": "pathogens/variola"
     },
     {
       "id": "pg-mpox",
-      "title": "Вирус оспы обезьян"
+      "title": "Вирус оспы обезьян",
+      "route": "pathogens/mpox"
     },
     {
       "id": "pg-tbev",
-      "title": "Вирус клещевого энцефалита"
+      "title": "Вирус клещевого энцефалита",
+      "route": "pathogens/tbev"
     },
     {
       "id": "pg-prion",
-      "title": "Прионы"
+      "title": "Прионы",
+      "route": "pathogens/prion"
+    },
+    {
+      "id": "pg-proteus",
+      "title": "Proteus spp.",
+      "route": "pathogens/proteus"
+    },
+    {
+      "id": "pg-bacillus-subtilis",
+      "title": "Bacillus subtilis",
+      "route": "pathogens/bacillus-subtilis"
+    },
+    {
+      "id": "pg-borrelia-recurrentis",
+      "title": "Borrelia recurrentis",
+      "route": "pathogens/borrelia-recurrentis"
+    },
+    {
+      "id": "pg-rick-typhi",
+      "title": "Rickettsia typhi",
+      "route": "pathogens/rick-typhi"
+    },
+    {
+      "id": "pg-anaplasma",
+      "title": "Anaplasma phagocytophilum",
+      "route": "pathogens/anaplasma"
+    },
+    {
+      "id": "pg-ehrlichia",
+      "title": "Ehrlichia spp.",
+      "route": "pathogens/ehrlichia"
+    },
+    {
+      "id": "pg-toxoplasma",
+      "title": "Toxoplasma gondii",
+      "route": "pathogens/toxoplasma"
+    },
+    {
+      "id": "pg-adenovirus",
+      "title": "Human mastadenovirus",
+      "route": "pathogens/adenovirus"
+    },
+    {
+      "id": "pg-rhinovirus",
+      "title": "Rhinovirus A, B, C",
+      "route": "pathogens/rhinovirus"
+    },
+    {
+      "id": "pg-coronaviruses",
+      "title": "Coronaviridae",
+      "route": "pathogens/coronaviruses"
+    },
+    {
+      "id": "pg-astrovirus",
+      "title": "Astroviridae",
+      "route": "pathogens/astrovirus"
+    },
+    {
+      "id": "pg-ebola",
+      "title": "Orthoebolavirus zairense",
+      "route": "pathogens/ebola"
+    },
+    {
+      "id": "pg-yellow-fever",
+      "title": "Orthoflavivirus flavi",
+      "route": "pathogens/yellow-fever"
+    },
+    {
+      "id": "pg-ntm",
+      "title": "Нетуберкулёзные микобактерии",
+      "route": "pathogens/ntm"
+    },
+    {
+      "id": "pg-hgv",
+      "title": "Pegivirus (HPgV-1, бывший вирус гепатита G)",
+      "route": "pathogens/hgv"
+    },
+    {
+      "id": "questions",
+      "title": "Вопросы экзамена · оба набора",
+      "route": "questions"
+    },
+    {
+      "id": "learn-pg",
+      "title": "Тренажёр возбудителей",
+      "route": "learn/pg"
+    },
+    {
+      "id": "gallery-1",
+      "title": "Микропрепараты · страница 1",
+      "route": "gallery/1"
+    },
+    {
+      "id": "gallery-2",
+      "title": "Микропрепараты · страница 2",
+      "route": "gallery/2"
+    },
+    {
+      "id": "gallery-3",
+      "title": "Микропрепараты · страница 3",
+      "route": "gallery/3"
+    },
+    {
+      "id": "gallery-4",
+      "title": "Микропрепараты · страница 4",
+      "route": "gallery/4"
+    },
+    {
+      "id": "gallery-5",
+      "title": "Микропрепараты · страница 5",
+      "route": "gallery/5"
+    },
+    {
+      "id": "gallery-6",
+      "title": "Микропрепараты · страница 6",
+      "route": "gallery/6"
+    },
+    {
+      "id": "gallery-7",
+      "title": "Микропрепараты · страница 7",
+      "route": "gallery/7"
+    },
+    {
+      "id": "gallery-8",
+      "title": "Микропрепараты · страница 8",
+      "route": "gallery/8"
+    },
+    {
+      "id": "gallery-9",
+      "title": "Микропрепараты · страница 9",
+      "route": "gallery/9"
+    },
+    {
+      "id": "gallery-10",
+      "title": "Микропрепараты · страница 10",
+      "route": "gallery/10"
+    },
+    {
+      "id": "gallery-11",
+      "title": "Микропрепараты · страница 11",
+      "route": "gallery/11"
+    },
+    {
+      "id": "anim-gram",
+      "title": "Окраска по Граму: что происходит с клетками на каждом этапе",
+      "route": "anim/gram"
+    },
+    {
+      "id": "anim-growth",
+      "title": "Кривая роста бактерий в периодической культуре",
+      "route": "anim/growth"
+    },
+    {
+      "id": "anim-biofilm",
+      "title": "Стадии формирования биоплёнки",
+      "route": "anim/biofilm"
+    },
+    {
+      "id": "anim-transfer",
+      "title": "Горизонтальный перенос генов у бактерий",
+      "route": "anim/transfer"
+    },
+    {
+      "id": "anim-virus-cycle",
+      "title": "Продуктивная вирусная инфекция: стадии взаимодействия вируса с клеткой",
+      "route": "anim/virus-cycle"
+    },
+    {
+      "id": "anim-phage-cycle",
+      "title": "Бактериофаг: литический и лизогенный циклы",
+      "route": "anim/phage-cycle"
+    },
+    {
+      "id": "anim-plaque",
+      "title": "Формирование зубной бляшки: от пелликулы к поздним колонизаторам",
+      "route": "anim/plaque"
+    },
+    {
+      "id": "anim-stephan",
+      "title": "Кривая Стефана: pH зубной бляшки после приёма сахара",
+      "route": "anim/stephan"
+    },
+    {
+      "id": "anim-resistance",
+      "title": "Основные механизмы приобретённой устойчивости бактерий к антибиотикам",
+      "route": "anim/resistance"
+    },
+    {
+      "id": "anim-ast",
+      "title": "Методы определения чувствительности к антибиотикам",
+      "route": "anim/ast"
+    },
+    {
+      "id": "anim-yeast-budding",
+      "title": "Почкование дрожжевой клетки",
+      "route": "anim/yeast-budding"
+    },
+    {
+      "id": "anim-repair-photo",
+      "title": "Фотореактивация — прямая репарация",
+      "route": "anim/repair-photo"
+    },
+    {
+      "id": "anim-repair-excision",
+      "title": "Эксцизионная репарация",
+      "route": "anim/repair-excision"
+    },
+    {
+      "id": "anim-repair-recomb",
+      "title": "Пострепликативная (рекомбинационная) репарация",
+      "route": "anim/repair-recomb"
+    },
+    {
+      "id": "anim-conjugation",
+      "title": "Конъюгация: передача F-плазмиды",
+      "route": "anim/conjugation"
+    },
+    {
+      "id": "anim-ab-toxin",
+      "title": "A-B токсины: строение и путь в клетку",
+      "route": "anim/ab-toxin"
+    },
+    {
+      "id": "anim-superantigen",
+      "title": "Суперантиген: поликлональная активация T-лимфоцитов",
+      "route": "anim/superantigen"
+    },
+    {
+      "id": "anim-enteric-types",
+      "title": "Четыре типа взаимодействия кишечных бактерий с эпителием",
+      "route": "anim/enteric-types"
+    },
+    {
+      "id": "anim-labeled-assays",
+      "title": "Иммунологические реакции с меткой: РИФ, ИФА, экспресс-тесты",
+      "route": "anim/labeled-assays"
+    },
+    {
+      "id": "anim-serology-curve",
+      "title": "Динамика антител и правило парных сывороток",
+      "route": "anim/serology-curve"
+    },
+    {
+      "id": "anim-v-influenza",
+      "title": "Вирус гриппа: строение и изменчивость",
+      "route": "anim/v-influenza"
+    },
+    {
+      "id": "anim-v-hiv",
+      "title": "ВИЧ: строение вириона и мишени антиретровирусной терапии",
+      "route": "anim/v-hiv"
+    },
+    {
+      "id": "anim-v-rabies",
+      "title": "Вирус бешенства: строение и путь в организме",
+      "route": "anim/v-rabies"
+    },
+    {
+      "id": "abx",
+      "title": "Интерактивная карта антибиотиков",
+      "route": "abx"
     }
   ],
   "aliases": {
-    "questions/g1": "g1",
-    "questions/g2": "g2",
-    "questions/g3": "g3",
-    "questions/g4": "g4",
-    "questions/g5": "g5",
-    "questions/g6": "g6",
-    "questions/g7": "g7",
-    "questions/g8": "g8",
-    "questions/g9": "g9",
-    "questions/g10": "g10",
-    "questions/p1": "p1",
-    "questions/p2": "p2",
-    "questions/p3": "p3",
-    "questions/p4": "p4",
-    "questions/p5": "p5",
-    "questions/p6": "p6",
-    "questions/p7": "p7",
-    "questions/p8": "p8",
-    "questions/p9": "p9",
-    "questions/p10": "p10",
-    "questions/p11": "p11",
-    "questions/p12": "p12",
+    "questions/g1": "questions",
+    "questions/g2": "questions",
+    "questions/g3": "questions",
+    "questions/g4": "questions",
+    "questions/g5": "questions",
+    "questions/g6": "questions",
+    "questions/g7": "questions",
+    "questions/g8": "questions",
+    "questions/g9": "questions",
+    "questions/g10": "questions",
+    "questions/g11": "questions",
+    "questions/p1": "questions",
+    "questions/p2": "questions",
+    "questions/p3": "questions",
+    "questions/p4": "questions",
+    "questions/p5": "questions",
+    "questions/p6": "questions",
+    "questions/p7": "questions",
+    "questions/p8": "questions",
+    "questions/p9": "questions",
+    "questions/p10": "questions",
+    "questions/p11": "questions",
+    "questions/p12": "questions",
+    "questions/p13": "questions",
+    "questions/p14": "questions",
+    "questions/p15": "questions",
+    "questions/p16": "questions",
+    "questions/p17": "questions",
+    "questions/p18": "questions",
+    "questions/z1": "questions",
+    "z1/g1": "z1",
+    "z1/g2": "z1",
+    "z1/g3": "z1",
+    "questions/z2": "questions",
+    "z2/g4": "z2",
+    "z2/g5": "z2",
+    "z2/g11": "z2",
+    "z2/g7": "z2",
+    "z2/g6": "z2",
+    "questions/z3": "questions",
+    "z3/g8": "z3",
+    "z3/g9": "z3",
+    "z3/g10": "z3",
+    "questions/z4": "questions",
+    "z4/p1": "z4",
+    "z4/p2": "z4",
+    "z4/p3": "z4",
+    "z4/p4": "z4",
+    "z4/p5": "z4",
+    "questions/z5": "questions",
+    "z5/p8": "z5",
+    "z5/p7": "z5",
+    "z5/p9": "z5",
+    "z5/p10": "z5",
+    "questions/z6": "questions",
+    "z6/p6": "z6",
+    "questions/z7": "questions",
+    "z7/p11": "z7",
+    "z7/p12": "z7",
+    "z7/p13": "z7",
+    "z7/p14": "z7",
+    "z7/p15": "z7",
+    "z7/p16": "z7",
+    "z7/p17": "z7",
+    "z7/p18": "z7",
     "pathogens/staph-aureus": "pg-staph-aureus",
     "pathogens/staph-epi": "pg-staph-epi",
     "pathogens/strep-pyo": "pg-strep-pyo",
@@ -626,6 +1124,160 @@
     "pathogens/variola": "pg-variola",
     "pathogens/mpox": "pg-mpox",
     "pathogens/tbev": "pg-tbev",
-    "pathogens/prion": "pg-prion"
-  }
+    "pathogens/prion": "pg-prion",
+    "pathogens/proteus": "pg-proteus",
+    "pathogens/bacillus-subtilis": "pg-bacillus-subtilis",
+    "pathogens/borrelia-recurrentis": "pg-borrelia-recurrentis",
+    "pathogens/rick-typhi": "pg-rick-typhi",
+    "pathogens/anaplasma": "pg-anaplasma",
+    "pathogens/ehrlichia": "pg-ehrlichia",
+    "pathogens/toxoplasma": "pg-toxoplasma",
+    "pathogens/adenovirus": "pg-adenovirus",
+    "pathogens/rhinovirus": "pg-rhinovirus",
+    "pathogens/coronaviruses": "pg-coronaviruses",
+    "pathogens/astrovirus": "pg-astrovirus",
+    "pathogens/ebola": "pg-ebola",
+    "pathogens/yellow-fever": "pg-yellow-fever",
+    "pathogens/ntm": "pg-ntm",
+    "pathogens/hgv": "pg-hgv",
+    "learn": "learn-pg",
+    "learn/pg": "learn-pg",
+    "gallery/1": "gallery-1",
+    "learn/ph/1": "gallery-1",
+    "gallery/2": "gallery-2",
+    "learn/ph/2": "gallery-2",
+    "gallery/3": "gallery-3",
+    "learn/ph/3": "gallery-3",
+    "gallery/4": "gallery-4",
+    "learn/ph/4": "gallery-4",
+    "gallery/5": "gallery-5",
+    "learn/ph/5": "gallery-5",
+    "gallery/6": "gallery-6",
+    "learn/ph/6": "gallery-6",
+    "gallery/7": "gallery-7",
+    "learn/ph/7": "gallery-7",
+    "gallery/8": "gallery-8",
+    "learn/ph/8": "gallery-8",
+    "gallery/9": "gallery-9",
+    "learn/ph/9": "gallery-9",
+    "gallery/10": "gallery-10",
+    "learn/ph/10": "gallery-10",
+    "gallery/11": "gallery-11",
+    "learn/ph/11": "gallery-11",
+    "gallery": "gallery-1",
+    "learn/ph": "gallery-1",
+    "anim/gram": "anim-gram",
+    "anim/growth": "anim-growth",
+    "anim/biofilm": "anim-biofilm",
+    "anim/transfer": "anim-transfer",
+    "anim/virus-cycle": "anim-virus-cycle",
+    "anim/phage-cycle": "anim-phage-cycle",
+    "anim/plaque": "anim-plaque",
+    "anim/stephan": "anim-stephan",
+    "anim/resistance": "anim-resistance",
+    "anim/ast": "anim-ast",
+    "anim/yeast-budding": "anim-yeast-budding",
+    "anim/repair-photo": "anim-repair-photo",
+    "anim/repair-excision": "anim-repair-excision",
+    "anim/repair-recomb": "anim-repair-recomb",
+    "anim/conjugation": "anim-conjugation",
+    "anim/ab-toxin": "anim-ab-toxin",
+    "anim/superantigen": "anim-superantigen",
+    "anim/enteric-types": "anim-enteric-types",
+    "anim/labeled-assays": "anim-labeled-assays",
+    "anim/serology-curve": "anim-serology-curve",
+    "anim/v-influenza": "anim-v-influenza",
+    "anim/v-hiv": "anim-v-hiv",
+    "anim/v-rabies": "anim-v-rabies",
+    "abx/benzylpen": "abx",
+    "abx/oxacillin": "abx",
+    "abx/ampicillin": "abx",
+    "abx/amox-clav": "abx",
+    "abx/pip-tazo": "abx",
+    "abx/cefazolin": "abx",
+    "abx/ceftriaxone": "abx",
+    "abx/ceftazidime": "abx",
+    "abx/cefepime": "abx",
+    "abx/ceftaroline": "abx",
+    "abx/cefta-avi": "abx",
+    "abx/cefiderocol": "abx",
+    "abx/meropenem": "abx",
+    "abx/aztreonam": "abx",
+    "abx/clavulanate": "abx",
+    "abx/vancomycin": "abx",
+    "abx/fosfomycin": "abx",
+    "abx/colistin": "abx",
+    "abx/daptomycin": "abx",
+    "abx/gentamicin": "abx",
+    "abx/streptomycin": "abx",
+    "abx/doxycycline": "abx",
+    "abx/azithromycin": "abx",
+    "abx/clindamycin": "abx",
+    "abx/linezolid": "abx",
+    "abx/chloramphenicol": "abx",
+    "abx/ciprofloxacin": "abx",
+    "abx/gepotidacin": "abx",
+    "abx/rifampicin": "abx",
+    "abx/cotrimoxazole": "abx",
+    "abx/metronidazole": "abx",
+    "abx/nitrofurantoin": "abx",
+    "abx/isoniazid": "abx",
+    "abx/pyrazinamide": "abx",
+    "abx/ethambutol": "abx",
+    "abx/bedaquiline": "abx",
+    "abx/pretomanid": "abx",
+    "abx/amoxicillin": "abx",
+    "abx/cefuroxime": "abx",
+    "abx/imipenem": "abx",
+    "abx/ertapenem": "abx",
+    "abx/aztre-avi": "abx",
+    "abx/sulb-durlo": "abx",
+    "abx/teicoplanin": "abx",
+    "abx/dalbavancin": "abx",
+    "abx/cycloserine": "abx",
+    "abx/amikacin": "abx",
+    "abx/tobramycin": "abx",
+    "abx/plazomicin": "abx",
+    "abx/tigecycline": "abx",
+    "abx/minocycline": "abx",
+    "abx/clarithromycin": "abx",
+    "abx/erythromycin": "abx",
+    "abx/tedizolid": "abx",
+    "abx/mupirocin": "abx",
+    "abx/levofloxacin": "abx",
+    "abx/moxifloxacin": "abx",
+    "abx/nalidixic": "abx",
+    "abx/rifaximin": "abx",
+    "abx/trimethoprim": "abx",
+    "abx/sulfadiazine": "abx",
+    "abx/ornidazole": "abx",
+    "abx/furazidin": "abx",
+    "abx/pas": "abx",
+    "abx/ethionamide": "abx",
+    "abx/clofazimine": "abx",
+    "abx/delamanid": "abx",
+    "anim/abx-ceftriaxone": "abx",
+    "anim/abx-vancomycin": "abx",
+    "anim/abx-fosfomycin": "abx",
+    "anim/abx-colistin": "abx",
+    "anim/abx-daptomycin": "abx",
+    "anim/abx-gentamicin": "abx",
+    "anim/abx-doxycycline": "abx",
+    "anim/abx-azithromycin": "abx",
+    "anim/abx-linezolid": "abx",
+    "anim/abx-ciprofloxacin": "abx",
+    "anim/abx-rifampicin": "abx",
+    "anim/abx-cotrimoxazole": "abx",
+    "anim/abx-metronidazole": "abx",
+    "anim/abx-isoniazid": "abx",
+    "anim/abx-bedaquiline": "abx"
+  },
+  "demo": [
+    "g1",
+    "g2",
+    "anim-biofilm",
+    "anim-gram",
+    "anim-growth"
+  ],
+  "publicRoutes": []
 }
