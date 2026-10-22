@@ -163,7 +163,7 @@ def public():
     catalog=json.loads((SRC/'catalog.json').read_text())
     code=(SRC/'core.js').read_text()+'\nconst MICRO_CATALOG = '+enc(catalog)+';\n'
     code+='MICRO_CATALOG.topics.forEach(t=>T({...t,locked:true,blocks:[]}));\nMICRO_CATALOG.clusters.forEach(z=>Z(z));\n'
-    code+=(SRC/'runtime.js').read_text()+'\n'+(SRC/'demo.js').read_text()
+    code+=(SRC/'runtime.js').read_text()+'\n'+(SRC/'prep-export.js').read_text()+'\n'+(SRC/'demo.js').read_text()
     html=(SRC/'template.html').read_text()
     values={'/*CSS*/':(SRC/'style.css').read_text(),'/*DATA*/':code,'/*APP*/':(SRC/'app.js').read_text(),'/*BOOT*/':(SRC/'boot.js').read_text()}
     for marker,value in values.items():

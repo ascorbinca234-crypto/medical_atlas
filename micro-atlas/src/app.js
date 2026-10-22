@@ -795,7 +795,7 @@ function render(){
   else if (r.v === 'gal') h = galleryPage();
   else if (r.v === 'anim') h = animationPage(r.arg);
   else if (r.v === 'abx') h = typeof abxPage==='function' ? abxPage(r.arg) : lockedPage('Карта антибиотиков');
-  else if (r.v === 'learn') h = PREP.page(r);
+  else if (r.v === 'learn') h = window.MICRO_REPORTS.page(PREP, r);
   else h = homePage();
   main.innerHTML = '<article class="page' + (r.v === 'abx' || r.v === 'anim' ? ' page-x' : '') + '">' + h + '</article>';
 
