@@ -287,6 +287,7 @@ function topicPage(t){
     (nFig && nPh ? ' · ' : '') + (nPh ? nPh + ' ' + plural(nPh, 'снимок', 'снимка', 'снимков') : '') + '</span>');
   if (acts.length) h += '<div class="acts">' + acts.join('') + '</div>';
 
+  h += PREP.topicStrip(t);
   h += blocksHtml(t);
 
   h += '<nav class="pager">' +
@@ -358,7 +359,7 @@ function homePage(){
   }
 
   if(!SUBJECT_ACCESS) h += '<div class="kwarn"><b>Два базовых конспекта бесплатно</b><p>Остальные материалы доступны по подписке на микробиологию. Регистрация не открывает закрытые темы.</p></div>';
-  h += v7HomeCards();
+  h += PREP.homeCard() + v7HomeCards();
   h += '<h2 class="sec">Зачёты</h2><p class="par">Порядок — как в программе кафедры. Начинайте с обзора зачёта: главы читаются за один-два вечера и дают общую картину; затем переходите к листам тем.</p>';
   ZS.forEach(z => {
     const min = zMin(z), q = zqs(z).length;
@@ -377,7 +378,7 @@ function homePage(){
     '<li><b>Возбудители</b> — досье по кафедральному плану ответа: классификация, морфология, физиология, культивирование, экология, эпидемиология, факторы вирулентности, защитные реакции, чувствительность к антибиотикам, диагностика, иммунопрофилактика.</li>' +
     '<li><b>Микропрепараты</b> — все микрофотографии: метод микроскопии, окраска, увеличение и источник у каждого снимка.</li>' +
     '<li><b>Вопросы</b> — вопросы стоматологического факультета и экзаменационные вопросы ПСПбГМУ 2018 с привязкой к темам, зачётам и досье.</li>' +
-    '<li><b>Учить</b> — карточки по возбудителям и тренажёр по микропрепаратам с интервальным повторением; прогресс хранится в этом браузере.</li>' + v7HomeList() + '</ul></div>' +
+    PREP.homeList() + v7HomeList() + '</ul></div>' +
     '<div class="kwarn"><b>Как читать пометки</b><p>«Неточность в конспекте» — место, где конспект расходится с современными данными или нормативами; перед экзаменом сверьте формулировку с кафедрой. «Новое» — что изменилось в систематике, нормативах и лечении. «Спросят» — частый уточняющий вопрос.</p></div>';
   return h;
 }
@@ -443,6 +444,7 @@ function dossierHtml(p){
     (p.st && ST[p.st] ? '<span class="tag">окраска ' + esc(ST[p.st]) + '</span>' : '') + '</div>';
 
   if (p.sum) h += '<p class="dz-sum">' + lat(p.sum) + '</p>';
+  h += PREP.dossierStrip(p);
 
   plan.forEach(row => {
     const [no, key, label, hint] = row;
@@ -612,7 +614,7 @@ function questionsPage(){
       '<div class="qdet" id="d' + qid(x) + '" hidden><div class="chips">' +
       ths.map(o => '<a class="chip" href="#' + o.id + '">' + o.no + '. ' + lat(o.title) + '</a>').join('') +
       x.pg.filter(id => PMAP[id]).map(id => '<button class="chip" data-pg="' + id + '">' + pname(PMAP[id]) + '</button>').join('') +
-      '</div></div>';
+      '</div>' + PREP.qActions(x) + '</div>';
   });
   return h + '</div>';
 }
@@ -756,7 +758,7 @@ function rail(){
     '<a href="#pathogens" data-id="pathogens"><span class="n">А—Я</span><span>Возбудители</span><span class="fill">' + MICRO_CATALOG.pathogens + '</span></a>' +
     '<a href="#gallery" data-id="gallery"><span class="n">◎</span><span>Микропрепараты</span><span class="fill">' + MICRO_CATALOG.photos + '</span></a>' +
     '<a href="#questions" data-id="questions"><span class="n">№</span><span>Вопросы экзамена</span><span class="fill">' + MICRO_CATALOG.questions + '</span></a>' +
-    '<a href="#learn" data-id="learn"><span class="n">↻</span><span>Учить</span></a>' +
+    '<a href="#learn" data-id="learn"><span class="n">↻</span><span>Подготовка к экзамену</span><span class="fill" id="pp-rail-due"></span></a>' +
     '</section></nav>' +
     '<div class="acts" style="margin-top:auto"><a class="btn" href="../">Все атласы</a><span data-ma-acct></span><button class="btn" id="theme">Сменить тему</button></div>';
   return h;
@@ -793,7 +795,7 @@ function render(){
   else if (r.v === 'gal') h = galleryPage();
   else if (r.v === 'anim') h = animationPage(r.arg);
   else if (r.v === 'abx') h = typeof abxPage==='function' ? abxPage(r.arg) : lockedPage('Карта антибиотиков');
-  else if (r.v === 'learn'){ if (r.arg === 'ph' || r.arg === 'pg'){ if (learnMode !== r.arg){ learnMode = r.arg; learnCard = null; learnShown = false; } } h = learnPage(); }
+  else if (r.v === 'learn') h = PREP.page(r);
   else h = homePage();
   main.innerHTML = '<article class="page' + (r.v === 'abx' || r.v === 'anim' ? ' page-x' : '') + '">' + h + '</article>';
 
@@ -801,9 +803,9 @@ function render(){
   document.querySelectorAll('.nav a').forEach(a => {
     if (a.dataset.id === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
-  document.title = (r.v === 'topic' ? r.t.title.replace(/[{}]/g, '') + ' — ' : r.v === 'z' ? 'Зачёт ' + r.z.n + '. ' + r.z.title + ' — ' : r.v === 'gal' ? 'Микропрепараты — ' : r.v === 'anim' ? 'Все анимации — ' : r.v === 'abx' ? 'Карта антибиотиков — ' : '') + 'Атлас микробиологии';
+  document.title = (r.v === 'topic' ? r.t.title.replace(/[{}]/g, '') + ' — ' : r.v === 'z' ? 'Зачёт ' + r.z.n + '. ' + r.z.title + ' — ' : r.v === 'gal' ? 'Микропрепараты — ' : r.v === 'anim' ? 'Все анимации — ' : r.v === 'abx' ? 'Карта антибиотиков — ' : r.v === 'learn' ? PREP.title() + ' — ' : '') + 'Атлас микробиологии';
   v7After(r);
-  if(r.v==='gal' || (r.v==='learn' && r.arg==='ph')) main.querySelector('article').insertAdjacentHTML('beforeend', photoPager(r.v==='learn'));
+  if(r.v==='gal') main.querySelector('article').insertAdjacentHTML('beforeend', photoPager(r.v==='learn'));
   if (r.v === 'z' && r.arg){ const el = document.getElementById('ch-' + r.arg); if (el) requestAnimationFrame(() => el.scrollIntoView({block:'start'})); }
   if (r.v === 'cat' && r.arg && PMAP[r.arg] && dzOpen !== r.arg) openDossier(r.arg, true);
 }
@@ -933,7 +935,7 @@ function photoPager(learn){
   keep('gq', v => GF.q = v);
 
   document.addEventListener('keydown', e => {
-    if (ANV) return;
+    if (ANV || PREP.modalOpen()) return;
     if (LB){
       if (e.key === 'Escape') lbClose();
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ LB.i = (LB.i + (e.key === 'ArrowRight' ? 1 : -1) + LB.items.length) % LB.items.length; lbRender(); }
@@ -947,6 +949,7 @@ function photoPager(learn){
     const r = route();
     if (LB) lbClose();
     if (ANV) anvClose();
+    PREP.closeModal();
     if (dzOpen && !(r.v === 'cat' && r.arg === dzOpen)){ document.getElementById('dz').innerHTML = ''; document.documentElement.style.overflow = ''; dzOpen = null; }
     render();
     if (!(r.v === 'cat' && r.arg) && !(r.v === 'z' && r.arg)) scrollTo({top:0});

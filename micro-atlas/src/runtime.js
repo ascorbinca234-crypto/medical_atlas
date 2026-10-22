@@ -784,9 +784,11 @@ const V7TABS = [
   {id:'anim', h:'#anim', t:'Все анимации', m:'Анимации',
    ic:'<circle cx="12" cy="12" r="8.2"/><path d="M10.2 8.6v6.8l5.4-3.4z"/>'},
   {id:'abx', h:'#abx', t:'Интерактивная карта антибиотиков', m:'Карта антибиотиков',
-   ic:'<rect x="3.5" y="7" width="17" height="10" rx="5"/><circle cx="9" cy="12" r="1.6"/><path d="M13 10.5l3 3M16 10.5l-3 3"/>'}
+   ic:'<rect x="3.5" y="7" width="17" height="10" rx="5"/><circle cx="9" cy="12" r="1.6"/><path d="M13 10.5l3 3M16 10.5l-3 3"/>'},
+  {id:'learn', h:'#learn', t:'Подготовка к экзамену', m:'Подготовка',
+   ic:'<path d="M4 19.5h16"/><path d="M6.5 19.5v-4"/><path d="M10.5 19.5v-7"/><path d="M14.5 19.5v-10"/><path d="M18.5 19.5V5"/>'}
 ];
-function v7Tab(r){ return r && r.v === 'anim' ? 'anim' : r && r.v === 'abx' ? 'abx' : 'mat'; }
+function v7Tab(r){ return r && r.v === 'anim' ? 'anim' : r && r.v === 'abx' ? 'abx' : r && r.v === 'learn' ? 'learn' : 'mat'; }
 function v7Tabs(){
   return '<nav class="tabs7" aria-label="Разделы атласа">' + V7TABS.map(x =>
     '<a href="' + x.h + '" data-tab="' + x.id + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + x.ic + '</svg><span>' + x.t + '</span></a>').join('') + '</nav>';
@@ -810,6 +812,7 @@ function v7After(r){
   anHydrate(main);
   if (r.v === 'anim' && typeof ancMount === 'function') ancMount(r.arg);
   if (r.v === 'abx' && typeof abxMount === 'function') abxMount(r.arg);
+  PREP.after(r);
 }
 
 /* анимация вместо пошаговой схемы: тот же номер, подпись и исходная схема по кнопке */
@@ -853,3 +856,17 @@ function v7HomeList(){
   return '<li><b>Все анимации</b> — пошаговые схемы атласа, превращённые в анимации процессов: у каждой — этапы, пауза, повтор, скорость и пояснение. Те же анимации стоят в листах тем.</li>' +
     '<li><b>Интерактивная карта антибиотиков</b> — срез бактериальной клетки: выберите препарат, чтобы увидеть, как он проходит оболочку, с чем связывается и что нарушает, а в режиме устойчивости — какие механизмы описаны именно для него.</li>';
 }
+
+
+// The course-wide preparation engine is delivered only after authorization.
+// Other pages retain links without constructing an incomplete exercise registry.
+var PREP = {
+  after(){}, modalOpen(){ return false; }, closeModal(){},
+  page(){ return lockedPage('Подготовка к экзамену'); },
+  title(){ return 'Подготовка к экзамену'; },
+  topicStrip(t){ return '<div class="acts"><a class="btn pri" href="#learn/topic/'+t.id+'">Учить тему и проверить знания</a></div>'; },
+  dossierStrip(){ return '<div class="acts"><a class="btn" href="#learn/pg">Карточки по плану ответа</a></div>'; },
+  qActions(){ return '<div class="acts"><a class="btn" href="#learn/exam">Ответить как на экзамене</a></div>'; },
+  homeCard(){ return '<div class="home7 pp-home"><a href="#learn"><b>Подготовка к экзамену</b><small>План на сегодня, интервальное повторение, журнал ошибок, «Не перепутай», смешанный тест и экзамен</small></a></div>'; },
+  homeList(){ return '<li><b>Подготовка к экзамену</b> — повторение по расписанию, журнал ошибок, свои сложные факты, сравнения, тесты и экзамен. Прогресс хранится в этом браузере и переносится файлом.</li>'; }
+};
