@@ -147,6 +147,7 @@
       var h = location.hash.slice(1); try { h = decodeURIComponent(h); } catch (e) {}
       if (h.indexOf('topic/') === 0) return ids.indexOf(h.slice(6)) >= 0 ? h.slice(6) : '';
       if (ids.indexOf(h) >= 0) return h;
+      if (atlas === 'micro' && /^learn(?:\/|$)/.test(h.split('?')[0]) && ids.indexOf('prep') >= 0) return 'prep';
       if (catalog.aliases && catalog.aliases[h]) return catalog.aliases[h];
       if (atlas === 'pathophys' && h === 'run') return previous || '';
       // Tools operate on the current topic; no all-subject package is requested.

@@ -776,11 +776,6 @@
       "route": "questions"
     },
     {
-      "id": "learn-pg",
-      "title": "Тренажёр возбудителей",
-      "route": "learn/pg"
-    },
-    {
       "id": "gallery-1",
       "title": "Микропрепараты · страница 1",
       "route": "gallery/1"
@@ -954,6 +949,11 @@
       "id": "abx",
       "title": "Интерактивная карта антибиотиков",
       "route": "abx"
+    },
+    {
+      "id": "prep",
+      "title": "Подготовка к экзамену",
+      "route": "learn"
     }
   ],
   "aliases": {
@@ -1140,8 +1140,8 @@
     "pathogens/yellow-fever": "pg-yellow-fever",
     "pathogens/ntm": "pg-ntm",
     "pathogens/hgv": "pg-hgv",
-    "learn": "learn-pg",
-    "learn/pg": "learn-pg",
+    "learn": "prep",
+    "learn/pg": "prep",
     "gallery/1": "gallery-1",
     "learn/ph/1": "gallery-1",
     "gallery/2": "gallery-2",
@@ -1165,7 +1165,7 @@
     "gallery/11": "gallery-11",
     "learn/ph/11": "gallery-11",
     "gallery": "gallery-1",
-    "learn/ph": "gallery-1",
+    "learn/ph": "prep",
     "anim/gram": "anim-gram",
     "anim/growth": "anim-growth",
     "anim/biofilm": "anim-biofilm",

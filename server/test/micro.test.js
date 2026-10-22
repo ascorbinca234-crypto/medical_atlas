@@ -21,9 +21,9 @@ test('публичная микробиология содержит ровно 
   assert.equal(vm.runInContext('PG.length+QS.length', ctx), 0);
   assert.doesNotMatch(vm.runInContext('homePage()', ctx), /NaN|Infinity/);
 });
-test('версия 7 сохраняет полный каталог, оба набора вопросов и раздельную загрузку новых разделов',()=>{
+test('версия 8 сохраняет полный каталог, оба набора вопросов и раздельную загрузку новых разделов',()=>{
   const catalog=JSON.parse(fs.readFileSync(path.join(root,'src/catalog.json')));
-  assert.equal(catalog.version,7);assert.equal(catalog.topics.length,29);assert.equal(catalog.clusters.length,7);
+  assert.equal(catalog.version,8);assert.equal(catalog.topics.length,29);assert.equal(catalog.clusters.length,7);
   assert.equal(catalog.pathogens,118);assert.equal(catalog.questions,440);assert.equal(catalog.photos,130);
   assert.equal(catalog.animations.length,23);assert.equal(catalog.drugs,67);assert.equal(catalog.classes,21);
   const nav=JSON.parse(fs.readFileSync(path.join(root,'topics.json')));

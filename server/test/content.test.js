@@ -74,7 +74,13 @@ test('каждый собранный пакет синтаксически ко
     const ctx=vm.createContext({window:{},document:{addEventListener(){}},localStorage:{getItem:()=>null}});
     const src=path.join(root,'micro-atlas/src');
     vm.runInContext(['core.js','runtime.js'].map(f=>fs.readFileSync(path.join(src,f),'utf8')).join('\n')+'\n'+code,ctx);
-    assert.ok(vm.runInContext('TH.length<=1',ctx),'Each package contains at most one leaf topic: '+id);
+    if(id==='prep'){
+     assert.equal(vm.runInContext('TH.length',ctx),29);
+     assert.equal(vm.runInContext('PG.length',ctx),118);
+     assert.equal(vm.runInContext('QS.length',ctx),440);
+     assert.equal(vm.runInContext('PH.length',ctx),130);
+     assert.ok(vm.runInContext('PH.every(p=>p.file.includes("#micro-photo-"))',ctx));
+    } else assert.ok(vm.runInContext('TH.length<=1',ctx),'Each lesson package contains at most one leaf topic: '+id);
     if(id.startsWith('pg-'))assert.equal(vm.runInContext('PG.length',ctx),1);
     if(id.startsWith('gallery-'))assert.ok(vm.runInContext('PH.length<=12',ctx));
     if(/^g\d|^p\d/.test(id))assert.ok(vm.runInContext('QS.length<440',ctx));

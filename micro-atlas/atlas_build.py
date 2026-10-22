@@ -1,4 +1,4 @@
-"""Compile the v7 atlas into a public demo and separately authorized materials."""
+"""Compile the v8 atlas into a public demo and separately authorized materials."""
 import json, re, subprocess
 from pathlib import Path
 import sys
@@ -18,7 +18,7 @@ def build(private):
     topics, pathogens, questions = data['topics'], data['pathogens'], data['questions']
     tids = {t['id'] for t in topics}; pids = {p['id'] for p in pathogens}
     if len(tids) != len(topics) or len(pids) != len(pathogens): raise ValueError('Duplicate source IDs')
-    if len(topics) != 29 or len(data['clusters']) != 7 or len(questions) != 440: raise ValueError('Incomplete v7 source')
+    if len(topics) != 29 or len(data['clusters']) != 7 or len(questions) != 440: raise ValueError('Incomplete v8 source')
     qids = {(q['src'], q['blk'], q['no']) for q in questions}
     if len(qids) != len(questions): raise ValueError('Duplicate question IDs')
     for q in questions:
@@ -38,6 +38,7 @@ def build(private):
     runtime=runtime.replace('const nA = AN_LIST.filter(a => !a.hidden).length;', 'const nA = MICRO_CATALOG.animations.length+15;')
     runtime=runtime.replace("const nD = typeof ABX_DRUGS !== 'undefined' ? ABX_DRUGS.length : 0;", 'const nD = MICRO_CATALOG.drugs;')
     runtime=runtime.replace("const nC = typeof ABX_CLASSES !== 'undefined' ? ABX_CLASSES.length : 0;", 'const nC = MICRO_CATALOG.classes;')
+    runtime += '\n' + (SRC/'prep-shell.js').read_text()
     (SRC/'runtime.js').write_text(runtime.rstrip()+'\n')
     (SRC/'core.js').write_text((private/'core.js').read_text().rstrip()+'\n')
     style=(private/'style.css').read_text()
@@ -90,7 +91,7 @@ def build(private):
     demo_code = payload(demo,demo_chapters,full=False,dossiers=False)
     (SRC/'demo.js').write_text(demo_code)
     for tid,name in [('g1','g01_morph.js'),('g2','g02_phys.js')]: (SRC/name).write_text('T('+enc(byid[tid])+');\n')
-    catalog = {'version':7,'demo':DEMO,'topics':[{k:t[k] for k in ['id','blk','no','title','short']} for t in topics],
+    catalog = {'version':8,'demo':DEMO,'topics':[{k:t[k] for k in ['id','blk','no','title','short']} for t in topics],
                'clusters':data['clusters'], 'pathogens':len(pathogens),'questions':len(questions),'photos':len(data['photos']),
                'figures':len(data['figures']),'drugs':data['drugs'],'classes':data['classes'],
                'drugIndex':data['drugIndex'], 'questionCounts':{s:sum(q['src']==s for q in questions) for s in ['dent','spb']},
@@ -131,13 +132,32 @@ def build(private):
     aliases.update({'abx/'+d['id']:'abx' for d in data['drugIndex']})
     # The animation catalogue includes the original fifteen antibiotic examples.
     aliases.update({'anim/abx-'+tid:'abx' for tid in ['ceftriaxone','vancomycin','fosfomycin','colistin','daptomycin','gentamicin','doxycycline','azithromycin','linezolid','ciprofloxacin','rifampicin','cotrimoxazole','metronidazole','isoniazid','bedaquiline']})
+    # Study needs a course-wide exercise registry. Image bytes remain independent
+    # authorized resources; lecture routes retain their original per-topic delivery.
+    placeholder = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="260"%3E%3Crect width="100%25" height="100%25" fill="%23e8e6f0"/%3E%3C/svg%3E#micro-photo-'
+    study_photos = [p | {'file': placeholder+p['id']} for p in data['photos']]
+    study = ['TH.length=0;PG.length=0;QS.length=0;PH.length=0;',
+             'TH.push(...'+enc(topics)+');', 'PG.push(...'+enc(pathogens)+');',
+             'QS.push(...'+enc(questions)+');', 'PH.push(...'+enc(study_photos)+');',
+             'Object.assign(ZTX,'+enc(data['chapters'])+');']
+    study += [a['code'] for a in animations.values()]
+    study += [abx, (private/'pp_core.js').read_text().replace('const PREP = {};','PREP = {};')]
+    study += [(private/n).read_text().replace('Сервер не нужен, всё работает без сети.', 'Для загрузки материалов и снимков нужны подключение к сети и подписка.') for n in ['pp_cmp.js','pp_items.js','pp_model.js','pp_tasks.js','pp_session.js','pp_pages.js','pp_pages2.js','pp_app.js']]
+    study += [(SRC/'prep-media.js').read_text(), 'window.MICRO_FULL=true;']
+    packages['prep']='\n'.join(study); titles['prep']='Подготовка к экзамену'
+    # Every supported subroute, query and item in #learn stays in this package.
+    aliases['learn']='prep'; aliases['learn/pg']='prep'; aliases['learn/ph']='prep'
+    for p in data['photos']:
+        packages['photo-'+p['id']]='window.MICRO_PHOTO='+enc({'id':p['id'],'file':p['file']})+';'
+        titles['photo-'+p['id']]='Снимок: '+p['t']
     topic_build.emit('micro',packages,titles,aliases)
     path=ROOT/'topics.json'; nav=json.loads(path.read_text())
     for t in nav['topics']:
-        tid=t['id']; t['route']='gallery/'+tid[8:] if tid.startswith('gallery-') else 'anim/'+tid[5:] if tid.startswith('anim-') else 'learn/pg' if tid=='learn-pg' else 'pathogens/'+tid[3:] if tid.startswith('pg-') else tid
+        tid=t['id']; t['route']='learn' if tid=='prep' else 'gallery/'+tid[8:] if tid.startswith('gallery-') else 'anim/'+tid[5:] if tid.startswith('anim-') else 'learn/pg' if tid=='learn-pg' else 'pathogens/'+tid[3:] if tid.startswith('pg-') else tid
+    nav['topics']=[t for t in nav['topics'] if not t['id'].startswith('photo-') and t['id']!='learn-pg']
     nav.update(demo=DEMO+['anim-'+a for a in re.findall(r'AN\(\{"id":"([^"]+)"',demo_code)],publicRoutes=[])
     path.write_text(json.dumps(nav,ensure_ascii=False,indent=2)+'\n')
-    print('v7:', len(topics),'topics,',len(pathogens),'dossiers,',len(questions),'questions,',len(data['photos']),'photos,',len(animations)+15,'animations,',data['drugs'],'antibiotics')
+    print('v8:', len(topics),'topics,',len(pathogens),'dossiers,',len(questions),'questions,',len(data['photos']),'photos,',len(animations)+15,'animations,',data['drugs'],'antibiotics')
 
 def public():
     catalog=json.loads((SRC/'catalog.json').read_text())
@@ -152,4 +172,4 @@ def public():
         html=html.replace(marker,value)
     html=html.replace('<script src="../auth/config.js"></script>','<script>window.MA_TOPICS='+enc(json.loads((ROOT/'topics.json').read_text()))+';</script>\n<script src="../auth/config.js"></script>')
     (ROOT/'index.html').write_text(html)
-    print('Public v7 demo:',len(html.encode())//1024,'KiB; exactly two lessons')
+    print('Public v8 demo:',len(html.encode())//1024,'KiB; exactly two lessons')
