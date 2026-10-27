@@ -27,7 +27,7 @@ if (process.argv.includes('--full')) {
     const visual = atlas.visuals.get(topic.id);
     const helpers = atlas.closure([...visual.names]);
     if (helpers.some(d => /^T_|^TOPIC/.test(d.name))) throw new Error('Visual depends on other lesson data');
-    const code = `window.MA_PATHO_TOPIC={topic:${enc(topic)},makeVisuals(runtime){const {${atlas.bindings.join(',')}}=runtime;\n${helpers.map(d => d.text).join('\n')}\nreturn ${visual.text};}};`;
+    const code = `window.MA_PATHO_TOPIC={topic:${enc(topic)},expert:${enc(atlas.experts[topic.id] || null)},makeVisuals(runtime){const {${atlas.bindings.join(',')}}=runtime;\n${helpers.map(d => d.text).join('\n')}\nreturn ${visual.text};}};`;
     const compiled = (await transform(code, { loader: 'jsx', minify: true, target: 'es2020', charset: 'utf8' })).code;
     fs.writeFileSync(path.join(dest, topic.id + '.js'), compiled);
     manifest.topics[topic.id] = { sha256: crypto.createHash('sha256').update(compiled).digest('hex'), bytes: Buffer.byteLength(compiled) };

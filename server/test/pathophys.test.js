@@ -10,6 +10,8 @@ test('патофизиология: открыты ровно две темы; �
   const src = fs.readFileSync(path.join(atlas, 'src/PathoAtlas.jsx'), 'utf8');
   const parsed = analyze(src, false);
   assert.deepEqual(parsed.topics.map(t => t.id), ['disease', 'pathogenesis']);
+  assert.deepEqual(Object.keys(parsed.experts), ['disease', 'pathogenesis']);
+  assert.match(src, /if\(topic.locked\)return \[\]/);
   assert.equal(catalog.topics.length, 28);
   assert.equal(new Set(catalog.topics.map(t => t.id)).size, 28);
   for (const name of ['MicroCirc', 'CellDeath', 'MastCell', 'BasalGanglia', 'O2Curve', 'Thrombus']) assert.ok(!parsed.declarations.has(name), name);
@@ -52,6 +54,10 @@ test('патофизиология: каждый частный пакет со�
     const code = fs.readFileSync(path.join(dir,id+'.js'), 'utf8'), ctx = {window:{}};
     vm.runInNewContext(code, ctx);
     const loaded = ctx.window.MA_PATHO_TOPIC; assert.equal(loaded.topic.id, id);
+    assert.ok(loaded.expert && loaded.expert.items.length, id+' expert material missing');
+    if (!catalog.demo.includes(id)) {
+      for (const item of loaded.expert.items) assert.ok(!publicText.includes(item.b), id+' expert material leaked');
+    }
     if (!catalog.demo.includes(id)) assert.ok(!publicText.includes(loaded.topic.definition), id+' definition leaked');
     for (const C of loaded.makeVisuals({React,...React,...icons})) {
       assert.match(renderToStaticMarkup(React.createElement(C)), /<svg/, id);

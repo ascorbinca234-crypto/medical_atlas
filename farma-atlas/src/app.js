@@ -693,8 +693,8 @@ document.addEventListener('keydown',e=>{ const t=e.target.closest&&e.target.clos
 
 /* ---------- страница листа ---------- */
 function renderPlate(p){
+  if(p.locked){renderLockedPlate(p);return;}
   figs={};
-  if(p.locked){ renderLockedPlate(p); return; }
   const chipKeys=new Set(); p.blocks.forEach(b=>(b.chips||[]).forEach(c=>chipKeys.add(first(c.d))));
   let n=0, hn=0; const no=()=>`${isK(p)?p.roman:p.num}.${++n}`;
   KMODE = isK(p); KCUR = []; if(KMODE) p.blocks.forEach(b=>{ if(b.t==='cards') b.items.forEach(c=>KCUR.push(kNames(c))); });
@@ -825,8 +825,8 @@ function renderHome(){
   $('#page').innerHTML=`<section class="hero"><p class="eyebrow">Фармакология · 3 курс · лечебный факультет</p>
   <h1>Атлас <em>фармакологии</em></h1>
   <p class="lead">Два слоя. <b>Конспект лекций</b> — схемы, классификации, списки для выписывания и формулировки из ваших материалов, ровно в том виде, в каком их спрашивают на зачётах. <b>Подробные листы</b> — углублённые схемы механизмов с точками приложения препаратов, реакции синтеза и распада и вопросы для самопроверки.</p>
-  ${lockBanner()}<div class="howto"><div><b>Нажмите на препарат</b>Под каждой схемой — список препаратов. Кольцо на рисунке покажет, где именно он действует.</div><div><b>Нажмите на элемент схемы</b>Рецептор, фермент или транспортёр расскажет, что он делает и какие препараты на него влияют.</div><div><b>Найдите препарат</b>Поиск в боковой панели ведёт к схеме или карточке группы на нужном листе.</div></div>
-  ${HASV?`<div class="hero-ecg" aria-hidden="true">${vECG({}).svg.replace('xMinYMid slice','none')}</div>`:''}
+  <div class="howto"><div><b>Нажмите на препарат</b>Под каждой схемой — список препаратов. Кольцо на рисунке покажет, где именно он действует.</div><div><b>Нажмите на элемент схемы</b>Рецептор, фермент или транспортёр расскажет, что он делает и какие препараты на него влияют.</div><div><b>Найдите препарат</b>Поиск в боковой панели ведёт к схеме или карточке группы на нужном листе.</div></div>
+  ${lockBanner()}${HASV?`<div class="hero-ecg" aria-hidden="true">${vECG({}).svg.replace('xMinYMid slice','none')}</div>`:''}
   <a class="dbcta" href="#drugs"><span class="dbcta-n" data-count="${UNI.length}">${UNI.length}</span><span><b>${LOCKED_N?'Препараты из конспектов':'Все препараты'}</b>На каждый препарат — одна карточка: дозировка и форма выпуска, зачем выписывают, побочные эффекты, противопоказания, формулировки из конспекта и механизм по шагам.</span><span class="go" aria-hidden="true">→</span></a>
   <div class="cta2">${HASV?`<a class="cta-b" href="#body"><span class="cta-ic cta-heart" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40C11 31 6 24 6 17c0-6 4.6-10 10-10 3.8 0 6.6 2 8 5 1.4-3 4.2-5 8-5 5.4 0 10 4 10 10 0 7-5 14-18 23z"/><path class="cta-pulse" d="M8 24h8l3-6 4 12 4-9 2 3h11"/></svg></span><span><b>Организм</b>Выберите препарат — анимированная схема тела покажет, что происходит с сердцем и ЭКГ, сосудами и давлением, зрачком, бронхами, ЖКТ, железами и ЦНС. Дозовые режимы, отравления и антидоты.</span><span class="go" aria-hidden="true">→</span></a>`:''}${typeof lDeck==='function'?(()=>{ const dn=lDueCount(A), tot=lDeck(A).length; return `<a class="cta-b" href="#learn"><span class="cta-ic cta-cards" aria-hidden="true"><i></i><i></i><i></i></span><span><b>Учить препараты</b>${tot} ${plur(tot,'препарат','препарата','препаратов')} из конспектов: карточки с интервальным повторением, тест в формулировках зачёта, тренажёр доз и рецептов.${dn?` <em class="due">Сегодня к повторению: ${dn}</em>`:''}</span><span class="go" aria-hidden="true">→</span></a>`; })():''}</div>
   ${(()=>{ const dd=drugOfDay(); if(!dd) return ''; const g=dd.groups[0]; return `<div class="dday"><div><p class="eyebrow">Препарат дня${uKLecs(dd).length?' · конспект '+uKLecs(dd).map(p=>p.roman).join(', '):''}</p><h3>${dd.n}</h3><p>${g?g.g:(dd.d?dd.d.g:'')}</p>${dd.hl?`<p class="u-hl">${uHlBadge(dd.hl)}</p>`:''}</div><div class="dday-a"><button type="button" class="btn pri" data-dr="${esc(dd.n)}">Открыть карточку →</button><button type="button" class="btn" data-rand="1">Случайный препарат</button></div></div>`; })()}
@@ -924,8 +924,8 @@ function route(){
   if(!pendingDossier) closeDz(true);
   if(pending) requestAnimationFrame(focusPending); else window.scrollTo(0,0);
   if(pendingDossier){ const n=pendingDossier; pendingDossier=null; openDossier(n); }
-  if(typeof FX!=='undefined') FX.page(kind);
   if(kind==='plate' && p && !p.locked && window.MAP){ try{ window.MAP.last({atlas:'farma', title:p.title, sub:'Фармакология, '+(p.lec||('лист '+(p.roman||''))), url:location.href}); }catch(e){} }
+  if(typeof FX!=='undefined') FX.page(kind);
   const due=$('#nav .due'); if(due && typeof lDueCount==='function'){ const n=lDueCount(A); due.textContent=n; due.hidden=!n; }
 }
 window.addEventListener('hashchange',route);

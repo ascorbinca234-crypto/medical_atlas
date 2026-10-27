@@ -92,14 +92,6 @@ def main():
         out.parent.mkdir(parents=True, exist_ok=True); out.write_text(code)
         topic_build.biochem(data, style, markup, app, (PRIV / 'src/locked.js').read_text())
         print('Полная биохимия:', len(data['substances.json']), 'веществ,', len(data['reactions.json']), 'реакций')
-    template = (ROOT / 'src/template.html').read_text()
-    data = {n: json.loads((ROOT / 'data' / n).read_text()) for n in NAMES}
-    problems = check(data)
-    if problems: sys.exit('\n'.join(problems))
-    def inject(match):
-        text = json.dumps(data[match.group(1)], ensure_ascii=False, separators=(',', ':'))
-        if '</script' in text.lower(): sys.exit('Недопустимый тег script в данных')
-        return text
-    (ROOT / 'index.html').write_text(re.sub(r'/\*@([a-z]+\.json)\*/', inject, template))
-    print('Исходная биохимия:', len(data['substances.json']), 'веществ,', len(data['reactions.json']), 'реакций')
+    import runpy
+    runpy.run_path(str(ROOT / 'build_public.py'), run_name='__main__')
 if __name__ == '__main__': main()

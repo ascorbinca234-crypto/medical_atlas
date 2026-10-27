@@ -3,7 +3,7 @@ import {
   Activity, Waves, HeartCrack, CirclePause, Droplet, CircleDot, Flame, Thermometer, Wind, FlaskConical, Droplets,
   Search, BookOpen, GraduationCap, Lock, Check, CircleCheck, Eye, Shuffle, Menu, X, ChevronRight,
   RotateCw, TriangleAlert, Zap, Target, ShieldCheck, Stethoscope, Table2, Layers, ListChecks, Microscope,
-  LayoutGrid, RefreshCw, ArrowRight, ThumbsUp, ThumbsDown, Play, ChevronDown, Pause, Film, ChevronLeft,
+  LayoutGrid, RefreshCw, ArrowRight, ThumbsUp, ThumbsDown, Play, ChevronDown, Pause, Film, ChevronLeft, Sparkles, Quote, ClipboardCheck,
   ScrollText, Workflow, Shield, Hexagon, Dna, ShieldAlert, Sprout, Siren, UtensilsCrossed,
   TestTube, HeartPulse, AirVent, Bean, Filter, Soup, SlidersHorizontal, Brain,
 } from 'lucide-react';
@@ -124,16 +124,9 @@ body::before{ content:""; position:fixed; inset:0 0 auto; height:env(safe-area-i
 .pa-ring-node{ background:var(--surface); border:1px solid var(--line); }
 .pa-scroll{ scrollbar-width:thin; }
 .pa-root button{ cursor:pointer; }
-.pa-btn.pa-all-atlases{display:none}
-@media(min-width:640px){.pa-btn.pa-all-atlases{display:inline-flex}}
-.pa-root .ma-login{display:inline-flex;padding:8px 12px;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-size:14px;font-weight:600}
-.pa-root .ma-user{position:relative}
-.pa-root .ma-chip{display:flex;align-items:center;gap:8px;padding:5px 9px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:14px}
-.pa-root .ma-ava{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;overflow:hidden;background:var(--accent-soft)}
-.pa-root .ma-ava img{width:100%;height:100%;object-fit:cover}
-.pa-root .ma-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pa-root .ma-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 8px 25px #0002;z-index:50}
-.pa-root .ma-menu a,.pa-root .ma-menu button{display:block;width:100%;padding:8px;text-align:left;white-space:nowrap}
+.pa-say{ background:var(--surface-2); border-left:3px solid var(--accent); }
+.pa-expert-lead{ background:var(--accent-soft); border:1px solid var(--line); }
+.pa-chip-neutral{ background:var(--surface-2); color:var(--ink-2); border-color:var(--line); }
 .pa-root :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
 @media (prefers-reduced-motion: reduce){ .pa-root *{ transition:none !important; animation:none !important; } }
 `;
@@ -644,12 +637,14 @@ function CausalGraph() {
 }
 
 
-const SUBJECT_ACCESS = !!window.MA?.hasAtlasAccess('pathophys');
 const TOPICS = catalog.map(t => ({...t, locked:true, tags:[], definition:'', classification:[], etiology:[], signs:[], flows:[], sanogenesis:[], circles:[], traps:[], quiz:[], tables:[]}));
 for(const topic of [T_DISEASE,T_PATHOGEN,window.MA_PATHO_TOPIC?.topic].filter(Boolean)){const i=TOPICS.findIndex(t=>t.id===topic.id);if(i>=0)TOPICS[i]=topic;}
 const TOPIC_MAP=Object.fromEntries(TOPICS.map(t=>[t.id,t]));
+const EXPERT={"disease":{"lead":"Показать, что вы понимаете болезнь как процесс со своей диалектикой и знаете, где проходит граница жизни и смерти по современным критериям.","items":[{"k":"hist","h":"И.П. Павлов: «поломка» и «физиологическая мера против неё»","b":"Павлов писал, что в каждой болезни есть собственно патологическое и одновременно физиологическая мера против него. Отсюда базовый тезис отечественной патофизиологии: болезнь — единство повреждения и защиты, и одна и та же реакция (лихорадка, воспаление) бывает защитной или повреждающей в зависимости от меры.","say":"Любой симптом я оцениваю с двух сторон: это проявление поломки или физиологическая мера против неё — как говорил Павлов."},{"k":"hist","h":"И.В. Давыдовский: болезнь как форма приспособления","b":"В книге «Проблема причинности в медицине» (1962) Давыдовский критиковал и монокаузализм, и кондиционализм и рассматривал болезнь как проявление приспособительной деятельности организма в необычных условиях. Позиция дискуссионная, но её полезно знать как полюс спектра взглядов."},{"k":"debate","h":"Критерии причинности Брэдфорда Хилла и молекулярные постулаты Коха","b":"Постулаты Коха не выполняются для носительства, неразводимых возбудителей и мультифакторных болезней. Эпидемиология использует критерии Хилла (1965): сила и постоянство связи, временная последовательность, градиент «доза–эффект», биологическая правдоподобность, эксперимент, аналогия. Фальков (1988) сформулировал «молекулярные постулаты Коха»: причинен ген вирулентности, если его инактивация снижает патогенность, а восстановление возвращает её.","say":"Для мультифакторных болезней постулаты Коха не работают, поэтому причинность доказывают по критериям Брэдфорда Хилла."},{"k":"hist","h":"Постреанимационная болезнь В.А. Неговского","b":"Неговский, основатель отечественной реаниматологии, показал, что после восстановления кровообращения развивается самостоятельный патологический процесс — постреанимационная болезнь: реперфузионное повреждение мозга и миокарда, системное воспаление, полиорганная дисфункция. Современный международный аналог — post-cardiac arrest syndrome (ILCOR, 2008).","say":"Оживление не заканчивает патологию: по Неговскому, начинается постреанимационная болезнь — её зарубежный аналог описан только в 2008 году."},{"k":"clin","h":"Смерть мозга — юридическая смерть человека","b":"Смерть мозга — необратимое прекращение функций всего головного мозга при работающем сердце и ИВЛ; в России порядок установления определён приказом Минздрава № 908н (2014): глубокая кома, отсутствие стволовых рефлексов, положительный апноэ-тест, исключение гипотермии, интоксикаций и метаболических причин. Отличать от вегетативного состояния (ствол работает, кора нет) и синдрома «запертого человека» (сознание сохранено)."},{"k":"debate","h":"Почему гипотермия удлиняет клиническую смерть","b":"Снижение температуры на каждые 10 °С уменьшает скорость обмена примерно в 2–3 раза (коэффициент Q₁₀), медленнее истощается АТФ, меньше выброс глутамата и нагрузка Ca²⁺. Поэтому при утоплении в ледяной воде описаны успешные реанимации после десятков минут остановки кровообращения."}]},"pathogenesis":{"lead":"Показать системное мышление: главное звено меняется во времени, а регуляцию можно описать языком функциональных систем и патологических детерминант.","items":[{"k":"debate","h":"Главное звено меняется по ходу болезни","b":"Пример — ожоговая болезнь: в периоде ожогового шока главное звено — гиповолемия от плазморрагии; в периоде токсемии — интоксикация продуктами распада тканей; в септикотоксемии — инфекция; затем — реконвалесценция. Поэтому терапия меняет мишень по стадиям.","say":"Главное звено не статично: при ожоговой болезни оно последовательно смещается от гиповолемии к токсемии и инфекции, и терапия идёт за ним."},{"k":"hist","h":"Г.Н. Крыжановский: дизрегуляционная патология","b":"Крыжановский ввёл понятия генератора патологически усиленного возбуждения, патологической детерминанты (структура, навязывающая свою активность) и патологической системы, а также антисистем, которые ей противодействуют. Обобщение — монография «Дизрегуляционная патология» (2002): многие болезни — результат нарушения регуляторных связей, а не первичного повреждения клеток."},{"k":"hist","h":"П.К. Анохин: функциональные системы","b":"Теория функциональных систем: результат действия через обратную афферентацию сравнивается с «акцептором результата действия». Патологическая функциональная система поддерживает уже не полезный, а вредный результат — например, стойко повышенное АД при гипертонической болезни с перенастройкой барорецепторов."},{"k":"debate","h":"Эквифинальность и мультифинальность","b":"Разные причины ведут к одному синдрому (эквифинальность: гипоксия, ацидоз, шок при разной этиологии), а одна причина — к разным исходам (мультифинальность: стрептококк вызывает ангину, ревматизм или гломерулонефрит в зависимости от реактивности). Это аргумент в пользу типовых патологических процессов как самостоятельного предмета."},{"k":"clin","h":"Автономизация патогенеза: «точка невозврата»","b":"После определённого момента патогенез поддерживается порочными кругами независимо от причины: необратимый шок, ДВС, полиорганная недостаточность. Отсюда практический вывод — патогенетическая терапия должна начинаться до замыкания кругов, а устранение причины на поздней стадии уже недостаточно."},{"k":"new","h":"Сетевой подход: болезнь как поломка сети","b":"Сетевая медицина (Барабаши) рассматривает болезнь как нарушение модуля взаимодействующих генов и белков. Это объясняет коморбидность (общие модули у депрессии, атеросклероза и СД 2 через воспаление) и поиск лекарств «по сети», а не по одной мишени."}]}};
+if(window.MA_PATHO_TOPIC?.expert)EXPERT[window.MA_PATHO_TOPIC.topic.id]=window.MA_PATHO_TOPIC.expert;
+const SUBJECT_ACCESS=!!window.MA?.hasAtlasAccess('pathophys');
 const VISUALS={disease:[Terminal],pathogenesis:[CausalGraph]};
-if(window.MA_PATHO_TOPIC)VISUALS[window.MA_PATHO_TOPIC.topic.id]=window.MA_PATHO_TOPIC.makeVisuals({React,useEffect,useMemo,useRef,useState,Activity,Waves,HeartCrack,CirclePause,Droplet,CircleDot,Flame,Thermometer,Wind,FlaskConical,Droplets,Search,BookOpen,GraduationCap,Lock,Check,CircleCheck,Eye,Shuffle,Menu,X,ChevronRight,RotateCw,TriangleAlert,Zap,Target,ShieldCheck,Stethoscope,Table2,Layers,ListChecks,Microscope,LayoutGrid,RefreshCw,ArrowRight,ThumbsUp,ThumbsDown,Play,ChevronDown,Pause,Film,ChevronLeft,ScrollText,Workflow,Shield,Hexagon,Dna,ShieldAlert,Sprout,Siren,UtensilsCrossed,TestTube,HeartPulse,AirVent,Bean,Filter,Soup,SlidersHorizontal,Brain});
+if(window.MA_PATHO_TOPIC)VISUALS[window.MA_PATHO_TOPIC.topic.id]=window.MA_PATHO_TOPIC.makeVisuals({React,useEffect,useMemo,useRef,useState,Activity,Waves,HeartCrack,CirclePause,Droplet,CircleDot,Flame,Thermometer,Wind,FlaskConical,Droplets,Search,BookOpen,GraduationCap,Lock,Check,CircleCheck,Eye,Shuffle,Menu,X,ChevronRight,RotateCw,TriangleAlert,Zap,Target,ShieldCheck,Stethoscope,Table2,Layers,ListChecks,Microscope,LayoutGrid,RefreshCw,ArrowRight,ThumbsUp,ThumbsDown,Play,ChevronDown,Pause,Film,ChevronLeft,Sparkles,Quote,ClipboardCheck,ScrollText,Workflow,Shield,Hexagon,Dna,ShieldAlert,Sprout,Siren,UtensilsCrossed,TestTube,HeartPulse,AirVent,Bean,Filter,Soup,SlidersHorizontal,Brain});
 
 
 function VisualTab({ topic }) {
@@ -658,6 +653,265 @@ function VisualTab({ topic }) {
     <div className="grid gap-6">
       <p className="pa-muted text-[14.5px]">Анимированные и интерактивные схемы. Переключайте состояния и следите, как меняется механизм.</p>
       {list.map((C, i) => <C key={topic.id + i} />)}
+    </div>
+  );
+}
+
+const EXPERT_KINDS = {
+  mol: { label: 'Молекулярный механизм', tone: 'alt' },
+  hist: { label: 'История и приоритет', tone: 'clin' },
+  clin: { label: 'Клиническая проекция', tone: 'etio' },
+  new: { label: 'Современные данные', tone: 'san' },
+  debate: { label: 'Тонкость и дискуссия', tone: null },
+};
+
+const THEORY_TYPES = {
+  def: { label: 'Определения и классификации', on: true },
+  etio: { label: 'Этиология и проявления', on: true },
+  path: { label: 'Патогенез и саногенез', on: true },
+  circ: { label: 'Порочные круги', on: true },
+  tab: { label: 'Сравнительные таблицы', on: true },
+  trap: { label: 'Ловушки', on: true },
+  exp: { label: 'На 5+', on: false },
+};
+
+const AXIS_FIX = {
+  'Боль': 'виды боли', 'Сахарный диабет': 'типы сахарного диабета', 'Сердечная недостаточность': 'виды сердечной недостаточности',
+  'Артериальная гипертензия': 'виды артериальной гипертензии', 'Конституция': 'типы конституции', 'Резистентность': 'виды резистентности',
+  'Желтухи': 'виды желтух', 'Иммунодефициты': 'виды иммунодефицитов', 'Гипогидратации': 'виды гипогидратаций', 'Гипергидратации': 'виды гипергидратаций',
+  'Отёк мозга': 'виды отёка мозга', 'Печёночная недостаточность': 'виды печёночной недостаточности',
+  'Белково-энергетическая недостаточность': 'формы белково-энергетической недостаточности', 'Кишечная непроходимость': 'виды кишечной непроходимости',
+  'Экзогенные': 'экзогенные гипоксии', 'Эндогенные': 'эндогенные гипоксии', 'Гипертермии (не лихорадка)': 'виды гипертермий (не лихорадка)',
+};
+
+function axisPhrase(axis) {
+  if (AXIS_FIX[axis]) return AXIS_FIX[axis];
+  const low = axis.length > 1 && axis[1] === axis[1].toLowerCase() ? axis[0].toLowerCase() + axis.slice(1) : axis;
+  return low.startsWith('по ') ? 'виды ' + low : low;
+}
+
+const THEORY_CACHE = {};
+
+function buildTheory(topic) {
+  if(topic.locked)return [];
+  if (THEORY_CACHE[topic.id]) return THEORY_CACHE[topic.id];
+  const T = topic.title; const out = [];
+  const add = (type, q, a) => out.push({ id: topic.id + '-' + out.length, tid: topic.id, type, q, a });
+
+  add('def', `${T}: сформулируйте определение.`, topic.defNote ? { text: topic.definition, tail: topic.defNote } : topic.definition);
+  topic.classification.forEach((c) => add('def', `${T} — ${axisPhrase(c.axis)}: перечислите и раскройте.`, { list: c.items }));
+
+  add('etio', `${T}: назовите причины и условия возникновения.`, { list: topic.etiology });
+  topic.signs.forEach((s) => add('etio', `${T}: объясните «${s.s}».`, s.m));
+  if (topic.micro) add('etio', `${T}: микроскопическая картина и местные изменения.`, { list: topic.micro });
+
+  topic.flows.forEach((f) => {
+    const main = f.steps.find((s) => s.k === 'main');
+    if (main) add('path', `${f.title}: какое звено главное и почему?`, `${main.t}. ${main.d}`);
+    add('path', `${f.title}: назовите звенья по порядку.`, { list: f.steps.map((s) => (s.l ? s.l + ' — ' : '') + s.t + (s.k === 'main' ? ' (главное звено)' : '')), ordered: true });
+  });
+  add('path', `${T}: механизмы саногенеза и компенсации.`, { list: topic.sanogenesis });
+
+  topic.circles.forEach((c) => {
+    const sano = c.kind === 'sanogenic';
+    add('circ', sano ? `Саногенетическая петля «${c.title}»: опишите и объясните её смысл.` : `Порочный круг «${c.title}»: восстановите цепь и назовите способ разрыва.`,
+      { list: [...c.nodes, `замыкается на «${c.nodes[0]}»`], ordered: true, tail: (sano ? 'Смысл: ' : 'Разрыв: ') + c.brk });
+  });
+
+  (topic.tables || []).forEach((tb) => tb.rows.forEach((r) => {
+    add('tab', `${tb.title}: ${r[0]}.`, { list: r.slice(1).map((v, i) => `${tb.head[i + 1]} — ${v}`) });
+  }));
+
+  topic.traps.forEach((x) => add('trap', x.q, x.a));
+  ((EXPERT[topic.id] || {}).items || []).forEach((x) => add('exp', `${x.h}: что вы об этом знаете?`, x.say ? { text: x.b, tail: 'Фраза для ответа: ' + x.say } : x.b));
+
+  THEORY_CACHE[topic.id] = out;
+  return out;
+}
+
+const theoryDefault = (topic) => buildTheory(topic).filter((q) => THEORY_TYPES[q.type].on);
+
+function AnswerBody({ a }) {
+  if (typeof a === 'string') return <Rich text={a} />;
+  const L = a.ordered ? 'ol' : 'ul';
+  return (
+    <div className="grid gap-2">
+      {a.text && <p><Rich text={a.text} /></p>}
+      {a.list && (
+        <L className={cx('grid gap-1.5 pl-5', a.ordered ? 'list-decimal' : 'list-disc')}>
+          {a.list.map((it, i) => <li key={i} className="pl-1"><Lead text={it} /></li>)}
+        </L>
+      )}
+      {a.tail && <p className="pa-muted"><Rich text={a.tail} /></p>}
+    </div>
+  );
+}
+
+function TheoryCard({ q, idx, total, okCount, open, setOpen, answer, topicChip }) {
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = (e.target && e.target.tagName) || '';
+      if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
+      if (!open && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); setOpen(true); }
+      else if (open && (e.key === '1' || e.key === 'ArrowRight')) { e.preventDefault(); answer(true); }
+      else if (open && (e.key === '2' || e.key === 'ArrowLeft')) { e.preventDefault(); answer(false); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, setOpen, answer]);
+  return (
+    <div>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="pa-eyebrow ink-accent tabnum">Вопрос {idx + 1} из {total}</span>
+        <span className="pa-faint tabnum ml-auto text-[13px]">знаю: {okCount}</span>
+      </div>
+      <div className="pa-progress mt-3 h-1.5 overflow-hidden rounded-full"><span style={{ width: `${(idx / total) * 100}%` }} /></div>
+      <article className="pa-card mt-5 rounded-2xl p-6 sm:p-8">
+        <div className="flex flex-wrap gap-2">
+          {topicChip}
+          <Chip>{THEORY_TYPES[q.type].label}</Chip>
+        </div>
+        <p className="font-display mt-4 text-[19px] leading-[1.5] text-balance sm:text-[21px]">{q.q}</p>
+        {open ? (
+          <>
+            <div className="pa-answer mt-5 rounded-xl p-4 text-[15px] leading-relaxed"><AnswerBody a={q.a} /></div>
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              <button type="button" className="pa-btn tone-san" onClick={() => answer(true)}><ThumbsUp size={15} aria-hidden="true" />Знаю</button>
+              <button type="button" className="pa-btn tone-alt" onClick={() => answer(false)}><ThumbsDown size={15} aria-hidden="true" />Повторить</button>
+              <span className="pa-faint ml-1 hidden text-[12.5px] sm:inline">клавиши 1 и 2</span>
+            </div>
+          </>
+        ) : (
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            <button type="button" className="pa-btn pa-btn-primary" onClick={() => setOpen(true)}><Eye size={16} aria-hidden="true" />Показать ответ</button>
+            <span className="pa-faint ml-1 hidden text-[12.5px] sm:inline">или пробел</span>
+          </div>
+        )}
+      </article>
+    </div>
+  );
+}
+
+function TheoryList({ qs }) {
+  const [shown, setShown] = useState({});
+  const [all, setAll] = useState(false);
+  return (
+    <div className="grid gap-3">
+      <div><button type="button" className={cx('pa-check', all && 'is-on')} aria-pressed={all} onClick={() => setAll(!all)}><Eye size={14} aria-hidden="true" />{all ? 'Скрыть все ответы' : 'Показать все ответы'}</button></div>
+      {qs.map((q, i) => {
+        const open = all || shown[q.id];
+        return (
+          <article key={q.id} className="pa-card rounded-2xl p-5">
+            <div className="flex items-start gap-3">
+              <span className="pa-faint tabnum mt-0.5 w-7 shrink-0 text-[12.5px] font-semibold">{i + 1}</span>
+              <div className="min-w-0 flex-1">
+                <div className="pa-faint text-[12px]">{THEORY_TYPES[q.type].label}</div>
+                <h4 className="mt-0.5 text-[15.5px] font-semibold leading-snug">{q.q}</h4>
+                {open ? <div className="pa-answer mt-3 rounded-xl p-4 text-[14.5px] leading-relaxed"><AnswerBody a={q.a} /></div>
+                  : <button type="button" className="pa-btn mt-3" onClick={() => setShown((s) => ({ ...s, [q.id]: true }))}><Eye size={15} aria-hidden="true" />Ответ</button>}
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
+function TheorySummary({ res, onRetry, onRestart, onConfig }) {
+  const ok = res.filter((r) => r.good).length; const n = res.length;
+  const wrong = res.filter((r) => !r.good).map((r) => r.q);
+  const byType = {};
+  res.forEach((r) => { const b = byType[r.q.type] || (byType[r.q.type] = { ok: 0, n: 0 }); b.n++; if (r.good) b.ok++; });
+  return (
+    <div className="grid gap-5">
+      <section className="pa-card rounded-2xl p-6">
+        <div className="pa-eyebrow ink-accent">Итог прогона по теории</div>
+        <div className="font-display tabnum mt-2 text-[34px] font-semibold leading-tight">{ok} из {n} · {n ? Math.round((ok / n) * 100) : 0}%</div>
+        <ul className="mt-4 grid">
+          {Object.entries(byType).map(([k, b], j) => (
+            <li key={k} className={cx('flex flex-wrap items-center gap-3 py-2.5', j > 0 && 'border-t')} style={{ borderColor: 'var(--line)' }}>
+              <span className="min-w-0 flex-1 text-[14px]">{THEORY_TYPES[k].label}</span>
+              <span className="tabnum text-[14px]">{b.ok}/{b.n}</span>
+              <span className="pa-progress h-1.5 w-24 overflow-hidden rounded-full"><span style={{ width: `${(b.ok / b.n) * 100}%`, background: b.ok === b.n ? 'var(--san)' : b.ok / b.n >= 0.5 ? 'var(--accent)' : 'var(--alt)' }} /></span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-5 flex flex-wrap gap-2.5">
+          {wrong.length > 0 && <button type="button" className="pa-btn pa-btn-primary" onClick={() => onRetry(wrong)}><RefreshCw size={16} aria-hidden="true" />Повторить незнакомые ({wrong.length})</button>}
+          <button type="button" className="pa-btn" onClick={onRestart}><Shuffle size={16} aria-hidden="true" />Пройти заново</button>
+          <button type="button" className="pa-btn" onClick={onConfig}>Настроить</button>
+        </div>
+      </section>
+      {wrong.length > 0 && (
+        <section>
+          <h3 className="font-display mb-3 text-[18px] font-semibold">Что повторить</h3>
+          <TheoryList qs={wrong} />
+        </section>
+      )}
+    </div>
+  );
+}
+
+function TheoryTab({ topic, saved, onScore }) {
+  const all = useMemo(() => buildTheory(topic), [topic]);
+  const [types, setTypes] = useState(() => new Set(Object.keys(THEORY_TYPES).filter((k) => THEORY_TYPES[k].on)));
+  const [order, setOrder] = useState('seq');
+  const [view, setView] = useState('cards');
+  const [deck, setDeck] = useState(null);
+  const [i, setI] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [res, setRes] = useState([]);
+  const topRef = useRef(null);
+  const toTop = () => { try { const el = topRef.current; if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 130) }); } catch (e) { /* ignore */ } };
+  useEffect(() => { if (deck) toTop(); }, [deck]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pool = all.filter((q) => types.has(q.type));
+  const listQs = useMemo(() => (order === 'rnd' ? shuffle(pool) : pool), [all, types, order]); // eslint-disable-line react-hooks/exhaustive-deps
+  const present = Object.keys(THEORY_TYPES).filter((k) => all.some((q) => q.type === k));
+  const start = (src) => { const base = src || pool; setDeck(order === 'rnd' ? shuffle(base) : base); setI(0); setOpen(false); setRes([]); };
+  const answer = (good) => { window.MAP?.card({atlas:'pathophys',ok:good});
+    const r2 = [...res, { q: deck[i], good }]; setRes(r2); setOpen(false); setI(i + 1); if (i + 1 >= deck.length) setTimeout(toTop, 0);
+    if (i + 1 >= deck.length && deck.length === pool.length) onScore({ ok: r2.filter((x) => x.good).length, total: r2.length });
+  };
+  const toggleType = (k) => setTypes((s) => { const n = new Set(s); if (n.has(k)) n.delete(k); else n.add(k); return n; });
+
+  if (deck && i < deck.length) {
+    return (
+      <div ref={topRef} className="grid gap-4">
+        <TheoryCard q={deck[i]} idx={i} total={deck.length} okCount={res.filter((r) => r.good).length} open={open} setOpen={setOpen} answer={answer} />
+        <div><button type="button" className="pa-btn" onClick={() => setDeck(null)}>Прервать</button></div>
+      </div>
+    );
+  }
+  if (deck && i >= deck.length) return <div ref={topRef}><TheorySummary res={res} onRetry={(w) => start(w)} onRestart={() => start()} onConfig={() => setDeck(null)} /></div>;
+
+  return (
+    <div className="grid gap-5">
+      <section className="pa-expert-lead rounded-2xl p-5 sm:p-6">
+        <div className="pa-eyebrow ink-accent mb-2 flex items-center gap-1.5"><ClipboardCheck size={13} aria-hidden="true" />Прогон по теории</div>
+        <p className="max-w-[72ch] text-[15.5px] leading-relaxed">Вопросы на знание материала темы: определения, классификации, механизмы симптомов, звенья патогенеза, порочные круги, сравнительные таблицы и ловушки. Отвечайте вслух, открывайте эталон и честно отмечайте результат.</p>
+        {saved && <p className="pa-muted mt-2 text-[13.5px]">Последний полный прогон: <b className="tabnum">{saved.ok}/{saved.total}</b> ({Math.round((saved.ok / saved.total) * 100)} %)</p>}
+      </section>
+      <Panel title="Что спрашивать" Icon={Layers}>
+        <div className="flex flex-wrap gap-2">
+          {present.map((k) => {
+            const n = all.filter((q) => q.type === k).length; const on = types.has(k);
+            return <button key={k} type="button" aria-pressed={on} onClick={() => toggleType(k)} className={cx('inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[13.5px] font-medium', on ? 'tone-etio' : 'pa-chip')}>{on && <Check size={14} aria-hidden="true" />}{THEORY_TYPES[k].label}<span className="tabnum opacity-70">{n}</span></button>;
+          })}
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-1.5"><span className="text-[13.5px] font-medium">Порядок</span><Seg value={order} onChange={setOrder} label="Порядок" options={[{ id: 'seq', label: 'Как в теме' }, { id: 'rnd', label: 'Случайно' }]} /></div>
+          <div className="grid gap-1.5"><span className="text-[13.5px] font-medium">Формат</span><Seg value={view} onChange={setView} label="Формат" options={[{ id: 'cards', label: 'Карточки' }, { id: 'list', label: 'Списком' }]} /></div>
+        </div>
+      </Panel>
+      {view === 'cards' ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="button" className="pa-btn pa-btn-primary" disabled={!pool.length} onClick={() => start()} style={!pool.length ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}><Play size={16} aria-hidden="true" />Начать прогон</button>
+          <span className="pa-faint tabnum text-[13.5px]">{pool.length} {plural(pool.length, 'вопрос', 'вопроса', 'вопросов')}</span>
+        </div>
+      ) : (
+        <TheoryList key={[...types].join() + order} qs={listQs} />
+      )}
     </div>
   );
 }
@@ -709,6 +963,8 @@ const TABS = [
   { id: 'traps', label: 'Ловушки', Icon: TriangleAlert, count: (t) => t.traps.length },
   { id: 'blitz', label: 'Блиц', Icon: ListChecks, count: (t) => t.quiz.length },
   { id: 'tables', label: 'Таблицы', Icon: Table2, count: (t) => (t.tables || []).length },
+  { id: 'expert', label: 'На 5+', Icon: Sparkles, count: (t) => ((EXPERT[t.id] || {}).items || []).length },
+  { id: 'theory', label: 'Прогон по теории', Icon: ClipboardCheck, count: (t) => theoryDefault(t).length },
 ];
 
 const LEGEND = [
@@ -732,9 +988,9 @@ const STORE_KEY = 'patho-atlas:v1';
 function loadStore() {
   try {
     const raw = window.localStorage.getItem(STORE_KEY);
-    if (raw) { const s = JSON.parse(raw); return { done: s.done || {}, scores: s.scores || {}, mode: s.mode === 'exam' ? 'exam' : 'learn' }; }
+    if (raw) { const s = JSON.parse(raw); return { done: s.done || {}, scores: s.scores || {}, theory: s.theory || {}, mode: s.mode === 'exam' ? 'exam' : 'learn' }; }
   } catch (e) { /* хранилище недоступно — работаем без него */ }
-  return { done: {}, scores: {}, mode: 'learn' };
+  return { done: {}, scores: {}, theory: {}, mode: 'learn' };
 }
 
 function saveStore(s) { try { window.localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) { /* ignore */ } }
@@ -756,6 +1012,7 @@ function buildIndex(topics) {
     t.circles.forEach((c) => push(t, 'circles', 'Порочный круг', c.title + ': ' + c.nodes.join(' → ')));
     t.traps.forEach((x) => push(t, 'traps', 'Ловушка', x.q + ' ' + x.a));
     t.quiz.forEach((x) => push(t, 'blitz', 'Блиц', x.q + ' ' + x.a));
+    ((EXPERT[t.id] || {}).items || []).forEach((x) => push(t, 'expert', 'На 5+', x.h + '. ' + x.b + (x.say ? ' ' + x.say : '')));
     (t.tables || []).forEach((tb) => tb.rows.forEach((r) => push(t, 'tables', 'Таблица', r.join(' · '))));
   });
   return out;
@@ -862,7 +1119,7 @@ function Sidebar({ view, topicId, store, query, setQuery, onOpen, onHome, onRun,
     const sc = store.scores[t.id];
     return (
       <button type="button" onClick={() => onOpen(t.id)} className={cx('pa-navitem flex w-full items-center gap-2.5 px-3 py-2 text-left text-[14px]', indent && 'pl-5', active && 'is-active')} aria-current={active ? 'page' : undefined}>
-        <span className="pa-nav-muted shrink-0">{t.locked && !SUBJECT_ACCESS ? <Lock size={16} aria-label="По подписке" /> : <TopicIcon name={t.icon} size={16} />}</span>
+        <span className="pa-nav-muted shrink-0">{t.locked&&!SUBJECT_ACCESS?<Lock size={16} aria-label="По подписке"/>:<TopicIcon name={t.icon} size={16} />}</span>
         <span className="min-w-0 flex-1 leading-snug">{t.title}</span>
         {store.done[t.id] && <CircleCheck size={15} className="shrink-0" style={{ color: 'var(--san)' }} aria-label="Изучено" />}
         {sc && <span className="pa-navbadge tabnum shrink-0 rounded-md px-1.5 text-[11px] leading-5">{sc.ok}/{sc.total}</span>}
@@ -880,7 +1137,6 @@ function Sidebar({ view, topicId, store, query, setQuery, onOpen, onHome, onRun,
         {onClose && <button type="button" onClick={onClose} className="pa-navitem -mr-2 grid h-9 w-9 shrink-0 place-items-center lg:hidden" aria-label="Закрыть меню"><X size={19} /></button>}
       </div>
 
-      <div className="flex gap-4 px-4 pb-3 text-sm"><a href="../">Все атласы</a><a href="../cabinet/">Личный кабинет</a></div>
       <div className="px-4 pb-3">
         <label htmlFor={onClose ? 'pa-search-m' : 'pa-search'} className="sr-only">Поиск по атласу</label>
         <div className="relative">
@@ -964,11 +1220,14 @@ function HomeView({ store, onOpen, onRun }) {
   const nTraps = TOPICS.reduce((s, t) => s + t.traps.length, 0);
   const nQuiz = TOPICS.reduce((s, t) => s + t.quiz.length, 0);
   const nCircles = TOPICS.reduce((s, t) => s + t.circles.length, 0);
+  const nExpert = TOPICS.reduce((s, t) => s + ((EXPERT[t.id] || {}).items || []).length, 0);
   const stats = [
     { v: `${done}/${ready}`, l: 'тем изучено' },
     { v: total ? `${Math.round((ok / total) * 100)}%` : '—', l: total ? `верных в блице (${ok} из ${total})` : 'точность блица' },
     { v: nCircles, l: 'порочных кругов' },
     { v: nTraps, l: 'экзаменационных ловушек' },
+    { v: nExpert, l: 'фактов в разделе «На 5+»' },
+    { v: TOPICS.reduce((s, t) => s + theoryDefault(t).length, 0), l: 'вопросов в прогонах по теории' },
   ];
   return (
     <div className="pa-gutter mx-auto max-w-[1180px] pb-16 pt-8 sm:pt-10">
@@ -977,10 +1236,10 @@ function HomeView({ store, onOpen, onRun }) {
           <div className="pa-eyebrow ink-accent">Общая нозология · типовые процессы · частная патофизиология</div>
           <h1 className="font-display mt-3 text-[34px] font-semibold leading-[1.1] text-balance sm:text-[44px]">Атлас патофизиологии</h1>
           <p className="pa-muted mt-4 max-w-[60ch] text-[16px] leading-relaxed">
-            {ready} тем полного курса. Болезнь и этиология, общий патогенез доступны без подписки. Остальные темы открываются по подписке на патофизиологию. В каждой: паспорт процесса, анимированные схемы, пошаговый патогенез, порочные круги, ловушки экзамена и блиц-задачи.
+            {ready} тем полного курса. В каждой: паспорт процесса, анимированные схемы, пошаговый патогенез с главным звеном, порочные круги, ловушки экзамена, блиц-задачи, раздел «На 5+» с материалом сверх программы и прогон по теории в конце. Режим «Экзамен» прячет ответы, раскрывает звенья по одному и ведёт счёт.
           </p>
           <div className="mt-6 flex flex-wrap gap-2.5">
-            <button type="button" className="pa-btn pa-btn-primary" onClick={() => onOpen('disease')}><Play size={16} aria-hidden="true" />Открыть пробную тему</button>
+            <button type="button" className="pa-btn pa-btn-primary" onClick={() => onOpen('inflammation')}><Play size={16} aria-hidden="true" />Начать с воспаления</button>
             <button type="button" className="pa-btn" onClick={onRun}><Shuffle size={16} aria-hidden="true" />Экзаменационный прогон · {nQuiz} задач</button>
           </div>
         </div>
@@ -1034,10 +1293,11 @@ function HomeView({ store, onOpen, onRun }) {
                         </div>
                         <p className="pa-muted mt-3 text-[14px] leading-snug">{t.short}</p>
                         <div className="pa-faint mt-auto flex flex-wrap gap-x-3 gap-y-1 pt-4 text-[12.5px] tabnum">
-                          {t.locked ? (SUBJECT_ACCESS ? <span>Открыть тему</span> : <span><Lock size={13} className="inline"/> По подписке</span>) : <><span>{t.flows.reduce((s2, f) => s2 + f.steps.length, 0)} звеньев</span>
+                          <span>{t.flows.reduce((s2, f) => s2 + f.steps.length, 0)} звеньев</span>
                           <span>{t.circles.length} {plural(t.circles.length, 'круг', 'круга', 'кругов')}</span>
                           <span>{t.traps.length} {plural(t.traps.length, 'ловушка', 'ловушки', 'ловушек')}</span>
-                          <span>{sc ? `блиц ${sc.ok}/${sc.total}` : `${t.quiz.length} задач`}</span></>}
+                          <span>{sc ? `блиц ${sc.ok}/${sc.total}` : `${t.quiz.length} задач`}</span>
+                          <span>{(store.theory || {})[t.id] ? `теория ${store.theory[t.id].ok}/${store.theory[t.id].total}` : `${theoryDefault(t).length} вопросов`}</span>
                         </div>
                       </button>
                     );
@@ -1324,8 +1584,8 @@ function BlitzTab({ topic, exam, saved, onScore }) {
           )}
           {exam && open[i] && grade[i] === undefined && (
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" className="pa-btn tone-san" onClick={() => { window.MAP?.card({atlas:'pathophys',ok:true}); setGrade((g) => ({ ...g, [i]: true })); }}><ThumbsUp size={15} aria-hidden="true" />Ответил верно</button>
-              <button type="button" className="pa-btn tone-alt" onClick={() => { window.MAP?.card({atlas:'pathophys',ok:false}); setGrade((g) => ({ ...g, [i]: false })); }}><ThumbsDown size={15} aria-hidden="true" />Ошибся</button>
+              <button type="button" className="pa-btn tone-san" onClick={() => {window.MAP?.card({atlas:'pathophys',ok:true});setGrade((g) => ({ ...g, [i]: true }));}}><ThumbsUp size={15} aria-hidden="true" />Ответил верно</button>
+              <button type="button" className="pa-btn tone-alt" onClick={() => {window.MAP?.card({atlas:'pathophys',ok:false});setGrade((g) => ({ ...g, [i]: false }));}}><ThumbsDown size={15} aria-hidden="true" />Ошибся</button>
             </div>
           )}
           {grade[i] !== undefined && <div className="mt-3"><Chip tone={grade[i] ? 'san' : 'alt'}>{grade[i] ? 'Верно' : 'Повторить'}</Chip></div>}
@@ -1370,6 +1630,74 @@ function TablesTab({ topic, exam }) {
   return <div className="grid gap-6">{(topic.tables || []).map((tb, i) => <DataTable key={i + (exam ? 'e' : 'l')} tb={tb} exam={exam} />)}</div>;
 }
 
+function ExpertItem({ it, i, exam }) {
+  const [open, setOpen] = useState(!exam);
+  const K = EXPERT_KINDS[it.k] || EXPERT_KINDS.debate;
+  return (
+    <article className="pa-card rounded-2xl p-5 sm:p-6">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="pa-faint tabnum text-[12px] font-semibold">{String(i + 1).padStart(2, '0')}</span>
+        <Chip tone={K.tone} className={K.tone ? '' : 'pa-chip-neutral'}>{K.label}</Chip>
+      </div>
+      <h4 className="font-display mt-2.5 text-[18px] font-semibold leading-snug text-balance">{it.h}</h4>
+      {open ? (
+        <>
+          <p className="pa-muted mt-2 max-w-[78ch] text-[14.5px] leading-relaxed"><Rich text={it.b} /></p>
+          {it.say && (
+            <div className="pa-say mt-4 flex gap-3 rounded-r-xl px-4 py-3">
+              <Quote size={16} className="ink-accent mt-0.5 shrink-0" aria-hidden="true" />
+              <div className="min-w-0">
+                <div className="pa-eyebrow ink-accent mb-1">Фраза для ответа</div>
+                <p className="text-[14.5px] font-medium leading-relaxed"><Rich text={it.say} /></p>
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        <button type="button" className="pa-btn mt-3" onClick={() => setOpen(true)}><Eye size={15} aria-hidden="true" />Вспомнить и открыть</button>
+      )}
+    </article>
+  );
+}
+
+function ExpertTab({ topic, exam }) {
+  const data = EXPERT[topic.id];
+  const [kind, setKind] = useState('all');
+  const [phrases, setPhrases] = useState(false);
+  if (!data) return <p className="pa-muted">Раздел для этой темы готовится.</p>;
+  const kinds = ['all', ...Object.keys(EXPERT_KINDS).filter((k) => data.items.some((x) => x.k === k))];
+  const items = data.items.map((it, i) => ({ it, i })).filter(({ it }) => kind === 'all' || it.k === kind);
+  const says = data.items.filter((x) => x.say);
+  return (
+    <div className="grid gap-5">
+      <section className="pa-expert-lead rounded-2xl p-5 sm:p-6">
+        <div className="pa-eyebrow ink-accent mb-2 flex items-center gap-1.5"><Sparkles size={13} aria-hidden="true" />Ответ на 5+</div>
+        <p className="max-w-[72ch] text-[15.5px] leading-relaxed">{data.lead}</p>
+        <p className="pa-muted mt-2 max-w-[72ch] text-[13.5px] leading-relaxed">Материал сверх базовой программы: молекулярные механизмы, история открытий, клинические связи и современные данные. Вставляйте один-два факта к месту, после основного ответа, а не вместо него.</p>
+      </section>
+      <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        <Seg value={kind} onChange={setKind} label="Тип материала" options={kinds.map((k) => ({ id: k, label: k === 'all' ? 'Все' : EXPERT_KINDS[k].label }))} />
+        {says.length > 0 && <div><button type="button" className={cx('pa-check', phrases && 'is-on')} aria-pressed={phrases} onClick={() => setPhrases(!phrases)}><Quote size={14} aria-hidden="true" />Только фразы для ответа ({says.length})</button></div>}
+      </div>
+      {phrases ? (
+        <section className="pa-card rounded-2xl p-5 sm:p-6">
+          <h3 className="font-display text-[18px] font-semibold">Фразы для ответа</h3>
+          <ol className="mt-3 grid gap-3">
+            {says.map((x, j) => (
+              <li key={j} className="pa-say rounded-r-xl px-4 py-3">
+                <div className="pa-faint text-[12px]">{x.h}</div>
+                <p className="mt-1 text-[14.5px] font-medium leading-relaxed"><Rich text={x.say} /></p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : (
+        <div className="grid gap-4">{items.map(({ it, i }) => <ExpertItem key={i + (exam ? 'e' : 'l')} it={it} i={i} exam={exam} />)}</div>
+      )}
+    </div>
+  );
+}
+
 function TopicView({ topic, tab, setTab, mode, store, setStore, onOpen }) {
   const exam = mode === 'exam';
   const done = !!store.done[topic.id];
@@ -1392,9 +1720,12 @@ function TopicView({ topic, tab, setTab, mode, store, setStore, onOpen }) {
             <h1 className="font-display text-[29px] font-semibold leading-[1.15] text-balance sm:text-[36px]">{topic.title}</h1>
             <p className="pa-muted mt-1.5 text-[15.5px]">{topic.short}</p>
           </div>
-          <button type="button" onClick={toggleDone} className={cx('pa-btn', done && 'tone-san')} aria-pressed={done}>
-            {done ? <CircleCheck size={16} aria-hidden="true" /> : <Check size={16} aria-hidden="true" />}{done ? 'Изучено' : 'Отметить изученной'}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {EXPERT[topic.id] && tab !== 'expert' && <button type="button" onClick={() => setTab('expert')} className="pa-btn"><Sparkles size={16} className="ink-accent" aria-hidden="true" />На 5+</button>}
+            <button type="button" onClick={toggleDone} className={cx('pa-btn', done && 'tone-san')} aria-pressed={done}>
+              {done ? <CircleCheck size={16} aria-hidden="true" /> : <Check size={16} aria-hidden="true" />}{done ? 'Изучено' : 'Отметить изученной'}
+            </button>
+          </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-1.5">{topic.tags.map((t) => <Chip key={t}>{t}</Chip>)}</div>
       </header>
@@ -1428,27 +1759,34 @@ function TopicView({ topic, tab, setTab, mode, store, setStore, onOpen }) {
         {tab === 'traps' && <TrapsTab key={key} topic={topic} exam={exam} />}
         {tab === 'blitz' && <BlitzTab key={key} topic={topic} exam={exam} saved={store.scores[topic.id]} onScore={onScore} />}
         {tab === 'tables' && <TablesTab key={key} topic={topic} exam={exam} />}
+        {tab === 'expert' && <ExpertTab key={key} topic={topic} exam={exam} />}
+        {tab === 'theory' && <TheoryTab key={topic.id} topic={topic} saved={(store.theory || {})[topic.id]} onScore={(sc) => setStore((s) => ({ ...s, theory: { ...(s.theory || {}), [topic.id]: sc } }))} />}
 
-        {next && (
-          <div className="mt-10 flex justify-end">
-            <button type="button" className="pa-btn" onClick={() => onOpen(next.id)}>Следующая тема: {next.title}<ArrowRight size={15} aria-hidden="true" /></button>
-          </div>
-        )}
+        <div className="mt-10 flex flex-wrap items-center justify-end gap-2.5 border-t pt-6" style={{ borderColor: 'var(--line)' }}>
+          {tab !== 'theory' && <button type="button" className="pa-btn pa-btn-primary" onClick={() => { setTab('theory'); try { window.scrollTo({ top: 0 }); } catch (e) { /* ignore */ } }}><ClipboardCheck size={15} aria-hidden="true" />Закрепить: прогон по теории · {theoryDefault(topic).length}</button>}
+          {next && <button type="button" className="pa-btn" onClick={() => onOpen(next.id)}>Следующая тема: {next.title}<ArrowRight size={15} aria-hidden="true" /></button>}
+        </div>
       </div>
     </div>
   );
 }
 
-const ALL_Q = TOPICS.flatMap((t) => t.quiz.map((x, k) => ({ ...x, tid: t.id, key: t.id + '-' + k })));
+const ALL_Q = TOPICS.flatMap((t) => t.quiz.map((x, k) => ({ ...x, tid: t.id, key: t.id + '-' + k, type: 'case' })));
+
+let ALL_THEORY = null;
+
+const allTheory = () => (ALL_THEORY || (ALL_THEORY = TOPICS.flatMap((t) => theoryDefault(t))));
 
 function RunView({ onOpen }) {
-  const [sel, setSel] = useState(() => new Set(TOPICS.filter(t => !t.locked).map((t) => t.id)));
+  const [sel, setSel] = useState(() => new Set(TOPICS.filter(t=>!t.locked).map((t) => t.id)));
   const [count, setCount] = useState(15);
   const [deck, setDeck] = useState(null);
   const [i, setI] = useState(0);
   const [open, setOpen] = useState(false);
   const [res, setRes] = useState([]);
-  const pool = ALL_Q.filter((q) => sel.has(q.tid));
+  const [kind, setKind] = useState('cases');
+  const src = kind === 'cases' ? ALL_Q : kind === 'theory' ? allTheory() : [...ALL_Q, ...allTheory()];
+  const pool = src.filter((q) => sel.has(q.tid));
 
   const start = (src) => { const base = src || pool; const d = shuffle(base).slice(0, count === 0 ? base.length : count); setDeck(d); setI(0); setOpen(false); setRes([]); };
   const toggle = (id) => setSel((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
@@ -1459,7 +1797,8 @@ function RunView({ onOpen }) {
       <div className="pa-gutter mx-auto max-w-[920px] pb-16 pt-8 sm:pt-10">
         <div className="pa-eyebrow ink-accent">Самопроверка по всем темам</div>
         <h1 className="font-display mt-3 text-[30px] font-semibold leading-tight sm:text-[38px]">Экзаменационный прогон</h1>
-        <p className="pa-muted mt-3 max-w-[60ch] text-[15.5px] leading-relaxed">Случайные ситуационные задачи из выбранных тем. Отвечайте вслух, открывайте эталон и честно отмечайте результат. В конце — разбор по темам.</p>
+        <p className="pa-muted mt-3 max-w-[60ch] text-[15.5px] leading-relaxed">Случайные ситуационные задачи или теоретические вопросы из выбранных тем. Отвечайте вслух, открывайте эталон и честно отмечайте результат. В конце — разбор по темам.</p>
+        <div className="mt-6 grid gap-1.5"><span className="text-[13.5px] font-medium">Что спрашивать</span><Seg value={kind} onChange={setKind} label="Тип вопросов" options={[{ id: 'cases', label: 'Ситуационные задачи' }, { id: 'theory', label: 'Теория' }, { id: 'mix', label: 'Всё вместе' }]} /></div>
         <Panel title="Темы" Icon={Layers} className="mt-7" aside={<button type="button" className="pa-btn" onClick={() => setSel(sel.size === TOPICS.filter(t=>!t.locked).length ? new Set() : new Set(TOPICS.filter(t=>!t.locked).map((t) => t.id)))}>{sel.size === TOPICS.filter(t=>!t.locked).length ? 'Снять все' : 'Выбрать все'}</button>}>
           <div className="grid gap-5">
             {SECTIONS.map((sec) => {
@@ -1472,10 +1811,10 @@ function RunView({ onOpen }) {
                     <button type="button" className="ink-accent text-[13px] font-medium underline-offset-2 hover:underline" onClick={() => setSel((cur) => { const n = new Set(cur); ids.forEach((id) => (allOn ? n.delete(id) : n.add(id))); return n; })}>{allOn ? 'снять раздел' : 'весь раздел'}</button>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {TOPICS.filter((t) => t.section === sec.id).map((t) => {
+                    {TOPICS.filter((t) => t.section === sec.id && !t.locked).map((t) => {
                       const on = sel.has(t.id);
                       return (
-                        <button key={t.id} type="button" onClick={() => toggle(t.id)} disabled={t.locked} title={t.locked ? (SUBJECT_ACCESS ? "Откройте тему, чтобы загрузить задания" : "Откройте тему по подписке") : undefined} aria-pressed={on} className={cx('inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[13.5px] font-medium', on ? 'tone-etio' : 'pa-chip')}>
+                        <button key={t.id} type="button" onClick={() => toggle(t.id)} disabled={t.locked} title={t.locked?"Откройте тему, чтобы загрузить задания":undefined} aria-pressed={on} className={cx('inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[13.5px] font-medium', on ? 'tone-etio' : 'pa-chip')}>
                           {on ? <Check size={14} aria-hidden="true" /> : <TopicIcon name={t.icon} size={14} />}{t.title}
                         </button>
                       );
@@ -1486,7 +1825,7 @@ function RunView({ onOpen }) {
             })}
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-4">
-            <span className="text-[14px] font-medium">Сколько задач</span>
+            <span className="text-[14px] font-medium">Сколько вопросов</span>
             <div className="pa-seg" role="group" aria-label="Количество задач">
               {[10, 15, 25, 0].map((c) => <button key={c} type="button" className={cx(count === c && 'is-on')} onClick={() => setCount(c)}>{c === 0 ? 'все' : c}</button>)}
             </div>
@@ -1515,7 +1854,7 @@ function RunView({ onOpen }) {
                 <span className="min-w-0 flex-1 text-[14.5px] font-medium">{TOPIC_MAP[tid].title}</span>
                 <span className="tabnum text-[14px]">{b.ok}/{b.n}</span>
                 <span className="pa-progress h-1.5 w-24 overflow-hidden rounded-full"><span style={{ width: `${(b.ok / b.n) * 100}%`, background: b.ok === b.n ? 'var(--san)' : b.ok / b.n >= 0.5 ? 'var(--accent)' : 'var(--alt)' }} /></span>
-                <button type="button" className="pa-btn" onClick={() => onOpen(tid, 'traps')}>К ловушкам</button>
+                <button type="button" className="pa-btn" onClick={() => onOpen(tid, kind === 'cases' ? 'traps' : 'theory')}>{kind === 'cases' ? 'К ловушкам' : 'К прогону темы'}</button>
               </li>
             ))}
           </ul>
@@ -1533,16 +1872,16 @@ function RunView({ onOpen }) {
   return (
     <div className="pa-gutter mx-auto max-w-[860px] pb-16 pt-8 sm:pt-10">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="pa-eyebrow ink-accent tabnum">Задача {i + 1} из {deck.length}</span>
+        <span className="pa-eyebrow ink-accent tabnum">{q.type === 'case' ? 'Задача' : 'Вопрос'} {i + 1} из {deck.length}</span>
         <span className="pa-faint tabnum ml-auto text-[13px]">верно: {res.filter((r) => r.good).length}</span>
       </div>
       <div className="pa-progress mt-3 h-1.5 overflow-hidden rounded-full"><span style={{ width: `${(i / deck.length) * 100}%` }} /></div>
       <article className="pa-card mt-6 rounded-2xl p-6 sm:p-8">
-        <Chip tone="etio"><TopicIcon name={t.icon} size={13} />{t.title}</Chip>
+        <div className="flex flex-wrap gap-2"><Chip tone="etio"><TopicIcon name={t.icon} size={13} />{t.title}</Chip>{q.type !== 'case' && <Chip>{THEORY_TYPES[q.type].label}</Chip>}</div>
         <p className="font-display mt-4 text-[19px] leading-[1.5] sm:text-[21px]">{q.q}</p>
         {open ? (
           <>
-            <div className="pa-answer mt-5 rounded-xl p-4 text-[15px] leading-relaxed"><Rich text={q.a} /></div>
+            <div className="pa-answer mt-5 rounded-xl p-4 text-[15px] leading-relaxed"><AnswerBody a={q.a} /></div>
             <div className="mt-5 flex flex-wrap gap-2">
               <button type="button" className="pa-btn tone-san" onClick={() => answer(true)}><ThumbsUp size={15} aria-hidden="true" />Ответил верно</button>
               <button type="button" className="pa-btn tone-alt" onClick={() => answer(false)}><ThumbsDown size={15} aria-hidden="true" />Ошибся</button>
@@ -1667,4 +2006,5 @@ function PathoAtlas() {
     </div>
   );
 }
+
 export default PathoAtlas;

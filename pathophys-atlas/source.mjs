@@ -41,5 +41,7 @@ export function analyze(source, evaluate = true) {
   const dataNodes = closure(evaluate ? ['TOPICS'] : ['T_DISEASE', 'T_PATHOGEN']);
   const topics = vm.runInNewContext(dataNodes.map(entry => entry.text).join('\n') + ';JSON.stringify(' + (evaluate ? 'TOPICS' : '[T_DISEASE,T_PATHOGEN]') + ')', {}, { timeout: 5000 });
   const visuals = new Map(declarations.get('VISUALS').node.declarations[0].init.properties.map(p => [p.key.name || p.key.value, { text: source.slice(p.value.start, p.value.end), names: identifiers(p.value) }]));
-  return { declarations, imports, bindings, closure, topics: JSON.parse(topics), visuals };
+  const expertNodes = closure(['EXPERT']);
+  const experts = expertNodes.length ? vm.runInNewContext(expertNodes.map(entry => entry.text).join('\n') + ';JSON.stringify(EXPERT)', {}, {timeout:5000}) : '{}';
+  return { declarations, imports, bindings, closure, topics: JSON.parse(topics), experts: JSON.parse(experts), visuals };
 }
