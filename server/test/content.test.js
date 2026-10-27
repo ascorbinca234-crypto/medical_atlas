@@ -63,7 +63,7 @@ test('каждый собранный пакет синтаксически ко
   const manifest=JSON.parse(fs.readFileSync(path.join(out,atlas,'manifest.json')));
   for(const id of Object.keys(manifest.topics)) {
    const code=fs.readFileSync(path.join(out,atlas,id+'.js'),'utf8');new vm.Script(code,{filename:atlas+'/'+id});
-   if(atlas==='farma') {
+   if(atlas==='farma' && id!=='atlas') {
     const ctx=vm.createContext({window:{},localStorage:{getItem:()=>null}});
     const src=path.join(root,'farma-atlas/src');vm.runInContext(['data.js','k0.js','k_00_gen.js','k_01_aff.js','locked_stubs.js','drugs.js','body.js'].map(f=>fs.readFileSync(path.join(src,f),'utf8')).join('\n'),ctx);vm.runInContext(code,ctx);
     const unlocked=JSON.parse(vm.runInContext('JSON.stringify([...P,...KP].filter(t=>!t.locked).map(t=>t.id))',ctx));

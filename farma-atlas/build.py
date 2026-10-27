@@ -55,6 +55,23 @@ if args.full:
     content_out.parent.mkdir(parents=True, exist_ok=True)
     content_out.write_text(locked_js, encoding='utf-8')
     topic_build.farma(data, read(base / 'body.js'), read(base / 'learn.js'))
+    # The supplied application builds its common drug registry and tests from the
+    # complete course. Keep that original program together behind subject access.
+    original_app = read(base / 'app.js')
+    registry = original_app[:original_app.index('/* ---------- карточка ---------- */')]
+    summary_code = source.rsplit('\nconsole.log(', 1)[0] + '\n' + read(base / 'body.js') + '\n' + registry
+    summary_code += '\nglobalThis.overview={drugs:UNI.length,lectures:KP.length};})();\nconsole.log(JSON.stringify(globalThis.overview));'
+    summary = subprocess.run(['node', '-'], input=summary_code, text=True, capture_output=True, timeout=30, check=True)
+    (src / 'overview.json').write_text(json.dumps(json.loads(summary.stdout), ensure_ascii=False, indent=2) + '\n')
+    original_app = original_app.replace("  if(typeof FX!=='undefined') FX.page(kind);", "  if(kind==='plate' && p && window.MAP) window.MAP.last({atlas:'farma',title:p.title,sub:p.lec||p.roman||'',url:location.href});\n  if(typeof FX!=='undefined') FX.page(kind);")
+    full_source = source.rsplit('\nconsole.log(', 1)[0] + '\n' + read(base / 'body.js') + '\n' + read(base / 'learn.js') + '\n' + read(base / 'fx.js') + '\n' + original_app
+    full_code = '(function(){\n' + full_source + '\nwindow.MA_FARMA_FULL=true;\n})();\n'
+    topic_build.add_package('farma', 'atlas', 'Атлас фармакологии', full_code)
+    catalog_path = root / 'topics.json'
+    catalog = json.loads(catalog_path.read_text())
+    catalog['fullAtlas'] = 'atlas'
+    catalog_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + '\n')
+    (src / 'learn.js').write_text(read(base / 'learn.js'))
     stubs=[]
     for key in ['KP','P']:
         for item in data[key]:
@@ -67,9 +84,10 @@ if args.full:
 # ---------- публичная часть ----------
 css = read(src / 'style.css')
 data_files = ['data.js', 'k0.js', 'k_00_gen.js', 'k_01_aff.js', 'locked_stubs.js', 'drugs.js', 'body.js']
-code_files = ['fixup.js', 'fx.js', 'app.js']
+code_files = ['fixup.js', 'learn.js', 'fx.js', 'app.js']
 data_js = '\n'.join(read(src / f) for f in data_files)
 code_js = '\n'.join(read(src / f) for f in code_files)
+code_js = 'if(!window.MA_FARMA_FULL){\n' + code_js + '\n}'
 for name, text in (('data', data_js), ('code', code_js)):
     if '</script' in text.lower():
         sys.exit(f'В {name}-части встретилось «</script» — экранируйте его.')
@@ -113,9 +131,10 @@ body{{margin:0}}
 </div>
 <div class="dz" id="dz" lang="ru" hidden><div class="dz-scrim" data-close></div><aside class="dz-panel" role="dialog" aria-modal="true" aria-labelledby="dz-title" tabindex="-1"><div class="dz-top"><button type="button" class="dz-back" hidden>← Назад</button><button type="button" class="dz-x" data-close aria-label="Закрыть досье">×</button></div><div class="dz-body" id="dzBody"></div></aside></div>
 <script>window.MA_TOPICS={read(root / "topics.json")};</script>
+<script>window.MA_FARMA_OVERVIEW={read(src / "overview.json")};</script>
 <script src="../auth/config.js"></script>
-<script src="../auth/auth.js?v=subject-access-v1"></script>
-<script src="../progress/progress.js?v=topic-delivery-v1"></script>
+<script src="../auth/auth.js?v=farma-original-20261027"></script>
+<script src="../progress/progress.js?v=farma-original-20261027"></script>
 <script>
 {data_js}
 </script>

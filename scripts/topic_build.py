@@ -26,6 +26,19 @@ def emit(atlas, packages, titles, aliases=None):
     (ROOT / (atlas + '-atlas') / 'topics.json').write_text(json.dumps(catalog, ensure_ascii=False, indent=2)+'\n')
     print(atlas + ':', len(packages), 'independent topic packages; largest', max(v['bytes'] for v in manifest['topics'].values()), 'bytes')
 
+def add_package(atlas, tid, title, code):
+    dest = ROOT / 'server/content/topics' / atlas
+    raw = code.encode()
+    (dest / (tid + '.js')).write_bytes(raw)
+    mp = dest / 'manifest.json'
+    manifest = json.loads(mp.read_text())
+    manifest['topics'][tid] = {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
+    mp.write_text(json.dumps(manifest, indent=2) + '\n')
+    cp = ROOT / (atlas + '-atlas') / 'topics.json'
+    catalog = json.loads(cp.read_text())
+    catalog['topics'].append({'id': tid, 'title': title})
+    cp.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + '\n')
+
 def farma(data, body, learn):
     full = jsdata('const VIT_LOCKED='+enc(data['VIT_LOCKED'])+';const VIT_ORDER='+enc(data['VIT_ORDER'])+';\n'+body[:body.index('const VCAT =')], 'VIT')
     # Strip the old embedded all-drug model, including its merge of locked entries.
@@ -53,7 +66,7 @@ def farma(data, body, learn):
         code += ['Object.assign('+k+','+enc(v)+');' for k,v in values.items()]
         code += ['RXAL.push(...'+enc([x for x in data['RXAL'] if x[1] in rxnames])+');']
         code += ['ANTIDOTES.push(...'+enc([x for x in data['ANTIDOTES'] if any(n in enc(x) for n in names)])+');']
-        code += ['const DRUGS_ORDER='+enc([n for n in data['DRUGS_ORDER'] if n in names])+';', learn]
+        code += ['const DRUGS_ORDER='+enc([n for n in data['DRUGS_ORDER'] if n in names])+';']
         packages[tid] = '\n'.join(code)
     emit('farma', packages, titles, aliases)
     catalog_path = ROOT / 'farma-atlas/topics.json'

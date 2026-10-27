@@ -115,6 +115,10 @@
     {
       "id": "stim",
       "title": "Психостимуляторы, ноотропы, аналептики"
+    },
+    {
+      "id": "atlas",
+      "title": "Атлас фармакологии"
     }
   ],
   "aliases": {},
@@ -125,5 +129,6 @@
   "publicRoutes": [
     "body",
     "drugs"
-  ]
+  ],
+  "fullAtlas": "atlas"
 }

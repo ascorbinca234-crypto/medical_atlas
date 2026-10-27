@@ -144,6 +144,7 @@
     var owner = user(), full = false, expiresAt = 0, catalog = window.MA_TOPICS || { topics: [], aliases: {} };
     var ids = catalog.topics.map(function (t) { return t.id; });
     function selected(previous) {
+      if (atlas === 'farma' && catalog.fullAtlas) return catalog.fullAtlas;
       var h = location.hash.slice(1); try { h = decodeURIComponent(h); } catch (e) {}
       if (h.indexOf('topic/') === 0) return ids.indexOf(h.slice(6)) >= 0 ? h.slice(6) : '';
       if (ids.indexOf(h) >= 0) return h;
@@ -219,7 +220,7 @@
     window.addEventListener('pagehide', function () { if (full) document.documentElement.style.visibility = 'hidden'; });
     window.addEventListener('pageshow', function (e) { if (e.persisted) reload(); });
     document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
-    var publicRoute = (catalog.publicRoutes || []).indexOf(location.hash.slice(1).split('/')[0]) >= 0;
+    var publicRoute = !catalog.fullAtlas && (catalog.publicRoutes || []).indexOf(location.hash.slice(1).split('/')[0]) >= 0;
     var delivery = publicRoute || catalog.demo && catalog.demo.indexOf(topic) >= 0 ? Promise.resolve({ status: 'public', code: null }) : loadLocked(atlas, topic);
     // A title-only stub means "not loaded", not "no subscription".
     // Resolve subject rights even when the current page is a free lesson/tool.

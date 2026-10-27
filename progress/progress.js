@@ -176,8 +176,9 @@
     var prev = L.sec[atlas];
     // Topic packages publish only complete counts for their current section.
     // Never replace other sections with zeros from a deliberately partial dataset.
-    if (window.MA_TOPICS) {
+    if (window.MA_TOPICS && !(atlas === 'farma' && window.MA_FARMA_FULL)) {
       var topic = window.MA_TOPIC || '', id = atlas === 'biochem' ? (topic.indexOf('sec-') === 0 ? topic.slice(4) : '') : topic;
+      if (atlas === 'farma' && topic === 'atlas') topic = '';
       list = list.filter(function (row) { return topic ? row.id === id : !row.locked; });
       if (!list.length) return;
       var incoming = list;
