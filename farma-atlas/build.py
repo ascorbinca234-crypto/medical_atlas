@@ -118,6 +118,7 @@ body{{margin:0}}
 </style>
 </head>
 <body>
+<nav aria-label="Навигация по сайту" style="display:flex;gap:16px;align-items:center;padding:8px 16px;background:#172036;color:white;font:600 14px system-ui,sans-serif;position:relative;z-index:100"><a href="../" style="color:inherit;text-decoration:none">← Главное меню</a><a href="../cabinet/" style="color:inherit;text-decoration:none">Личный кабинет</a></nav>
 <div class="mbar" lang="ru"><a href="#">Атлас фармакологии</a><div class="acct" data-ma-acct="compact"></div><button type="button" id="menuBtn" aria-expanded="false" aria-controls="rail"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Листы</button></div>
 <div class="scrim" id="scrim"></div>
 <div class="app" lang="ru">
