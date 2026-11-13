@@ -71,7 +71,7 @@ def farma(data, body, learn):
     emit('farma', packages, titles, aliases)
     catalog_path = ROOT / 'farma-atlas/topics.json'
     catalog = json.loads(catalog_path.read_text())
-    catalog.update(demo=['k-gen', 'k-aff'], publicRoutes=['body', 'drugs'])
+    catalog.update(demo=['k-gen', 'k-aff'], publicRoutes=['body', 'drugs', 'topics'])
     catalog_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2)+'\n')
 
 def micro(data):

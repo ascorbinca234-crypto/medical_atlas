@@ -152,7 +152,7 @@
       if (catalog.aliases && catalog.aliases[h]) return catalog.aliases[h];
       if (atlas === 'pathophys' && h === 'run') return previous || '';
       // Tools operate on the current topic; no all-subject package is requested.
-      if (/^(body|drugs|learn|pathogens|questions|study)(\/|$)/.test(h)) return previous || '';
+      if (/^(body|drugs|learn|pathogens|questions|study|topics)(\/|$)/.test(h)) return previous || '';
       return '';
     }
     var topic = selected('');

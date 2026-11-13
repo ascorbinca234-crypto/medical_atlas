@@ -214,9 +214,16 @@ const ICO = {
 };
 function buildNav(){
   const due = typeof lDueCount==='function' ? lDueCount(A) : 0;
-  $('#nav').innerHTML = `<div class="navtop"><a href="#drugs" data-id="drugs" class="navdb"><span class="n">${ICO.db}</span><span>Все препараты <small>${UNI.length}</small></span></a>${HASV?`<a href="#body" data-id="body" class="navdb"><span class="n">${ICO.body}</span><span>Организм <small>${Object.keys(VIT).length}</small></span></a>`:''}${typeof lDeck==='function'?`<a href="#learn" data-id="learn" class="navdb"><span class="n">${ICO.learn}</span><span>Учить препараты <small class="due" title="к повторению сегодня"${due?'':' hidden'}>${due}</small></span></a>`:''}<a href="#train" data-id="train" class="navdb"><span class="n">${ICO.train}</span><span>Тренажёры</span></a><a href="#cmp" data-id="cmp" class="navdb"><span class="n">${ICO.cmp}</span><span>Сравнение</span></a><a href="#sheet" data-id="sheet" class="navdb"><span class="n">${ICO.sheet}</span><span>Шпаргалки</span></a></div>` + MODULES.map(m=>`<div><h6>${m.t}</h6>${P.filter(p=>p.mod===m.id).map(p=>`<a href="#${p.id}" data-id="${p.id}"><span class="n">${p.roman}</span><span>${p.title}</span></a>`).join('')}</div>`).join('');
+  const link=(id,label,icon,extra='')=>`<a href="#${id}" data-id="${id}" class="navdb"><span class="n">${icon}</span><span>${label}${extra}</span></a>`;
+  const homeIcon='<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 9 10 3l7 6v8H5V9M8 17v-5h4v5"/></svg>';
+  const basic=link('','Главная',homeIcon)+link('drugs','Все препараты',ICO.db)+link('learn','Учить препараты',ICO.learn,` <small class="due" title="к повторению сегодня"${due?'':' hidden'}>${due}</small>`);
+  const tools=(HASV?link('body','Организм',ICO.body):'')+link('train','Тренажёры',ICO.train)+link('cmp','Сравнение',ICO.cmp)+link('sheet','Шпаргалки',ICO.sheet)+link('find','Поиск по показаниям',ICO.db);
+  const groups=MODULES.map(m=>{const items=P.filter(p=>p.mod===m.id);return `<details class="nav-group" data-nav-module="${esc(m.id)}"><summary><span>${m.t}</span><small>${items.length}</small></summary><div class="nav-group-items">${items.map(p=>`<a href="#${p.id}" data-id="${p.id}"><span class="n">${p.roman}</span><span>${p.title}</span></a>`).join('')}</div></details>`;}).join('');
+  $('#nav').innerHTML=`<div class="nav-section"><h6>Навигация</h6><div class="navtop">${basic}</div></div><div class="nav-section"><h6>Материалы</h6>${groups}</div><div class="nav-section"><h6>Дополнительно</h6><details class="nav-group nav-tools"><summary><span>Инструменты</span><small>5</small></summary><div class="navtop nav-group-items">${tools}</div></details></div>`;
 }
-function setCurrent(id){ $$('#nav a').forEach(a=>{ if(a.dataset.id===id) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); }); }
+function setCurrent(id){
+  $$('#nav a').forEach(a=>{if(a.dataset.id===id){a.setAttribute('aria-current','page');const group=a.closest('details');if(group)group.open=true;}else a.removeAttribute('aria-current');});
+}
 
 const rail=$('#rail'), scrim=$('#scrim'), menuBtn=$('#menuBtn');
 function menu(open){ rail.classList.toggle('open',open); scrim.classList.toggle('open',open); menuBtn.setAttribute('aria-expanded',open?'true':'false'); }
@@ -1009,7 +1016,12 @@ function renderHome(){
   figs={};
   $('#page').innerHTML=`<section class="hero"><p class="eyebrow">Фармакология · 3 курс · лечебный факультет</p>
   <h1>Атлас <em>фармакологии</em></h1>${lockBanner()}
-  <p class="lead">Два слоя. <b>Конспект лекций</b> — схемы, классификации, списки для выписывания и формулировки из ваших материалов, ровно в том виде, в каком их спрашивают на зачётах. <b>Подробные листы</b> — углублённые схемы механизмов с точками приложения препаратов, реакции синтеза и распада и вопросы для самопроверки.</p>
+  <p class="lead">Разбирайте механизмы, находите препараты и готовьтесь к зачётам — всё в одном атласе.</p>
+  <div class="quick-start" aria-label="С чего начать">
+    <a href="#drugs"><span class="quick-icon" aria-hidden="true">⌕</span><span><b>Найти препарат</b><small>Карточки, механизмы и побочные эффекты</small></span><span class="quick-arrow" aria-hidden="true">↗</span></a>
+    <a href="#topics"><span class="quick-icon" aria-hidden="true">≡</span><span><b>Изучить тему</b><small>Конспекты, классификации и схемы</small></span><span class="quick-arrow" aria-hidden="true">↓</span></a>
+    <a href="#learn"><span class="quick-icon" aria-hidden="true">✓</span><span><b>Подготовиться к экзамену</b><small>Повторение, тесты и план занятий</small></span><span class="quick-arrow" aria-hidden="true">↗</span></a>
+  </div>
   ${todayHTML()}
   <div class="howto"><div><b>Нажмите на препарат</b>Под каждой схемой — список препаратов. Кольцо на рисунке покажет, где именно он действует.</div><div><b>Нажмите на элемент схемы</b>Рецептор, фермент или транспортёр расскажет, что он делает и какие препараты на него влияют.</div><div><b>Найдите препарат</b>Поиск в боковой панели ведёт к схеме или карточке группы на нужном листе.</div></div>
   ${HASV?`<div class="hero-ecg" aria-hidden="true">${vECG({}).svg.replace('xMinYMid slice','none')}</div>`:''}
@@ -1017,7 +1029,7 @@ function renderHome(){
   <div class="cta2">${HASV?`<a class="cta-b" href="#body"><span class="cta-ic cta-heart" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 40C11 31 6 24 6 17c0-6 4.6-10 10-10 3.8 0 6.6 2 8 5 1.4-3 4.2-5 8-5 5.4 0 10 4 10 10 0 7-5 14-18 23z"/><path class="cta-pulse" d="M8 24h8l3-6 4 12 4-9 2 3h11"/></svg></span><span><b>Организм</b>Выберите препарат — анимированная схема тела покажет, что происходит с сердцем и ЭКГ, сосудами и давлением, зрачком, бронхами, ЖКТ, железами и ЦНС. Дозовые режимы, отравления и антидоты.</span><span class="go" aria-hidden="true">→</span></a>`:''}</div>
   ${(()=>{ const dd=drugOfDay(); if(!dd) return ''; const g=dd.groups[0]; return `<div class="dday"><div><p class="eyebrow">Препарат дня${uKLecs(dd).length?' · конспект '+uKLecs(dd).map(p=>p.roman).join(', '):''}</p><h3>${dd.n}</h3><p>${g?g.g:(dd.d?dd.d.g:'')}</p>${dd.hl?`<p class="u-hl">${uHlBadge(dd.hl)}</p>`:''}</div><div class="dday-a"><button type="button" class="btn pri" data-dr="${esc(dd.n)}">Открыть карточку →</button><button type="button" class="btn" data-rand="1">Случайный препарат</button></div></div>`; })()}
   <div class="legend"><span class="chip stim">стимулирует, агонист</span><span class="chip block">блокирует, ингибирует</span><span class="chip mod">модулирует, смешанное действие</span><span><span class="rx-e">Фермент</span> — оранжевым моноширинным</span></div></section>
-  ${MODULES.map(m=>`<section class="module${m.id==='kon'?' module-k':''}"><h2>${m.t}</h2>${m.id==='kon'?'<p class="par">Схемы, классификации и формулировки из ваших лекций — так, как спрашивают на зачётах. Препараты кликабельны: ведут к карточке конспекта или к подробному досье.</p><p class="par"><span class="kd hl-y">Жёлтый фон</span> — знать наизусть дозировку, сигнатуру, классификацию, показания и побочные эффекты, выписать рецепт. <span class="kd hl-g">Зелёный фон</span> — выписать рецепт. Рамка «Возможные формулировки» — так препарат могут описать на микроконтрольной и в ЗКР.</p>':''}<div class="plist">${P.filter(p=>p.mod===m.id).map(p=>`<a class="pcard" href="#${p.id}"><span class="num">${p.roman}</span><b>${p.title}</b><span>${p.sum}</span></a>`).join('')}</div></section>`).join('')}
+  <div id="topics" tabindex="-1"></div>${MODULES.map(m=>`<section class="module${m.id==='kon'?' module-k':''}"><h2>${m.t}</h2>${m.id==='kon'?'<p class="par">Схемы, классификации и формулировки из ваших лекций — так, как спрашивают на зачётах. Препараты кликабельны: ведут к карточке конспекта или к подробному досье.</p><p class="par"><span class="kd hl-y">Жёлтый фон</span> — знать наизусть дозировку, сигнатуру, классификацию, показания и побочные эффекты, выписать рецепт. <span class="kd hl-g">Зелёный фон</span> — выписать рецепт. Рамка «Возможные формулировки» — так препарат могут описать на микроконтрольной и в ЗКР.</p>':''}<div class="plist">${P.filter(p=>p.mod===m.id).map(p=>`<a class="pcard" href="#${p.id}"><span class="num">${p.roman}</span><b>${p.title}</b><span>${p.sum}</span></a>`).join('')}</div></section>`).join('')}
   <section class="tblw" style="margin-top:48px"><div class="rx-head"><h2 class="sec" style="margin:0">Антидоты семестра</h2></div><div class="tbl"><table><thead><tr><th scope="col">Отравление</th><th scope="col">Антидот</th><th scope="col">Механизм</th><th scope="col">Лист</th></tr></thead><tbody>${ANTIDOTES.map(r=>`<tr><td>${r[0]}</td><td style="color:var(--ink)">${r[1]}</td><td>${r[2]}</td><td><a href="#${P.find(p=>p.roman===r[3]).id}">${r[3]}</a></td></tr>`).join('')}</tbody></table></div></section>
   <p class="note">Материал для подготовки к занятиям. Дозы и показания сверяйте с инструкциями к препаратам и действующими клиническими рекомендациями.</p>`;
   HOMEREFRESH=()=>{ const el=$('#today'); if(el) el.outerHTML=todayHTML(); };
@@ -1716,8 +1728,10 @@ const A = {$, $$, esc, plain, key, first, findDrug, kFindDrug, kSame, findCard, 
 window.__A = A;
 function route(){
   let id=location.hash.slice(1); try{ id=decodeURIComponent(id); }catch(e){}
+  if(id==='topics'){ if(!$('#topics')) renderHome(); setCurrent(''); requestAnimationFrame(()=>$('#topics')?.scrollIntoView({behavior:'smooth'})); return; }
   const parts=id.split('/'), base=parts[0], arg=parts.slice(1).join('/');
   const p=BY[id]; document.onkeydown=null;
+  $('#page').classList.toggle('preview-topic', !!p && p===P.find(isK));
   if(typeof RUN!=='undefined') RUN.close(); $('#page').classList.remove('kv-s','kv-t'); CURP=null; KFOCUS=-1; HOMEREFRESH=null; document.documentElement.classList.remove("rd-focus"); if(typeof ttsStop==="function") ttsStop();
   let kind='home';
   if(typeof EXTRA!=='undefined' && EXTRA.routes[base]){ figs={}; EXTRA.routes[base](A,arg); setCurrent(base); kind=base; }

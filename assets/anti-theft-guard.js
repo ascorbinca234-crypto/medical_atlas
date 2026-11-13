@@ -88,9 +88,9 @@
 
     // 1. Атлас фармакологии (/farma-atlas/)
     if (/\/farma-atlas(\/|$)/i.test(path)) {
-      if (!h || h === 'home') return false;
+      if (!h || h === 'home' || h === 'topics') return false;
       // Вспомогательные разделы меню/тренажёров — не конспекты
-      if (/^(drugs|body|learn|train|cmp|find)(\/|$)/i.test(h)) return false;
+      if (/^(drugs|body|learn|train|cmp|find|topics)(\/|$)/i.test(h)) return false;
       // Все лекции (#k-gen, #k-aff, #k-pns...), подробные листы (#pk, #pd, #la...) и #sheet — это конспекты
       return true;
     }

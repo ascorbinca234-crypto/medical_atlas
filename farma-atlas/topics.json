@@ -128,7 +128,8 @@
   ],
   "publicRoutes": [
     "body",
-    "drugs"
+    "drugs",
+    "topics"
   ],
   "fullAtlas": "atlas"
 }
