@@ -33,7 +33,11 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--full', action='store_true')
 args = parser.parse_args()
 locked_js = ''
-if args.full:
+standalone = priv_root / 'farma-atlas' / 'Атлас фармакологии.html'
+if args.full and standalone.exists():
+    import farma_html
+    farma_html.build(standalone, root)
+elif args.full:
     base = priv_root / 'farma-atlas' / 'base' / 'src'
     for name in ['k_00_gen.js','k_01_aff.js']:
         if (base / name).read_bytes() != (src / name).read_bytes(): sys.exit('Demo differs from private source: ' + name)
@@ -133,8 +137,8 @@ body{{margin:0}}
 <script>window.MA_TOPICS={read(root / "topics.json")};</script>
 <script>window.MA_FARMA_OVERVIEW={read(src / "overview.json")};</script>
 <script src="../auth/config.js"></script>
-<script src="../auth/auth.js?v=farma-original-20261027"></script>
-<script src="../progress/progress.js?v=farma-original-20261027"></script>
+<script src="../auth/auth.js?v=farma-20261113"></script>
+<script src="../progress/progress.js?v=farma-20261113"></script>
 <script>
 {data_js}
 </script>
