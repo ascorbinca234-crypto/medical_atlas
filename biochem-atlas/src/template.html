@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -584,13 +584,14 @@ a.nl.flash{animation:nflash 1.1s ease 3;border-radius:3px}
   .bchip.hint{animation:none}
 }
 
+.site-links{display:flex;gap:12px;flex-wrap:wrap}.site-links a{font:500 13px/1.4 system-ui,sans-serif;color:var(--accent);text-decoration:none}.site-links a:hover{text-decoration:underline}.site-links a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 /* Общая оболочка и палитра атласов */
 body > nav[aria-label="Навигация по сайту"]{background:var(--surface)!important;border-color:var(--line)!important}body > nav[aria-label="Навигация по сайту"] a{color:var(--accent)!important}
 :root:not([data-theme="dark"]){--paper:#f7f9fc;--surface:#fff;--ink:#172235;--muted:#6d7c91;--line:#dce4ee;--accent:#285eac}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0d1020;--surface:#151a2e;--ink:#e6e8f4;--muted:#a2abc2;--line:#2b3152;--accent:#9c9aff}}
 :root[data-theme="dark"]{--paper:#0d1020;--surface:#151a2e;--ink:#e6e8f4;--muted:#a2abc2;--line:#2b3152;--accent:#9c9aff}
-.app{max-width:none;margin:0;padding:0;display:grid;grid-template-columns:292px minmax(0,1fr);min-height:calc(100vh - 45px)}
-.top{position:sticky;top:45px;height:calc(100vh - 45px);overflow:auto;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:22px;flex-wrap:nowrap;margin:0;padding:24px 18px 48px;background:var(--surface);border-right:1px solid var(--line)}
+.app{max-width:none;margin:0;padding:0;display:grid;grid-template-columns:292px minmax(0,1fr);min-height:100vh}
+.top{position:sticky;top:0;height:100vh;overflow:auto;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:22px;flex-wrap:nowrap;margin:0;padding:24px 18px 48px;background:var(--surface);border-right:1px solid var(--line)}
 .bx-brand{font:700 18px/1.25 "Golos Text",system-ui,sans-serif;letter-spacing:-.035em;color:var(--ink)}.bx-kicker{margin:4px 0 0;color:var(--muted);font-size:13px}
 .controls{display:flex;flex-direction:column;align-items:stretch;gap:18px}.controls:before{content:"НАВИГАЦИЯ";font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);margin:0 10px -12px}
 .controls>.views[role="tablist"]{display:flex;flex-direction:column;align-items:stretch;gap:3px;padding:0;border:0;border-radius:0;background:transparent}
@@ -601,10 +602,22 @@ body > nav[aria-label="Навигация по сайту"]{background:var(--sur
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn,.search input,.views,.grid>*,.fig{border-radius:10px}.views button[aria-selected="true"]{background:var(--accent);color:#fff}
 @media(max-width:920px){.app{display:block}.top{position:relative;top:auto;width:auto;height:auto;overflow:visible;padding:18px 16px;margin:0;gap:14px;border-right:0;border-bottom:1px solid var(--line)}.controls{gap:12px}.controls:before{margin-bottom:-6px}.controls>.views[role="tablist"]{flex-direction:row;overflow:auto;flex-wrap:nowrap;padding-bottom:4px}.controls>.views[role="tablist"] button{white-space:nowrap}.controls .fsw{align-self:flex-start}.app>main{padding:26px 16px 72px}}
 
+
+/* Светлая визуальная система атласов */
+:root[data-theme="light"]{--paper:#f5f8fc;--surface:#fff;--ink:#182940;--muted:#718198;--line:#e2eaf3;--accent:#2864bf;--shadow:0 24px 64px -30px rgba(31,65,110,.3)}
+.top{padding:30px 20px 48px;box-shadow:8px 0 30px rgba(32,70,120,.025)}
+.bx-brand{display:flex;align-items:center;gap:10px;font-size:18px;letter-spacing:-.035em}.bx-brand:before{content:"";flex:none;width:37px;height:37px;border-radius:12px;background:#eaf2ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232864bf' stroke-width='1.6'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cellipse cx='12' cy='12' rx='9' ry='4' transform='rotate(60 12 12)'/%3E%3Cellipse cx='12' cy='12' rx='9' ry='4' transform='rotate(-60 12 12)'/%3E%3C/svg%3E") center/23px no-repeat}.bx-kicker{padding-left:47px;margin-top:-6px;font-size:12px}
+.site-links{gap:8px}.site-links a{padding:8px 10px;border:1px solid var(--line);border-radius:9px;font-size:12px}.site-links a:hover{background:var(--paper);text-decoration:none}
+.controls>.views[role="tablist"]{gap:5px}.controls>.views[role="tablist"] button{display:flex;align-items:center;gap:12px;padding:11px 12px;color:var(--muted);transition:background .2s,color .2s}.bx-nav-icon{width:20px;height:20px;flex:none;opacity:.8}.controls>.views[role="tablist"] button[aria-selected="true"] .bx-nav-icon{opacity:1}
+.controls .fsw{border-color:var(--line);background:var(--paper);padding:4px;border-radius:12px}.controls .fsw button{border-radius:8px;color:var(--muted)}.controls .fsw button[aria-pressed="true"]{background:var(--surface);color:var(--accent);box-shadow:0 2px 8px rgba(25,54,91,.08)}#themeBtn{color:var(--muted);font-size:13px}
+.app>main{max-width:1320px;padding-top:48px}.bx-main-title{font-size:clamp(36px,4vw,52px);letter-spacing:-.05em}.bx-main-lede{font-size:15px;line-height:1.65;max-width:72ch}.search input{border-radius:14px;box-shadow:0 4px 16px rgba(31,65,110,.035)}.chroma{height:9px;border-radius:8px;margin-top:25px}.lg{border-color:var(--line);font-size:13px;transition:transform .2s,box-shadow .2s}.lg:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(31,65,110,.07)}
+.grid{gap:14px}.card{border-radius:16px;padding:13px 15px 17px;box-shadow:0 5px 18px rgba(34,67,108,.04);transition:transform .2s,box-shadow .2s,border-color .2s}.card:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(34,67,108,.1)}.card .mol{border-radius:11px;background:color-mix(in srgb,var(--paper) 55%,var(--surface));margin-bottom:12px}.cname{font-family:"Golos Text",system-ui,sans-serif;font-size:15px;font-weight:600}.cf{font-size:13px}.btn,.pdiag,.tcard,.dmol{border-radius:14px}.btn:hover{border-color:var(--accent)}
+@media(max-width:920px){.top{padding:18px 16px;box-shadow:none}.controls>.views[role="tablist"] button{gap:7px}.bx-nav-icon{width:17px;height:17px}.app>main{padding:28px 16px 72px}}@media(prefers-reduced-motion:reduce){.card:hover,.lg:hover{transform:none}}
+
 </style>
 </head>
 <body>
-<nav aria-label="Навигация по сайту" style="position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:24px;padding:11px 24px;background:#fff;border-bottom:1px solid #e1e8f2;font:600 14px/1.4 system-ui,sans-serif"><a href="../" style="color:#315c99;text-decoration:none">← Главное меню</a><a href="../cabinet/" style="color:#66778f;text-decoration:none">Личный кабинет</a></nav>
+
 <div class="app">
   <header class="top">
     <div>
@@ -612,19 +625,20 @@ body > nav[aria-label="Навигация по сайту"]{background:var(--sur
       <p class="bx-kicker">Лечебный факультет</p>
     </div>
     <div class="controls">
+      <div class="site-links"><a href="../#atlases">← Все атласы</a><a href="../cabinet/">Личный кабинет ↗</a></div>
       <div class="views" role="tablist" aria-label="Режим">
-        <button role="tab" data-view="atlas" aria-selected="true">Атлас</button>
-        <button role="tab" data-view="notes" aria-selected="false">Конспект</button>
-        <button role="tab" data-view="rx" aria-selected="false">Реакции</button>
-        <button role="tab" data-view="paths" aria-selected="false">Пути</button>
-        <button role="tab" data-view="anim" aria-selected="false">Анимации</button>
-        <button role="tab" data-view="study" aria-selected="false">Учёба</button>
+        <button role="tab" data-view="atlas" aria-selected="true"><svg class="bx-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-60 12 12)"/></svg>Атлас</button>
+        <button role="tab" data-view="notes" aria-selected="false"><svg class="bx-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21zM4 5.5V21M8 7h8M8 11h8"/></svg>Конспект</button>
+        <button role="tab" data-view="rx" aria-selected="false"><svg class="bx-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h15m-4-4 4 4-4 4M20 16H5m4-4-4 4 4 4"/></svg>Реакции</button>
+        <button role="tab" data-view="paths" aria-selected="false"><svg class="bx-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><path d="M7 5h10M6 7l5 10m7-10-5 10"/></svg>Пути</button>
+        <button role="tab" data-view="anim" aria-selected="false"><svg class="bx-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="m10 8 6 4-6 4z"/></svg>Анимации</button>
+        <button role="tab" data-view="study" aria-selected="false"><svg class="bx-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-5 9 5-9 5zM6 11v5c3 3 9 3 12 0v-5M21 9v6"/></svg>Учёба</button>
       </div>
       <div class="views fsw" role="group" aria-label="Вид формул">
         <button type="button" data-fs="tx" aria-pressed="true">Учебные формулы</button>
         <button type="button" data-fs="sk" aria-pressed="false">Скелетные</button>
       </div>
-      <button class="btn" id="themeBtn" type="button">Тема: авто</button>
+      <button class="btn" id="themeBtn" type="button">Тема: светлая</button>
     </div>
   </header>
 
@@ -3084,7 +3098,7 @@ document.querySelectorAll("[data-fs]").forEach(b => {
 document.documentElement.lang = "ru";
 
 const MODES = ["auto", "light", "dark"], MLAB = {auto: "Тема: авто", light: "Тема: светлая", dark: "Тема: тёмная"};
-let mode = "auto";
+let mode = "light";
 $("themeBtn").addEventListener("click", () => {
   mode = MODES[(MODES.indexOf(mode) + 1) % 3];
   if (mode === "auto") document.documentElement.removeAttribute("data-theme");
