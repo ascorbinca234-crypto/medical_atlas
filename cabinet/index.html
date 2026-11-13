@@ -1022,6 +1022,7 @@ document.addEventListener('DOMContentLoaded', function () {
     micro: SITE + 'micro-atlas/', microLearn: SITE + 'micro-atlas/#g1',
     pathophys: SITE + 'pathophys-atlas/', pathophysLearn: SITE + 'pathophys-atlas/#run',
     patan: SITE + 'patan-atlas/', patanLearn: SITE + 'patan-atlas/#diag',
+    chemistry: SITE + 'chemistry-atlas/', chemistryLearn: SITE + 'chemistry-atlas/',
     cabinet: SITE + 'cabinet/', account: SITE + 'auth/#account'
   };
   const DEMO = new URLSearchParams(location.search).has('demo');
@@ -1032,7 +1033,8 @@ document.addEventListener('DOMContentLoaded', function () {
     biochem: { name: 'Биохимия', url: URLS.biochem, learn: URLS.biochemLearn, unit: 'раздел' },
     micro: { name: 'Микробиология', url: URLS.micro, learn: URLS.microLearn, unit: 'конспект' },
     pathophys: { name: 'Патофизиология', url: URLS.pathophys, learn: URLS.pathophysLearn, unit: 'тема' },
-    patan: { name: 'Патанатомия', url: URLS.patan, learn: URLS.patanLearn, unit: 'тема' }
+    patan: { name: 'Патанатомия', url: URLS.patan, learn: URLS.patanLearn, unit: 'тема' },
+    chemistry: { name: 'Медицинская химия', url: URLS.chemistry, learn: URLS.chemistryLearn, unit: 'занятие' }
   };
 
   const RANKS = [
@@ -1127,6 +1129,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const user = () => (signedIn() && MA.user()) || null;
   let ACCESS = null, accessOwner = null, accessState = 'idle', accessRequest = 0, accessTimer;
   function hasAtlasAccess(atlas) {
+    if (atlas === 'chemistry') return true; // открытая версия
     const u = user(), grant = ACCESS && ACCESS.grants && ACCESS.grants[atlas];
     if (u && accessOwner === u.id && ACCESS && ACCESS.admin === true) return true;
     return !!(u && accessOwner === u.id && grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now());
@@ -1272,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#defibCount').textContent = s.freezes + ' из 2 ' + plural(2, W_CHARGE);
     const atlas = V.last && ATLASES[V.last.atlas] ? V.last.atlas : 'farma';
     $('#learnBtn').href = ATLASES[atlas].learn;
-    $('#learnLabel').textContent = atlas === 'patan' ? 'Диагностикум патанатомии' : atlas === 'pathophys' ? 'Повторить патофизиологию' : atlas === 'micro' ? 'Продолжить микробиологию' : s.todayDone ? 'Повторить ещё карточки' : 'Повторить карточки: ' + ATLASES[atlas].name.toLowerCase();
+    $('#learnLabel').textContent = atlas === 'chemistry' ? 'Продолжить химию' : atlas === 'patan' ? 'Диагностикум патанатомии' : atlas === 'pathophys' ? 'Повторить патофизиологию' : atlas === 'micro' ? 'Продолжить микробиологию' : s.todayDone ? 'Повторить ещё карточки' : 'Повторить карточки: ' + ATLASES[atlas].name.toLowerCase();
   }
 
   function atlasTotals(atlas) {
@@ -1283,19 +1286,20 @@ document.addEventListener('DOMContentLoaded', function () {
   function renderResume() {
     const L = V.last, body = $('#resBody');
     if (!L) {
-      body.innerHTML = '<div class="res-meta" style="gap:10px"><p class="res-title">Выберите предмет для изучения</p><p class="res-empty">Откройте любой из 5 атласов: здесь появится тема, на которой вы остановились, и прогресс по ней.</p>' +
+      body.innerHTML = '<div class="res-meta" style="gap:10px"><p class="res-title">Выберите предмет для изучения</p><p class="res-empty">Откройте любой из 6 атласов: здесь появится тема, на которой вы остановились, и прогресс по ней.</p>' +
         '<a class="btn btn-primary" href="' + URLS.farma + '"><i data-lucide="pill"></i>Открыть фармакологию</a>' +
         '<a class="btn btn-ghost" href="' + URLS.biochem + '"><i data-lucide="flask-conical"></i>Открыть биохимию</a>' +
         '<a class="btn btn-ghost" href="' + URLS.micro + '"><i data-lucide="microscope"></i>Открыть микробиологию</a>' +
         '<a class="btn btn-ghost" href="' + URLS.pathophys + '"><i data-lucide="activity"></i>Открыть патофизиологию</a>' +
-        '<a class="btn btn-ghost" href="' + URLS.patan + '"><i data-lucide="scan-search"></i>Открыть патанатомию</a></div>';
+        '<a class="btn btn-ghost" href="' + URLS.patan + '"><i data-lucide="scan-search"></i>Открыть патанатомию</a>' +
+        '<a class="btn btn-ghost" href="' + URLS.chemistry + '"><i data-lucide="flask-conical"></i>Открыть химию</a></div>';
       return;
     }
     const A = ATLASES[L.atlas] || ATLASES.farma, tot = atlasTotals(ATLASES[L.atlas] ? L.atlas : 'farma'), W_UNIT = (L.atlas === 'pathophys' || L.atlas === 'patan') ? ['тем', 'темы', 'тем'] : L.atlas === 'micro' ? ['конспектов', 'конспекта', 'конспектов'] : L.atlas === 'biochem' ? W_OF_SUBST : W_OF_CARDS;
     const sec = ((V.sec[L.atlas] || {}).list || []).find(x => x.n === L.title);
     const pr = sec && sec.total ? sec : tot.total ? { learned: tot.learned, total: tot.total } : null;
     body.innerHTML =
-      '<p class="res-sys"><span class="sys-ico"><i data-lucide="' + (L.atlas === 'patan' ? 'scan-search' : L.atlas === 'pathophys' ? 'activity' : L.atlas === 'micro' ? 'microscope' : L.atlas === 'biochem' ? 'flask-conical' : 'pill') + '"></i></span><span>' + esc(L.sub || A.name) + '</span></p>' +
+      '<p class="res-sys"><span class="sys-ico"><i data-lucide="' + (L.atlas === 'patan' ? 'scan-search' : L.atlas === 'pathophys' ? 'activity' : L.atlas === 'micro' ? 'microscope' : (L.atlas === 'biochem' || L.atlas === 'chemistry') ? 'flask-conical' : 'pill') + '"></i></span><span>' + esc(L.sub || A.name) + '</span></p>' +
       '<p class="res-title">' + esc(L.title) + '</p>' +
       (pr ? '<div class="res-meta"><p class="res-atlas">' + (sec ? 'Закреплено в теме' : 'Закреплено в атласе') + ': <b class="num">' + nf.format(pr.learned) + ' из ' + nf.format(pr.total) + '</b> ' + plural(pr.total, W_UNIT) + '</p>' +
         '<div class="bar"><span style="--w:' + (pr.learned / pr.total * 100).toFixed(1) + '%"></span></div></div>' : '') +
@@ -1528,7 +1532,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (V.code) rows.push(['ID', V.code]);
     $('#props').innerHTML = rows.map(([k, v]) => '<dt>' + k + '</dt><dd>' + esc(v) + '</dd>').join('');
     $('#accessBody').innerHTML = '<dl class="props">' + Object.entries(ATLASES).map(([id, atlas]) => {
-      const label = DEMO ? 'Демо-режим' : hasAtlasAccess(id) ? (adminAccess() ? 'Полный доступ · администратор' : 'Подписка активна') : signedIn() && accessState !== 'ok' ? (accessState === 'error' ? 'Не удалось проверить доступ' : 'Проверяем доступ…') : 'Пробная версия';
+      const label = id === 'chemistry' ? 'Открыт для всех' : DEMO ? 'Демо-режим' : hasAtlasAccess(id) ? (adminAccess() ? 'Полный доступ · администратор' : 'Подписка активна') : signedIn() && accessState !== 'ok' ? (accessState === 'error' ? 'Не удалось проверить доступ' : 'Проверяем доступ…') : 'Пробная версия';
       return '<dt><a href="' + esc(atlas.url) + '">' + esc(atlas.name) + '</a></dt><dd data-atlas-access="' + id + '">' + label + '</dd>';
     }).join('') + '</dl>';
     $('#propsActs').innerHTML = (u || DEMO) ? '<button class="btn btn-soft" type="button" data-edit-profile><i data-lucide="pencil"></i>Редактировать профиль</button>' : '<p class="muted">Профиль появится после входа.</p>';

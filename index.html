@@ -2116,6 +2116,7 @@ opacity: 0;
               <a href="micro-atlas/" class="flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[15px] font-semibold text-white hover:border-white/25">Открыть микробиологию</a>
               <a href="pathophys-atlas/" class="flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[15px] font-semibold text-white hover:border-white/25">Открыть патофизиологию</a>
               <a href="patan-atlas/" class="flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[15px] font-semibold text-white hover:border-white/25">Открыть патанатомию</a>
+              <a href="chemistry-atlas/" class="flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[15px] font-semibold text-white hover:border-white/25">Открыть химию</a>
               <a href="cabinet/" class="flex h-11 items-center justify-center rounded-xl border border-[#10B981]/35 bg-[#10B981]/10 text-[15px] font-semibold text-[#D1FAE5] hover:bg-[#10B981]/15">Личный кабинет: стрик и прогресс</a>
             </div>
             <div class="mt-4 flex justify-between gap-3 text-[14px]">
@@ -2300,7 +2301,7 @@ opacity: 0;
     <div class="flex flex-wrap items-end justify-between gap-4" data-reveal>
       <div class="max-w-2xl">
         <h2 class="text-[32px] font-bold leading-tight tracking-[-0.02em] text-white sm:text-[40px]">Атласы</h2>
-        <p class="mt-4 text-[17px] leading-relaxed text-[#B6C2D4]">Пять предметов уже на сайте. В каждом атласе первые два занятия доступны без подписки. Биология готовится; продажи подписок ещё не открыты.</p>
+        <p class="mt-4 text-[17px] leading-relaxed text-[#B6C2D4]">Шесть предметов уже на сайте. Химия доступна полностью, в остальных атласах есть открытые материалы. Биология готовится; продажи подписок ещё не открыты.</p>
       </div>
     </div>
 
@@ -2369,7 +2370,20 @@ opacity: 0;
         </div>
       </a>
 
-      <a data-ma-atlas="patan" href="patan-atlas/" class="glass glow-card group relative overflow-hidden rounded-3xl p-6 sm:p-8 md:col-span-2">
+      <a href="chemistry-atlas/" class="glass glow-card group relative overflow-hidden rounded-3xl p-6 sm:p-8">
+        <div class="absolute -right-16 -top-16 size-56 rounded-full bg-[#06B6D4]/15 blur-3xl" aria-hidden="true"></div>
+        <div class="relative">
+          <div class="flex items-center justify-between gap-4">
+            <span class="grid size-12 place-items-center rounded-2xl border border-[#06B6D4]/40 bg-[#06B6D4]/10 text-[#67E8F9]"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v7l-5.3 8.3A1.8 1.8 0 0 0 6.2 21h11.6a1.8 1.8 0 0 0 1.5-2.7L14 10V3M7.5 16h9"/></svg></span>
+            <span class="rounded-full border border-[#06B6D4]/40 bg-[#06B6D4]/10 px-3 py-1 text-[13px] font-medium text-[#A5F3FC]">Открытый доступ</span>
+          </div>
+          <h3 class="mt-6 text-[26px] font-bold tracking-tight text-white">Медицинская химия</h3>
+          <p class="mt-2 text-[15.5px] leading-relaxed text-[#B6C2D4]">14 занятий первого семестра: конспекты, формулы, пошаговые схемы, 8 интерактивных графиков и 56 вопросов с объяснениями.</p>
+          <p class="mt-5 text-[14px] text-mute">Все занятия доступны без подписки</p>
+          <span class="mt-6 inline-flex items-center gap-2 text-[15px] font-semibold text-[#67E8F9]">Открыть атлас <svg class="size-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+      <a data-ma-atlas="patan" href="patan-atlas/" class="glass glow-card group relative overflow-hidden rounded-3xl p-6 sm:p-8">
         <div class="absolute -right-16 -top-16 size-56 rounded-full bg-[#10B981]/15 blur-3xl" aria-hidden="true"></div>
         <div class="relative">
           <div class="flex items-center justify-between gap-4">
@@ -2568,6 +2582,7 @@ opacity: 0;
       <a class="hover:text-white" href="micro-atlas/">Микробиология</a>
       <a class="hover:text-white" href="pathophys-atlas/">Патофизиология</a>
       <a class="hover:text-white" href="patan-atlas/">Патанатомия</a>
+      <a class="hover:text-white" href="chemistry-atlas/">Медицинская химия</a>
       <a class="hover:text-white" href="auth/#account">Аккаунт</a>
       <a class="hover:text-white" href="cabinet/">Личный кабинет</a>
       <a class="hover:text-white" href="#teachers">Преподавателям</a>
