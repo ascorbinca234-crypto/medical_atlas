@@ -273,7 +273,15 @@
     return state;
   }
 
+  var isStaticHost = /\.github\.io$/i.test(location.hostname);
+
   function syncAction(url, payload, fallbackFn, cb) {
+    if (isStaticHost) {
+      state = fallbackFn();
+      renderUI();
+      if (cb) cb(state);
+      return;
+    }
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -521,6 +529,10 @@
     });
 
     // Initial fetch of security state (with local fallback for GitHub Pages)
+    if (isStaticHost) {
+      renderUI();
+      return;
+    }
     fetch('/api/security/state')
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
