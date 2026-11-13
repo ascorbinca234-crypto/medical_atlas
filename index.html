@@ -1936,6 +1936,8 @@ opacity: 0;
 @layer components{.team-points { display: grid; gap: 8px; margin-top: 16px; padding: 0; list-style: none; font-size: 14.5px; line-height: 1.4; color: #D7E0EC; }.team-points li { display: flex; gap: 10px; }.team-points li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: .5em; border-radius: 9999px; background: #67E8F9; }.msg-detail { margin-top: 8px; font-size: 12.5px; line-height: 1.4; color: #94A3B8; overflow-wrap: anywhere; }}
 /*tw:end*/
 </style>
+<link rel="stylesheet" href="assets/free-diagrams.css">
+<script defer src="assets/free-diagrams.js"></script>
 </head>
 <body class="min-h-screen overflow-x-hidden">
 
@@ -1954,6 +1956,7 @@ opacity: 0;
     <nav class="ml-6 hidden items-center gap-1 text-[14.5px] text-mute lg:flex" aria-label="Разделы">
       <a class="rounded-full px-3 py-2 hover:bg-white/5 hover:text-white" href="#features">Возможности</a>
       <a class="rounded-full px-3 py-2 hover:bg-white/5 hover:text-white" href="#demo">Интерактивное демо</a>
+      <a class="rounded-full px-3 py-2 hover:bg-white/5 hover:text-white" href="#free-diagrams">Бесплатные схемы</a>
       <a class="rounded-full px-3 py-2 hover:bg-white/5 hover:text-white" href="#atlases">Атласы</a>
       <a class="rounded-full px-3 py-2 hover:bg-white/5 hover:text-white" href="#team">Команда</a>
       <a class="rounded-full px-3 py-2 hover:bg-white/5 hover:text-white" href="#teachers">Преподавателям</a>
@@ -1968,6 +1971,7 @@ opacity: 0;
   <nav id="menu" class="sheet absolute inset-x-0 top-16 border-b border-white/10 px-4 pb-5 pt-2 lg:hidden" hidden aria-label="Меню">
     <a class="block rounded-xl px-3 py-3 text-[17px] text-ink hover:bg-white/5" href="#features">Возможности</a>
     <a class="block rounded-xl px-3 py-3 text-[17px] text-ink hover:bg-white/5" href="#demo">Интерактивное демо</a>
+    <a class="block rounded-xl px-3 py-3 text-[17px] text-ink hover:bg-white/5" href="#free-diagrams">Бесплатные схемы</a>
     <a class="block rounded-xl px-3 py-3 text-[17px] text-ink hover:bg-white/5" href="#atlases">Атласы</a>
     <a class="block rounded-xl px-3 py-3 text-[17px] text-ink hover:bg-white/5" href="#team">Команда</a>
     <a class="block rounded-xl px-3 py-3 text-[17px] text-ink hover:bg-white/5" href="#teachers">Преподавателям</a>
@@ -2277,6 +2281,14 @@ opacity: 0;
       </div>
     </div>
   </div>
+</section>
+
+<section id="free-diagrams" class="free-diagrams" aria-labelledby="fd-title">
+  <span class="fd-eyebrow">Открыто без регистрации</span>
+  <h2 id="fd-title">Разберите процесс по частям</h2>
+  <p>Две интерактивные схемы по патофизиологии и патанатомии. Выберите элемент на рисунке или нажмите на подпись под ним.</p>
+  <div class="fd-grid"><article class="fd-card" id="fd-inflammation"></article><article class="fd-card" id="fd-plaque"></article></div>
+  <noscript>Для интерактивных схем включите JavaScript.</noscript>
 </section>
 
 <!-- ===================== Атласы ===================== -->
