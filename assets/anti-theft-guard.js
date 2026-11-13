@@ -1,42 +1,50 @@
 /* ==========================================================================
-   Medical Atlas — Система защиты интеллектуальной собственности (Anti-Sharing & DRM)
-   Встраивается поверх оригинального сайта без изменения его дизайна:
-   1. Контроль устройств и сессий (лимит до 3 устройств, при входе 15 человек — авто-бан)
-   2. Защита от скриншотов (PrintScreen, Cmd+Shift+3/4/5, Win+Shift+S, DevTools, потеря фокуса)
-   3. Динамические водяные знаки поверх схем и конспектов
-   4. Запрет выделения текста, копирования, контекстного меню и печати
-   Работает как с серверным API, так и автономно на GitHub Pages.
+   Medical Atlas — Боевая система защиты контента (Anti-Sharing & Anti-Screenshot DRM v3)
+   1. Перехват скриншотов на уровне ОС и браузера (0 мс задержка):
+      - Упреждающее затемнение при нажатии клавиши Win / Cmd (Meta) ДО того,
+        как ОС заморозит кадр при Win+Shift+S или Cmd+Shift+3/4/5
+      - Мгновенный страйк и блокировка при зажатии Win/Cmd+Shift, PrintScreen (keyup 44),
+        вызове системных «Ножниц» / Snipping Tool / Lightshot (window.blur)
+      - Перезапись буфера обмена при попытке скриншота или копирования
+   2. Система страйков: 3 попытки скриншота/захвата экрана = автоматический БАН аккаунта.
+   3. Анти-складчина: лимит до 3 устройств (при входе с 4-го устройства или 15 человек — БАН).
    ========================================================================== */
 (function () {
   'use strict';
+  if (window.__MA_DRM_GUARD_LOADED__) return;
+  window.__MA_DRM_GUARD_LOADED__ = true;
 
-  var STORAGE_KEY = 'ma-drm-security-state-v1';
+  var STORAGE_KEY = 'ma-drm-security-state-v3';
+  var isStaticHost = /\.github\.io$/i.test(location.hostname);
 
   var style = document.createElement('style');
   style.textContent = [
     /* Запрет выделения и перетаскивания схем */
-    'body.ma-drm-active { -webkit-user-select: none; -moz-user-select: none; user-select: none; -webkit-touch-callout: none; }',
-    'body.ma-drm-active input, body.ma-drm-active textarea { -webkit-user-select: text; -moz-user-select: text; user-select: text; }',
-    'body.ma-drm-active img, body.ma-drm-active svg { -webkit-user-drag: none; user-drag: none; }',
+    'body.ma-drm-active { -webkit-user-select: none !important; -moz-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }',
+    'body.ma-drm-active input, body.ma-drm-active textarea { -webkit-user-select: text !important; -moz-user-select: text !important; user-select: text !important; }',
+    'body.ma-drm-active img, body.ma-drm-active svg { -webkit-user-drag: none !important; user-drag: none !important; }',
+    /* Мгновенное (0 мс) скрытие всего контента страницы при перехвате скриншота */
+    'body.ma-drm-shielded > *:not(#ma-drm-blur-shield):not(#ma-drm-ban-screen):not(#ma-drm-widget):not(#ma-drm-drawer):not(#ma-drm-toast) { filter: blur(36px) brightness(0.06) !important; opacity: 0.03 !important; transition: none !important; pointer-events: none !important; }',
     /* Полная блокировка печати страницы */
-    '@media print { body * { display: none !important; } body::after { content: "Печать и копирование материалов Medical Atlas запрещены системой защиты авторских прав."; display: block !important; padding: 48px; font: 600 18px/1.5 system-ui, sans-serif; color: #1e293b; text-align: center; } }',
-    /* Полупрозрачная диагональная сетка водяных знаков */
-    '#ma-drm-watermark { position: fixed; inset: 0; z-index: 2147482000; pointer-events: none; overflow: hidden; opacity: 0.045; display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px; padding: 32px; transform: rotate(-14deg) scale(1.25); font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; color: #0f172a; }',
+    '@media print { body * { display: none !important; } body::after { content: "Печать и сохранение материалов Medical Atlas запрещены системой защиты авторских прав."; display: block !important; padding: 48px; font: 600 18px/1.5 system-ui, sans-serif; color: #1e293b; text-align: center; } }',
+    /* Диагональная сетка водяных знаков */
+    '#ma-drm-watermark { position: fixed; inset: 0; z-index: 2147482000; pointer-events: none; overflow: hidden; opacity: 0.055; display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px; padding: 32px; transform: rotate(-14deg) scale(1.25); font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; color: #0f172a; }',
     '.ma-drm-wm-cell { white-space: nowrap; user-select: none; }',
-    /* Размытие при попытке скриншота / потере фокуса */
-    '#ma-drm-blur-shield { position: fixed; inset: 0; z-index: 2147483640; background: rgba(15, 23, 42, 0.84); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); display: none; align-items: center; justify-content: center; padding: 24px; font-family: system-ui, -apple-system, sans-serif; }',
-    '#ma-drm-blur-shield.is-open { display: flex; }',
-    '.ma-drm-modal { max-width: 480px; width: 100%; background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 16px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.45); }',
+    /* Мгновенный экран блокировки кадра (0ms transition) */
+    '#ma-drm-blur-shield { position: fixed; inset: 0; z-index: 2147483640; background: #070b14; background: rgba(7, 11, 20, 0.98); backdrop-filter: blur(36px); -webkit-backdrop-filter: blur(36px); display: none; align-items: center; justify-content: center; padding: 24px; font-family: system-ui, -apple-system, sans-serif; transition: none !important; }',
+    '#ma-drm-blur-shield.is-open { display: flex !important; }',
+    '.ma-drm-modal { max-width: 500px; width: 100%; background: #ffffff; color: #0f172a; border: 2px solid #ef4444; border-radius: 16px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.85); }',
+    '.ma-drm-modal-badge { display: inline-block; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font: 700 11px/1.2 ui-monospace, monospace; padding: 5px 10px; border-radius: 6px; margin-bottom: 12px; text-transform: uppercase; }',
     '.ma-drm-modal h2 { margin: 0 0 8px; font-size: 20px; font-weight: 700; color: #0f172a; }',
-    '.ma-drm-modal p { margin: 0 0 16px; font-size: 14px; line-height: 1.55; color: #475569; }',
+    '.ma-drm-modal p { margin: 0 0 16px; font-size: 14px; line-height: 1.55; color: #334155; }',
     '.ma-drm-strike-box { background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; font-size: 13px; color: #881337; }',
-    '.ma-drm-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 16px; border: 0; border-radius: 10px; background: #1e293b; color: #ffffff; font: 600 14px/1.2 system-ui, sans-serif; cursor: pointer; transition: background 0.15s; }',
-    '.ma-drm-btn:hover { background: #0f172a; }',
+    '.ma-drm-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 16px; border: 0; border-radius: 10px; background: #0f172a; color: #ffffff; font: 600 14px/1.2 system-ui, sans-serif; cursor: pointer; }',
+    '.ma-drm-btn:hover { background: #1e293b; }',
     /* Экран полной блокировки аккаунта (BANNED за 15 человек или 3 страйка скриншотов) */
     '#ma-drm-ban-screen { position: fixed; inset: 0; z-index: 2147483646; background: #090d16; color: #f8fafc; display: none; align-items: center; justify-content: center; padding: 24px; font-family: system-ui, -apple-system, sans-serif; overflow-y: auto; }',
-    '#ma-drm-ban-screen.is-banned { display: flex; }',
-    '.ma-ban-card { max-width: 640px; width: 100%; background: #111827; border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 20px; padding: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.65); }',
-    '.ma-ban-kicker { font: 600 11px/1.4 ui-monospace, monospace; color: #f87171; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px; }',
+    '#ma-drm-ban-screen.is-banned { display: flex !important; }',
+    '.ma-ban-card { max-width: 640px; width: 100%; background: #111827; border: 2px solid #ef4444; border-radius: 20px; padding: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.9); }',
+    '.ma-ban-kicker { font: 700 11px/1.4 ui-monospace, monospace; color: #f87171; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px; }',
     '.ma-ban-title { margin: 0 0 16px; font-size: 24px; font-weight: 700; color: #ffffff; }',
     '.ma-ban-reason { background: #030712; border: 1px solid #1f2937; border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; color: #fca5a5; }',
     '.ma-ban-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }',
@@ -46,12 +54,13 @@
     '.ma-ban-log { background: #030712; border: 1px solid #1f2937; border-radius: 12px; padding: 12px 14px; margin-bottom: 20px; max-height: 150px; overflow-y: auto; font-size: 12px; color: #d1d5db; }',
     '.ma-ban-log-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid #111827; }',
     /* Компактный виджет управления и тестирования защиты в правом нижнем углу */
-    '#ma-drm-widget { position: fixed; right: 16px; bottom: 16px; z-index: 2147483500; font-family: system-ui, -apple-system, sans-serif; }',
-    '#ma-drm-pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; background: #0f172a; color: #f8fafc; border: 1px solid rgba(148, 163, 184, 0.3); font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.28); }',
+    '#ma-drm-widget { position: fixed; right: 16px; bottom: 16px; z-index: 2147483645; font-family: system-ui, -apple-system, sans-serif; }',
+    '#ma-drm-pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; background: #0f172a; color: #f8fafc; border: 1px solid rgba(148, 163, 184, 0.35); font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4); }',
     '#ma-drm-pill:hover { background: #1e293b; }',
     '.ma-drm-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }',
     '.ma-drm-dot.is-warn { background: #f59e0b; }',
-    '#ma-drm-drawer { position: fixed; right: 16px; bottom: 60px; z-index: 2147483501; width: 380px; max-width: calc(100vw - 32px); background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 16px; padding: 18px; box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25); display: none; }',
+    '.ma-drm-dot.is-danger { background: #ef4444; }',
+    '#ma-drm-drawer { position: fixed; right: 16px; bottom: 60px; z-index: 2147483645; width: 390px; max-width: calc(100vw - 32px); background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 16px; padding: 18px; box-shadow: 0 20px 45px rgba(15, 23, 42, 0.4); display: none; }',
     '#ma-drm-drawer.is-open { display: block; }',
     '.ma-drm-drawer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; }',
     '.ma-drm-drawer-title { font-size: 14px; font-weight: 700; color: #0f172a; }',
@@ -63,7 +72,7 @@
     '.ma-drm-act-btn:hover { background: #f1f5f9; }',
     '.ma-drm-act-btn.danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }',
     '.ma-drm-act-btn.danger:hover { background: #fee2e2; }',
-    '#ma-drm-toast { position: fixed; left: 16px; bottom: 16px; z-index: 2147483600; max-width: 380px; background: #0f172a; color: #ffffff; border: 1px solid #334155; border-radius: 12px; padding: 12px 16px; font: 500 12px/1.45 system-ui, sans-serif; box-shadow: 0 12px 30px rgba(0,0,0,0.35); display: none; }'
+    '#ma-drm-toast { position: fixed; left: 16px; bottom: 16px; z-index: 2147483645; max-width: 380px; background: #0f172a; color: #ffffff; border: 1px solid #334155; border-radius: 12px; padding: 12px 16px; font: 500 12px/1.45 system-ui, sans-serif; box-shadow: 0 12px 30px rgba(0,0,0,0.45); display: none; }'
   ].join('\n');
   document.head.appendChild(style);
 
@@ -71,8 +80,29 @@
     return new Date().toTimeString().slice(0, 8);
   }
 
+  function getAuthUser() {
+    if (window.MA && typeof window.MA.user === 'function') return window.MA.user();
+    if (window.MA_AUTH && typeof window.MA_AUTH.user === 'function') return window.MA_AUTH.user();
+    return null;
+  }
+
+  function getDeviceFingerprint() {
+    var raw = [
+      navigator.userAgent || '',
+      navigator.platform || '',
+      screen.width + 'x' + screen.height,
+      Intl.DateTimeFormat().resolvedOptions().timeZone || ''
+    ].join('|');
+    var hash = 0;
+    for (var i = 0; i < raw.length; i++) {
+      hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+      hash |= 0;
+    }
+    return 'fp-' + Math.abs(hash).toString(16);
+  }
+
   function defaultState() {
-    var authUser = window.MA_AUTH && typeof window.MA_AUTH.user === 'function' ? window.MA_AUTH.user() : null;
+    var authUser = getAuthUser();
     return {
       userId: (authUser && authUser.id) || 'MED-84920-RU',
       email: (authUser && authUser.email) || 'ascorbinca234@gmail.com',
@@ -83,10 +113,10 @@
       bannedAt: '',
       registeredDevices: [
         {
-          deviceId: 'fp-macbook-pro-01',
-          name: 'MacBook Pro 14"',
-          os: 'macOS Sequoia',
-          browser: 'Chrome 134',
+          deviceId: getDeviceFingerprint(),
+          name: 'Текущее устройство (' + (navigator.platform || 'Desktop') + ')',
+          os: navigator.platform || 'OS',
+          browser: 'Browser',
           ip: '178.140.214.88',
           location: 'Санкт-Петербург, РФ',
           lastActive: 'Сейчас онлайн',
@@ -127,6 +157,15 @@
   var state = loadLocalState();
   var watermarkEl, blurShieldEl, banScreenEl, widgetEl, drawerEl, toastEl, toastTimer;
   var drawerOpen = false;
+  var lastStrikeAt = 0;
+
+  function poisonClipboard() {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText('Скриншоты и копирование материалов Medical Atlas заблокированы системой защиты авторских прав.').catch(function () {});
+      }
+    } catch (e) {}
+  }
 
   function showToast(msg) {
     if (!toastEl) return;
@@ -135,22 +174,30 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () {
       toastEl.style.display = 'none';
-    }, 4000);
+    }, 4500);
   }
 
-  function showBlur(reason) {
+  // Мгновенная (0 мс) блокировка видимости экрана
+  function activateInstantShield(reason, isStrike) {
+    document.body.classList.add('ma-drm-shielded');
     if (!blurShieldEl || state.status === 'BANNED') return;
     var reasonNode = blurShieldEl.querySelector('[data-drm-blur-reason]');
     var countNode = blurShieldEl.querySelector('[data-drm-strike-count]');
+    var badgeNode = blurShieldEl.querySelector('[data-drm-badge]');
     if (reasonNode) reasonNode.textContent = reason;
     if (countNode) countNode.textContent = state.strikes.length + ' из ' + state.maxStrikes;
+    if (badgeNode) {
+      badgeNode.textContent = isStrike
+        ? 'ЗАФИКСИРОВАН СТРАЙК БЕЗОПАСНОСТИ (' + state.strikes.length + '/' + state.maxStrikes + ')'
+        : 'ЗАЩИТА ОТ СКРИНШОТОВ АКТИВНА';
+    }
     blurShieldEl.classList.add('is-open');
   }
 
   function renderUI() {
     if (!watermarkEl) return;
 
-    var authUser = window.MA_AUTH && typeof window.MA_AUTH.user === 'function' ? window.MA_AUTH.user() : null;
+    var authUser = getAuthUser();
     if (authUser && authUser.email) state.email = authUser.email;
     if (authUser && authUser.id) state.userId = authUser.id;
 
@@ -168,11 +215,18 @@
       pillText.textContent = 'Защита контента · Устр: ' + state.registeredDevices.length + '/' + state.maxDevices + ' · Страйки: ' + state.strikes.length + '/' + state.maxStrikes;
     }
     if (dot) {
-      if (state.strikes.length > 0 || state.registeredDevices.length >= state.maxDevices) dot.classList.add('is-warn');
-      else dot.classList.remove('is-warn');
+      dot.classList.remove('is-warn', 'is-danger');
+      if (state.status === 'BANNED') dot.classList.add('is-danger');
+      else if (state.strikes.length > 0 || state.registeredDevices.length >= state.maxDevices) dot.classList.add('is-warn');
     }
 
-    // 3. Update Drawer details
+    // 3. Update Blur modal strike counter if open
+    if (blurShieldEl) {
+      var countNode = blurShieldEl.querySelector('[data-drm-strike-count]');
+      if (countNode) countNode.textContent = state.strikes.length + ' из ' + state.maxStrikes;
+    }
+
+    // 4. Update Drawer details
     if (drawerEl) {
       var devList = drawerEl.querySelector('[data-drm-devices]');
       if (devList) {
@@ -184,13 +238,15 @@
       if (strikeSummary) {
         strikeSummary.textContent = state.strikes.length === 0
           ? 'Нарушений не зафиксировано (0/' + state.maxStrikes + ').'
-          : 'Зафиксировано страйков: ' + state.strikes.length + '/' + state.maxStrikes + ' (' + state.strikes[0].details + ')';
+          : 'Зафиксировано страйков: ' + state.strikes.length + '/' + state.maxStrikes + ' — ' + state.strikes[0].details;
       }
     }
 
-    // 4. Update Ban Lockout Screen
+    // 5. Update Ban Lockout Screen
     if (banScreenEl) {
       if (state.status === 'BANNED') {
+        document.body.classList.add('ma-drm-shielded');
+        blurShieldEl.classList.remove('is-open');
         banScreenEl.classList.add('is-banned');
         var reasonEl = banScreenEl.querySelector('[data-ban-reason]');
         var devCountEl = banScreenEl.querySelector('[data-ban-devs]');
@@ -210,18 +266,22 @@
     }
   }
 
-  // Local state transitions (used on GitHub Pages or when offline)
   function applyLocalStrike(type, details) {
     if (state.status === 'BANNED') return state;
+    var nowMs = Date.now();
+    // Защита от двойного срабатывания одного и того же действия в пределах 1200 мс
+    if (nowMs - lastStrikeAt < 1200) return state;
+    lastStrikeAt = nowMs;
+
     state.strikes.unshift({
-      id: 'stk-' + Date.now(),
+      id: 'stk-' + nowMs,
       type: type,
       timestamp: nowTime(),
       details: details
     });
     if (state.strikes.length >= state.maxStrikes) {
       state.status = 'BANNED';
-      state.banReason = 'Автоматическая блокировка: достигнут лимит нарушений защиты контента (' + state.strikes.length + '/' + state.maxStrikes + ' попыток скриншота/копирования).';
+      state.banReason = 'Автоматическая блокировка аккаунта: зафиксировано 3 из 3 попыток создания скриншота / захвата экрана защищённых материалов атласа.';
       state.bannedAt = nowTime();
     }
     saveLocalState(state);
@@ -236,10 +296,10 @@
         id: 'stk-dev-' + Date.now(),
         type: 'MULTI_ACCOUNT_SHARING',
         timestamp: nowTime(),
-        details: 'Превышен лимит устройств: попытка входа с ' + state.registeredDevices.length + '-го устройства (' + device.name + ', IP ' + device.ip + ')'
+        details: 'Превышен лимит устройств: вход с ' + state.registeredDevices.length + '-го устройства (' + device.name + ', IP ' + device.ip + ')'
       });
       state.status = 'BANNED';
-      state.banReason = 'Превышен лимит привязанных устройств (' + state.registeredDevices.length + ' при максимуме ' + state.maxDevices + '). Подозрение на передачу аккаунта третьим лицам.';
+      state.banReason = 'Превышен лимит привязанных устройств (' + state.registeredDevices.length + ' при максимуме ' + state.maxDevices + '). Аккаунт заблокирован за передачу доступа третьим лицам.';
       state.bannedAt = nowTime();
     }
     saveLocalState(state);
@@ -273,15 +333,14 @@
     return state;
   }
 
-  var isStaticHost = /\.github\.io$/i.test(location.hostname);
-
   function syncAction(url, payload, fallbackFn, cb) {
-    if (isStaticHost) {
-      state = fallbackFn();
-      renderUI();
-      if (cb) cb(state);
-      return;
-    }
+    // МГНОВЕННО (0 мс) применяем локально, чтобы экран успел закрыться до снимка ОС
+    state = fallbackFn();
+    renderUI();
+    if (cb) cb(state);
+
+    if (isStaticHost) return;
+
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -296,26 +355,21 @@
           state = data;
           saveLocalState(state);
           renderUI();
-          if (cb) cb(state);
-        } else {
-          throw new Error('Invalid payload');
         }
       })
-      .catch(function () {
-        state = fallbackFn();
-        renderUI();
-        if (cb) cb(state);
-      });
+      .catch(function () {});
   }
 
   function recordStrike(type, details, blurMsg) {
+    document.body.classList.add('ma-drm-shielded');
+    poisonClipboard();
     syncAction(
       '/api/security/strike',
       { type: type, details: details },
       function () { return applyLocalStrike(type, details); },
       function (updated) {
-        if (updated.status !== 'BANNED' && blurMsg) {
-          showBlur(blurMsg);
+        if (updated.status !== 'BANNED') {
+          activateInstantShield(blurMsg || details, true);
         }
       }
     );
@@ -335,15 +389,18 @@
     blurShieldEl.id = 'ma-drm-blur-shield';
     blurShieldEl.innerHTML =
       '<div class="ma-drm-modal">' +
+        '<div class="ma-drm-modal-badge" data-drm-badge>ЗАФИКСИРОВАН СТРАЙК БЕЗОПАСНОСТИ</div>' +
         '<h2>Экран скрыт системой защиты от скриншотов</h2>' +
-        '<p data-drm-blur-reason>Обнаружена попытка создания скриншота или инспектирования защищённой схемы.</p>' +
+        '<p data-drm-blur-reason>Обнаружена попытка создания скриншота (PrintScreen / Win+Shift+S / Cmd+Shift+3/4) или вызова сторонней программы захвата экрана.</p>' +
         '<div class="ma-drm-strike-box">' +
-          '<b>Внимание:</b> Зафиксирован страйк безопасности (<span data-drm-strike-count>1 из 3</span>). При 3 попытках скриншота или записи экрана аккаунт автоматически блокируется.' +
+          '<b>Счётчик нарушений: <span data-drm-strike-count>1 из 3</span>.</b><br>' +
+          'При 3 попытках сделать скриншот или скопировать схему доступ к аккаунту блокируется автоматически.' +
         '</div>' +
-        '<button type="button" class="ma-drm-btn" data-drm-unblur>Вернуться к работе с атласом</button>' +
+        '<button type="button" class="ma-drm-btn" data-drm-unblur>Я понял, вернуться к изучению атласа</button>' +
       '</div>';
     document.body.appendChild(blurShieldEl);
     blurShieldEl.querySelector('[data-drm-unblur]').addEventListener('click', function () {
+      document.body.classList.remove('ma-drm-shielded');
       blurShieldEl.classList.remove('is-open');
     });
 
@@ -374,11 +431,13 @@
         '/api/security/reset',
         {},
         function () {
+          lastStrikeAt = 0;
           state = defaultState();
           saveLocalState(state);
           return state;
         },
         function () {
+          document.body.classList.remove('ma-drm-shielded');
           blurShieldEl.classList.remove('is-open');
           showToast('Блокировка снята, счётчик устройств и страйков сброшен.');
         }
@@ -420,7 +479,7 @@
           '<span>4/3 →</span>' +
         '</button>' +
         '<button type="button" class="ma-drm-act-btn" data-sim-shot>' +
-          '<span>Симулировать скриншот PrintScreen (+1 страйк)</span>' +
+          '<span>Тест: сделать скриншот (+1 страйк)</span>' +
           '<span>+1 →</span>' +
         '</button>' +
         '<button type="button" class="ma-drm-act-btn" data-sim-reset>' +
@@ -464,6 +523,7 @@
       });
     });
     drawerEl.querySelector('[data-sim-shot]').addEventListener('click', function () {
+      lastStrikeAt = 0;
       recordStrike(
         'SCREENSHOT',
         'Попытка создания скриншота защищённой схемы (PrintScreen)',
@@ -475,81 +535,171 @@
         '/api/security/reset',
         {},
         function () {
+          lastStrikeAt = 0;
           state = defaultState();
           saveLocalState(state);
           return state;
         },
         function () {
+          document.body.classList.remove('ma-drm-shielded');
+          blurShieldEl.classList.remove('is-open');
           showToast('Счётчик устройств и страйков успешно сброшен.');
         }
       );
     });
 
-    // Event listeners for real screenshot/copy/devtools protection
-    window.addEventListener('keydown', function (e) {
-      var isPrintScreen = e.key === 'PrintScreen';
-      var isShotShortcut = (e.metaKey || e.ctrlKey) && e.shiftKey && ['3', '4', '5', 's', 'S'].indexOf(e.key) >= 0;
-      var isDevTools = e.key === 'F12' || ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].indexOf(e.key) >= 0);
-      var isPrintOrSave = (e.ctrlKey || e.metaKey) && ['p', 'P', 's', 'S'].indexOf(e.key) >= 0;
+    // =========================================================================
+    // РЕАЛЬНЫЕ ПЕРЕХВАТЧИКИ СКРИНШОТОВ (WINDOWS / MACOS / МОБИЛЬНЫЕ / БРАУЗЕР)
+    // =========================================================================
 
-      if (isPrintScreen || isShotShortcut) {
-        e.preventDefault();
+    // 1. KEYDOWN:
+    // При нажатии системной клавиши Win / Cmd (Meta) мгновенно затемняем экран (за 0 мс),
+    // чтобы до нажатия Shift+S или Shift+3/4/5 кадр уже был закрыт!
+    window.addEventListener('keydown', function (e) {
+      var key = e.key || '';
+      var code = e.code || '';
+      var keyCode = e.keyCode || e.which || 0;
+
+      // Упреждающее затемнение при нажатии клавиши Win / Cmd (Meta / OS)
+      if (key === 'Meta' || key === 'OS' || keyCode === 91 || keyCode === 92 || e.metaKey) {
+        document.body.classList.add('ma-drm-shielded');
+      }
+
+      // A) Комбинация Win+Shift (перед S в Win+Shift+S) или Cmd+Shift (перед 3/4/5 на Mac)
+      if ((e.metaKey && e.shiftKey) || (e.ctrlKey && e.shiftKey && ['3', '4', '5', 's', 'S', 'ы', 'Ы'].indexOf(key) >= 0)) {
+        document.body.classList.add('ma-drm-shielded');
         recordStrike(
           'SCREENSHOT',
-          'Перехвачена горячая клавиша скриншота (' + e.key + ')',
-          'Обнаружена попытка создания скриншота экрана (' + e.key + ').'
+          'Перехвачена комбинация захвата экрана (Win/Cmd + Shift)',
+          'Обнаружена комбинация клавиш создания скриншота (Win+Shift+S / Cmd+Shift+3/4). Экран заблокирован, начислен страйк.'
         );
-      } else if (isDevTools) {
+        return;
+      }
+
+      // B) PrintScreen на keydown
+      if (key === 'PrintScreen' || code === 'PrintScreen' || keyCode === 44) {
+        e.preventDefault();
+        document.body.classList.add('ma-drm-shielded');
+        recordStrike(
+          'SCREENSHOT',
+          'Нажата клавиша PrintScreen (захват экрана)',
+          'Обнаружено нажатие клавиши PrintScreen. Экран скрыт, буфер обмена очищен, начислен страйк.'
+        );
+        return;
+      }
+
+      // C) DevTools (F12, Ctrl/Cmd+Shift+I/J/C, Ctrl+U)
+      var isDevTools =
+        key === 'F12' ||
+        keyCode === 123 ||
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c', 'И', 'и', 'О', 'о', 'С', 'с'].indexOf(key) >= 0) ||
+        ((e.ctrlKey || e.metaKey) && ['u', 'U', 'г', 'Г'].indexOf(key) >= 0);
+
+      if (isDevTools) {
         e.preventDefault();
         recordStrike(
           'DEVTOOLS',
-          'Попытка открытия DevTools для копирования схем',
-          'Инструменты разработчика (DevTools) заблокированы системой защиты.'
+          'Попытка открытия кода страницы / DevTools',
+          'Инструменты разработчика (DevTools) и инспектирование схем заблокированы. Начислен страйк.'
         );
-      } else if (isPrintOrSave) {
+        return;
+      }
+
+      // D) Печать или сохранение страницы (Ctrl+P / Ctrl+S)
+      if ((e.ctrlKey || e.metaKey) && ['p', 'P', 's', 'S', 'з', 'З', 'ы', 'Ы'].indexOf(key) >= 0) {
         e.preventDefault();
         showToast('Сохранение и печать материалов заблокированы системой защиты Medical Atlas.');
       }
+    }, true);
+
+    // 2. KEYUP:
+    // Windows Chrome/Edge отправляет PrintScreen (keyCode 44) ТОЛЬКО в событии keyup!
+    window.addEventListener('keyup', function (e) {
+      var key = e.key || '';
+      var code = e.code || '';
+      var keyCode = e.keyCode || e.which || 0;
+
+      if (key === 'PrintScreen' || code === 'PrintScreen' || keyCode === 44) {
+        e.preventDefault();
+        document.body.classList.add('ma-drm-shielded');
+        recordStrike(
+          'SCREENSHOT',
+          'Нажата клавиша PrintScreen (перехват буфера обмена)',
+          'Обнаружено нажатие клавиши PrintScreen. Содержимое буфера обмена стёрто, начислен страйк.'
+        );
+        return;
+      }
+
+      // Если пользователь просто нажал и отпустил Win/Cmd без скриншота и окно не открыло щит страйка
+      if ((key === 'Meta' || key === 'OS' || keyCode === 91 || keyCode === 92) && !blurShieldEl.classList.contains('is-open') && state.status !== 'BANNED') {
+        document.body.classList.remove('ma-drm-shielded');
+      }
+    }, true);
+
+    // 3. WINDOW BLUR (Вызов системных «Ножниц» Windows Win+Shift+S, Lightshot, ShareX, macOS Screenshot):
+    // Любая программа создания скриншота области экрана перехватывает фокус окна (blur).
+    // Мы за 0 мс закрываем экран и фиксируем страйк!
+    window.addEventListener('blur', function () {
+      if (state.status === 'BANNED') return;
+      document.body.classList.add('ma-drm-shielded');
+      recordStrike(
+        'SCREENSHOT',
+        'Попытка захвата экрана / вызов инструмента скриншотов (потеря фокуса окна)',
+        'Зафиксирован вызов системного инструмента скриншотов (Win+Shift+S / Ножницы / внешняя программа захвата). Экран заблокирован, начислен страйк.'
+      );
     });
 
+    // 4. VISIBILITYCHANGE (Сворачивание / фоновый захват вкладки)
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden && state.status !== 'BANNED') {
+        document.body.classList.add('ma-drm-shielded');
+        recordStrike(
+          'SCREENSHOT',
+          'Фоновый захват экрана / переключение окна со схемой',
+          'Обнаружена попытка фонового захвата или переключения окна во время работы с защищённым материалом.'
+        );
+      }
+    });
+
+    // 5. Блокировка правого клика мыши
     window.addEventListener('contextmenu', function (e) {
       e.preventDefault();
-      showToast('Правый клик и сохранение изображений отключены для защиты авторских схем.');
-    });
+      showToast('Правый клик и сохранение схем отключены системой защиты авторских прав.');
+    }, true);
 
+    // 6. Перехват копирования (Ctrl+C / Копировать)
     window.addEventListener('copy', function (e) {
       var tag = e.target && e.target.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       e.preventDefault();
+      if (e.clipboardData) {
+        e.clipboardData.setData('text/plain', 'Копирование материалов Medical Atlas запрещено системой защиты авторских прав.');
+      }
       recordStrike(
         'COPY_ATTEMPT',
-        'Попытка копирования текста конспекта в буфер обмена',
-        'Копирование материалов конспекта запрещено! Зафиксирован страйк.'
+        'Попытка копирования текста конспекта в буфер обмена (Ctrl+C)',
+        'Копирование материалов конспекта запрещено! Зафиксирован страйк безопасности.'
       );
-    });
+    }, true);
 
-    // Initial fetch of security state (with local fallback for GitHub Pages)
-    if (isStaticHost) {
-      renderUI();
-      return;
+    // Initial render
+    renderUI();
+
+    if (!isStaticHost) {
+      fetch('/api/security/state')
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function (data) {
+          if (data && data.userId) {
+            state = data;
+            saveLocalState(state);
+            renderUI();
+          }
+        })
+        .catch(function () {});
     }
-    fetch('/api/security/state')
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function (data) {
-        if (data && data.userId) {
-          state = data;
-          saveLocalState(state);
-          renderUI();
-        } else {
-          renderUI();
-        }
-      })
-      .catch(function () {
-        renderUI();
-      });
   }
 
   if (document.readyState === 'loading') {
