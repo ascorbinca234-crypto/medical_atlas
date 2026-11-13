@@ -15,7 +15,7 @@
 <script>
   /* тема применяется до отрисовки, чтобы не мигал светлый фон */
   (function () {
-    try { var t = localStorage.getItem('ma-cabinet-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) { /* без localStorage */ }
+    try { var t = localStorage.getItem('ma-cabinet-theme'); document.documentElement.setAttribute('data-theme', t === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : (t === 'light' ? 'light' : 'dark')); } catch (e) { /* без localStorage */ }
   })();
 </script>
 <style>
@@ -242,7 +242,7 @@ main { padding-block: 22px 56px; }
 }
 .lvl.up { animation: pop .7s var(--ease); }
 .who-txt { min-width: 0; display: grid; gap: 4px; }
-.who-txt h1 { font-size: clamp(20px, 2.4vw, 25px); line-height: 1.2; overflow-wrap: anywhere; }
+.who-txt h2 { font-size: clamp(20px, 2.4vw, 25px); line-height: 1.2; overflow-wrap: anywhere; }
 .who-uni { color: var(--mute); font-size: 14.5px; }
 .who-status { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--ink); }
 .who-status svg { color: var(--emerald); }
@@ -696,6 +696,26 @@ a.btn-coral { text-decoration: none; }
   .lb-big .lb-who b, .lb-big .lb-who > span { white-space: nowrap; }
 }
 .lb-big .lb-actions:empty { display: none; }
+
+/* Кабинет в общей визуальной системе Medical Atlas */
+:root{--f-display:"Golos Text",system-ui,sans-serif;--r-xl:22px;--r-lg:14px;--r-md:10px}
+:root[data-theme="dark"]{--bg:#070b14;--surface:#101a2a;--surface-2:#152235;--line:#26364b;--line-2:#34485d;--ink:#eef4fc;--mute:#a3b4c9;--cyan:#43d8c0;--cyan-ink:#04201e;--emerald:#43d8a9;--coral:#ef9d85;--amber:#e9c478;--violet:#a9b9db;--heat0:#1b2a3c;--glass:rgba(7,11,20,.88);--scr:#101a2a;--scr-edge:#26364b;--scr-ink:#eef4fc;--scr-mute:#a3b4c9;--scr-coral:#43d8c0;--scr-cyan:#43d8c0;--scr-emerald:#43d8a9;--scr-amber:#e9c478;color-scheme:dark}
+:root[data-theme="light"]{--bg:#f3f7fa;--surface:#fff;--surface-2:#eef4f5;--line:#d9e5e7;--line-2:#c2d7d8;--ink:#122638;--mute:#556c7a;--cyan:#007b72;--cyan-ink:#fff;--emerald:#087e63;--coral:#a9503e;--amber:#876112;--violet:#526789;--heat0:#e1eceb;--glass:rgba(243,247,250,.9);--scr:#fff;--scr-edge:#d9e5e7;--scr-ink:#122638;--scr-mute:#556c7a;--scr-coral:#007b72;--scr-cyan:#007b72;--scr-emerald:#087e63;--scr-amber:#876112;color-scheme:light}
+body{background-image:radial-gradient(760px 420px at 90% -15%,color-mix(in srgb,var(--cyan) 12%,transparent),transparent 72%)}
+.top{background:var(--glass);border-bottom:1px solid var(--line)}.brand{font-size:15px;font-weight:700}.brand-mark{background:linear-gradient(135deg,#10b981,#06b6d4);color:#04201e}
+.tabs{border-color:transparent;background:transparent;gap:5px}.tab{border-radius:10px}.tab[aria-selected="true"]{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
+main{padding-block:30px 72px}.overview-intro{display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:4px 0 24px}.overview-intro .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}.overview-intro h1{margin:7px 0 5px;font-size:clamp(28px,3.4vw,38px);font-weight:700;letter-spacing:-.035em;line-height:1.15}.overview-intro p{color:var(--mute);font-size:15px}.overview-intro a{white-space:nowrap}
+.bento{gap:16px;grid-template-areas:"profile" "resume" "mastery" "monitor" "heat" "board" "troph"}
+@media(min-width:740px){.bento{grid-template-areas:"profile profile" "resume mastery" "monitor monitor" "heat heat" "board troph"}}
+@media(min-width:1120px){.bento{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:"profile profile profile" "resume mastery monitor" "heat heat heat" "troph troph board"}}
+.card,.monitor{background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 18px 42px -30px rgba(0,0,0,.35);padding:24px}.card h2,.m-head h2{font-family:var(--f-body);font-size:17px;font-weight:700;letter-spacing:-.02em}.profile{gap:22px;align-content:start}.who-txt h2{font-size:24px;font-weight:700;letter-spacing:-.025em}.rank{padding-top:18px;border-top:1px solid var(--line)}
+.resume{background:linear-gradient(145deg,color-mix(in srgb,var(--cyan) 7%,var(--surface)),var(--surface) 60%)}.mastery .seg{width:100%}.mastery .seg button{font-size:13px;padding:8px 10px}
+.monitor{gap:14px;isolation:isolate;color:var(--ink)}.monitor::before{display:none}.monitor::after{display:none}.m-trace{flex:0 0 60px;min-height:60px;max-height:60px}.trace{stroke:var(--scr-cyan);filter:none}.m-num,.monitor[data-state="flat"] .m-num{color:var(--ink);text-shadow:none;font-size:48px}.m-heart,.monitor[data-state="flat"] .m-heart{color:var(--cyan);fill:none}.m-vitals{border-color:var(--line)}.m-vitals div{border-color:var(--line)}.m-goal-bar{background:var(--surface-2)}.m-goal-bar span,.monitor[data-state="ok"] .m-goal-bar span{background:linear-gradient(90deg,#10b981,#06b6d4);box-shadow:none}.m-defib{background:var(--surface-2);border-color:var(--line)}.zc.on{box-shadow:none}.wd-dot{border-color:var(--line-2)}.wd[data-s="done"] .wd-dot{background:var(--cyan);border-color:var(--cyan);color:var(--cyan-ink);box-shadow:none}
+.btn-primary,.btn-coral{background:linear-gradient(100deg,#10b981,#06b6d4);color:#04201e;border-color:transparent;font-weight:700}.btn-coral:focus-visible{outline-color:var(--cyan)}.btn-ghost,.icon-btn,.input,.seg{border-color:var(--line)}.btn-soft{background:color-mix(in srgb,var(--cyan) 12%,var(--surface));color:var(--cyan)}.xpbar-fill{background:linear-gradient(90deg,#10b981,#06b6d4)}
+[data-tone="coral"],[data-tone="violet"],[data-tone="amber"]{--t:var(--cyan)}
+@media(max-width:739px){.tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;overflow:visible}.tab{justify-content:center;min-width:0;font-size:13px;padding:9px 5px}.overview-intro{margin-bottom:18px}.overview-intro .btn{width:100%}.card,.monitor{padding:20px}.who{gap:12px}.m-trace{min-height:48px;max-height:48px;flex-basis:48px}}
+@media(prefers-reduced-motion:reduce){.sweep,.m-heart,.monitor[data-state="flat"] .m-status .dot,.monitor[data-state="wait"] .m-status .dot,.wd[data-s="today"] .wd-dot{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -727,6 +747,7 @@ a.btn-coral { text-decoration: none; }
 
   <!-- ===================== ОБЗОР ===================== -->
   <section role="tabpanel" id="panel-overview" aria-labelledby="tab-overview">
+    <div class="overview-intro"><div><span class="eyebrow">Личный кабинет</span><h1>Ваше обучение</h1><p>Продолжайте с того места, где остановились, и следите за прогрессом.</p></div><a href="../#atlases" class="btn btn-ghost">Все атласы <span aria-hidden="true">↗</span></a></div>
     <div class="bento">
 
       <!-- Профиль и ранг -->
@@ -737,7 +758,7 @@ a.btn-coral { text-decoration: none; }
             <span class="lvl" id="pLvl" title="Уровень"></span>
           </div>
           <div class="who-txt">
-            <h1 id="pName"></h1>
+            <h2 id="pName"></h2>
             <p class="who-uni" id="pUni"></p>
             <p class="who-status" id="pStatusRow"><i data-lucide="circle-dot"></i><span id="pStatus"></span></p>
           </div>
@@ -754,6 +775,26 @@ a.btn-coral { text-decoration: none; }
           </div>
           <p class="rank-next" id="rNext"></p>
         </div>
+      </article>
+
+      <!-- Карточка быстрого возврата -->
+      <article class="card resume" aria-labelledby="resH">
+        <h2 id="resH">Продолжить изучение</h2>
+        <div id="resBody"></div>
+      </article>
+
+      <!-- Освоение по разделам атласов -->
+      <article class="card mastery" aria-labelledby="masH">
+        <header class="card-head"><h2 id="masH">Освоение атласов</h2><span class="muted num" id="masAvg"></span></header>
+        <div class="seg" role="radiogroup" aria-label="Атлас" id="masSeg">
+          <button type="button" role="radio" data-atlas="farma" aria-checked="true">Фармакология</button>
+          <button type="button" role="radio" data-atlas="biochem" aria-checked="false">Биохимия</button>
+          <button type="button" role="radio" data-atlas="micro" aria-checked="false">Микробиология</button>
+          <button type="button" role="radio" data-atlas="pathophys" aria-checked="false">Патофизиология</button>
+          <button type="button" role="radio" data-atlas="patan" aria-checked="false">Патанатомия</button>
+        </div>
+        <div class="sys-scroll" id="masBody"></div>
+        <p class="mastery-foot"><span><span class="dot-ok" aria-hidden="true"></span><span id="masteryHint">Закреплено: карточку вспомнили 3 раза с растущим интервалом</span></span></p>
       </article>
 
       <!-- Стрик: прикроватный монитор -->
@@ -800,33 +841,13 @@ a.btn-coral { text-decoration: none; }
         <div class="m-defib">
           <div class="defib-cells" id="defibCells" aria-hidden="true"></div>
           <div>
-            <p class="defib-title">Дефибриллятор: <b id="defibCount"></b></p>
-            <p class="defib-help">Спасает стрик, если пропустить день. Заряд восстанавливается за каждые 7 дней в ритме.</p>
+            <p class="defib-title">Защита серии: <b id="defibCount"></b></p>
+            <p class="defib-help">Сохраняет серию при пропуске дня. Один заряд восстанавливается за каждые 7 дней занятий подряд.</p>
           </div>
         </div>
         <p class="m-note" id="mNote"></p>
         <a class="btn btn-coral" id="learnBtn" href="../farma-atlas/#learn"><i data-lucide="layers"></i><span id="learnLabel">Повторить карточки</span></a>
         <p class="m-links">Учить: <a href="../farma-atlas/#learn">фармакология</a>, <a href="../biochem-atlas/#study">биохимия</a>, <a href="../micro-atlas/">микробиология</a>, <a href="../pathophys-atlas/">патофизиология</a>, <a href="../patan-atlas/">патанатомия</a></p>
-      </article>
-
-      <!-- Карточка быстрого возврата -->
-      <article class="card resume" aria-labelledby="resH">
-        <h2 id="resH">Продолжить изучение</h2>
-        <div id="resBody"></div>
-      </article>
-
-      <!-- Освоение по разделам атласов -->
-      <article class="card mastery" aria-labelledby="masH">
-        <header class="card-head"><h2 id="masH">Освоение атласов</h2><span class="muted num" id="masAvg"></span></header>
-        <div class="seg" role="radiogroup" aria-label="Атлас" id="masSeg">
-          <button type="button" role="radio" data-atlas="farma" aria-checked="true">Фармакология</button>
-          <button type="button" role="radio" data-atlas="biochem" aria-checked="false">Биохимия</button>
-          <button type="button" role="radio" data-atlas="micro" aria-checked="false">Микробиология</button>
-          <button type="button" role="radio" data-atlas="pathophys" aria-checked="false">Патофизиология</button>
-          <button type="button" role="radio" data-atlas="patan" aria-checked="false">Патанатомия</button>
-        </div>
-        <div class="sys-scroll" id="masBody"></div>
-        <p class="mastery-foot"><span><span class="dot-ok" aria-hidden="true"></span><span id="masteryHint">Закреплено: карточку вспомнили 3 раза с растущим интервалом</span></span></p>
       </article>
 
       <!-- Теплокарта -->
@@ -1037,7 +1058,7 @@ document.addEventListener('DOMContentLoaded', function () {
     { id: 'first', title: 'Первичный осмотр', desc: 'Первая карточка в режиме «Учить»', icon: 'stethoscope', tone: 'cyan', p: c => [Math.min(c.cards, 1), 1] },
     { id: 'morning', title: 'Утренний обход', desc: 'Занятие до 8:00', icon: 'sunrise', tone: 'amber', p: c => [c.morning ? 1 : 0, 1] },
     { id: 'month', title: 'Стабильный пульс', desc: '30 дней подряд выполнять цель дня', icon: 'flame', tone: 'coral', p: c => [c.best, 30], unit: ' дн.' },
-    { id: 'reanim', title: 'Реанимация', desc: 'Дефибриллятор спас стрик', icon: 'zap', tone: 'cyan', p: c => [c.frozen ? 1 : 0, 1] },
+    { id: 'reanim', title: 'Реанимация', desc: 'Защита сохранила серию занятий', icon: 'zap', tone: 'cyan', p: c => [c.frozen ? 1 : 0, 1] },
     { id: 'council', title: 'Консилиум', desc: '5 коллег в ординаторской', icon: 'users', tone: 'emerald', p: c => [c.friends, 5] },
     { id: 'thousand', title: 'Тысяча карточек', desc: '1 000 ответов в режиме «Учить»', icon: 'layers', tone: 'amber', p: c => [c.cards, 1000] }
   ];
@@ -1219,14 +1240,14 @@ document.addEventListener('DOMContentLoaded', function () {
       mon.classList.remove('shock'); void mon.offsetWidth; mon.classList.add('shock');
     }
     prevStreak = s.streak;
-    $('#mUnit').innerHTML = esc(plural(s.streak, W_DAYS)) + ' в ритме<span>' + (s.streak ? 'стрик занятий' : 'стрик на нуле') + '</span>';
-    $('#mStatus').textContent = { ok: 'Синусовый ритм', wait: 'Ждём занятие', flat: 'Асистолия' }[state];
+    $('#mUnit').innerHTML = esc(plural(s.streak, W_DAYS)) + ' подряд<span>' + (s.streak ? 'серия занятий' : 'серия пока не началась') + '</span>';
+    $('#mStatus').textContent = { ok: 'Цель выполнена', wait: 'Цель ещё не выполнена', flat: 'Начните заниматься' }[state];
     const left = Math.max(0, R.goal - s.todayCards);
     $('#mNote').textContent = state === 'ok'
       ? 'Цель дня выполнена. Завтра стрик продлится, если снова повторить ' + R.goal + ' ' + plural(R.goal, W_CARDS) + '.'
       : state === 'wait'
-        ? 'Ещё ' + left + ' ' + plural(left, W_CARDS) + ', и день засчитан. ' + (s.freezes > 0 ? 'Если пропустить день, сработает дефибриллятор.' : 'Зарядов нет: пропуск обнулит стрик.')
-        : (s.cards ? 'Стрик прервался. ' : '') + 'Повторите ' + R.goal + ' ' + plural(R.goal, W_CARDS) + ' в режиме «Учить», чтобы запустить ритм.';
+        ? 'Ещё ' + left + ' ' + plural(left, W_CARDS) + ', и день засчитан. ' + (s.freezes > 0 ? 'Если пропустить день, заряд сохранит серию.' : 'Зарядов нет: пропуск прервёт серию.')
+        : (s.cards ? 'Серия прервалась. ' : '') + 'Повторите ' + R.goal + ' ' + plural(R.goal, W_CARDS) + ' в режиме «Учить», чтобы начать серию.';
     $('#goalNow').textContent = Math.min(s.todayCards, 999);
     $('#goalAll').textContent = R.goal;
     const gb = $('#goalBar');
@@ -1243,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const k = core.isoAdd(m0, i), n = V.days[k] ? V.days[k][0] : 0;
       const st = k > t ? 'future' : n >= R.goal ? 'done' : frozen.has(k) ? 'frozen' : k === t ? (n ? 'part' : 'today') : n ? 'part' : k < first ? 'none' : 'miss';
       const ic = { done: 'check', frozen: 'zap', miss: 'x', part: '', today: '', future: '', none: '' }[st];
-      const lbl = { done: 'цель выполнена', frozen: 'стрик спас дефибриллятор', miss: 'занятий не было', part: n + ' ' + plural(n, W_CARDS) + ', меньше цели', today: 'сегодня, занятий ещё не было', future: 'впереди', none: 'занятий не было' }[st];
+      const lbl = { done: 'цель выполнена', frozen: 'серию сохранила защита', miss: 'занятий не было', part: n + ' ' + plural(n, W_CARDS) + ', меньше цели', today: 'сегодня, занятий ещё не было', future: 'впереди', none: 'занятий не было' }[st];
       return '<li class="wd' + (k === t ? ' is-today' : '') + '" data-s="' + st + '" aria-label="' + cap(fmtLong.format(parse(k))) + ': ' + lbl + '"><span class="wd-name">' + w + '</span><span class="wd-dot">' +
         (ic ? '<i data-lucide="' + ic + '"></i>' : st === 'part' ? '<small class="num">' + Math.min(n, 99) + '</small>' : '') + '</span></li>';
     }).join('');
@@ -1327,7 +1348,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function heatInfo(k) {
     const x = V.days[k], label = cap(fmtLong.format(parse(k))), xp = V.stats.dayXp && V.stats.dayXp[k];
     if (x && x[0]) return '<b>' + label + '</b>: ' + x[0] + ' ' + plural(x[0], W_CARDS) + (xp ? ', +' + nf.format(xp) + ' XP' : '') + (x[0] < R.goal ? ', меньше цели' : '');
-    if ((V.stats.frozen || []).includes(k)) return '<b>' + label + '</b>: занятий не было, стрик спас дефибриллятор';
+    if ((V.stats.frozen || []).includes(k)) return '<b>' + label + '</b>: занятий не было, серию сохранила защита';
     return '<b>' + label + '</b>: занятий не было';
   }
 
@@ -1673,20 +1694,20 @@ document.addEventListener('DOMContentLoaded', function () {
   /* =========================================================
      ТЕМА
      ========================================================= */
-  let theme = 'system';
-  try { const x = localStorage.getItem(THEME_KEY); if (x === 'light' || x === 'dark') theme = x; } catch (e) { /* */ }
+  let theme = 'dark';
+  try { const x = localStorage.getItem(THEME_KEY); if (x === 'light' || x === 'dark' || x === 'system') theme = x; } catch (e) { /* */ }
   const mq = matchMedia('(prefers-color-scheme: dark)');
   const isDark = () => theme === 'dark' || (theme === 'system' && mq.matches);
   function applyTheme() {
     const root = document.documentElement;
-    if (theme === 'light' || theme === 'dark') root.setAttribute('data-theme', theme); else root.removeAttribute('data-theme');
+    root.setAttribute('data-theme', isDark() ? 'dark' : 'light');
     const dark = isDark();
     $('#themeBtn').innerHTML = '<i data-lucide="' + (dark ? 'sun' : 'moon') + '"></i>';
     $('#themeBtn').setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
     $('meta[name="theme-color"]').setAttribute('content', dark ? '#070B14' : '#EDF2F8');
     $$('[data-theme-set]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.themeSet === theme)));
   }
-  function setTheme(t) { theme = t; try { if (t === 'system') localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY, t); } catch (e) { /* */ } applyTheme(); icons(); }
+  function setTheme(t) { theme = t; try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* */ } applyTheme(); icons(); }
   $('#themeBtn').addEventListener('click', () => setTheme(isDark() ? 'light' : 'dark'));
   $$('[data-theme-set]').forEach(b => b.addEventListener('click', () => setTheme(b.dataset.themeSet)));
   if (mq.addEventListener) mq.addEventListener('change', () => { applyTheme(); icons(); });
