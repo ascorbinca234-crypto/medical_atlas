@@ -55,7 +55,21 @@ test('бесплатная Фарма содержит все анимации, 
   assert.equal(vm.runInContext('Object.keys(DRUGS).length',ctx),0);
   assert.equal(vm.runInContext('KP.filter(p=>!p.locked).length',ctx),2);
   const catalog=JSON.parse(fs.readFileSync(path.join(root,'farma-atlas/topics.json')));
-  assert.deepEqual(catalog.publicRoutes,['body','drugs']);assert.deepEqual(catalog.aliases,{});
+  assert.deepEqual(catalog.publicRoutes,['body','drugs','topics']);assert.deepEqual(catalog.aliases,{});
+});
+test('публичная патанатомия содержит 3 открытые темы первых 2 занятий и закрытые заглушки остальных 23 тем',()=>{
+  const page=fs.readFileSync(path.join(root,'patan-atlas/index.html'),'utf8');
+  const m=page.match(/<script id="patan-data">\s*window\.PATAN_DATA=(\{[\s\S]*?\});\s*<\/script>/);
+  assert.ok(m, 'window.PATAN_DATA script found in patan-atlas/index.html');
+  const data=JSON.parse(m[1]);
+  const topics=data.topics;
+  assert.equal(topics.length,26);
+  assert.deepEqual(topics.filter(t=>!t.locked).map(t=>t.id),['norma','necrosis','infarction']);
+  assert.equal(topics.filter(t=>t.locked).length,23);
+  assert.ok(topics.filter(t=>t.locked).every(t=>t.def===''&&t.blocks.length===0&&t.micro.length===0&&t.macro.length===0&&t.em.length===0&&t.schemes.length===0&&t.quiz.length===0&&t._counts));
+  const catalog=JSON.parse(fs.readFileSync(path.join(root,'patan-atlas/topics.json'),'utf8'));
+  assert.deepEqual(catalog.demo,['norma','necrosis','infarction']);
+  assert.deepEqual(catalog.publicRoutes,['diag','method']);
 });
 test('восстановлена исходная полная биохимия: 131 вещество, 275 реакций, формулы и все разделы без входа',()=>{
   const read=n=>JSON.parse(fs.readFileSync(path.join(root,'biochem-atlas/data',n+'.json')));
@@ -78,3 +92,4 @@ test('полная фармакология восстанавливает да�
   assert.equal(vm.runInContext('typeof EXTRA.routes.body',ctx),'function');
   assert.equal(vm.runInContext('typeof EXTRA.routes.learn',ctx),'function');
 });
+

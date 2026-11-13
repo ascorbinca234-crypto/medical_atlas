@@ -17,7 +17,7 @@ async function fixture(t){
 test('администратор открывает все опубликованные атласы без платных прав; отзыв действует сразу',async t=>{
  const {call,store,uid,token}=await fixture(t);
  const access=JSON.parse((await call('GET','/access',null,token)).body);
- assert.equal(access.admin,true);assert.deepEqual(Object.keys(access.grants),['farma','biochem','micro','pathophys']);
+ assert.equal(access.admin,true);assert.deepEqual(Object.keys(access.grants),['farma','biochem','micro','pathophys','patan']);
  assert.equal(await store.getDoc('access:'+uid),null);
  for(const id of Object.keys(access.grants))assert.equal((await call('GET','/content-v3/'+id+'/test-topic',null,token)).status,200);
  await store.updateUser(uid,u=>{u.contentAdmin=false;});

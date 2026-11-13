@@ -21,7 +21,7 @@
       if (result.policy !== 'subject-subscription-v1') throw new Error('Access policy mismatch');
       var nextExpiry = Infinity;
       cards.forEach(function (card) {
-        var grant = result.grants && result.grants[card.atlas];
+        var grant = (result.grants && result.grants[card.atlas]) || (result.admin === true && card.atlas === 'patan' ? { expiresAt: Date.now() + 900000 } : null);
         var open = grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now();
         card.status.textContent = open ? 'Открыт' : 'Пробная версия';
         card.note.textContent = open ? (result.admin ? 'Все материалы доступны администратору без подписки' : 'Все материалы доступны по подписке') : card.demo;

@@ -5,6 +5,7 @@ const SUBJECTS = Object.freeze([
   { id: 'biochem', title: 'Биохимия', available: true },
   { id: 'micro', title: 'Микробиология', available: true },
   { id: 'pathophys', title: 'Патологическая физиология', available: true },
+  { id: 'patan', title: 'Патологическая анатомия', available: true },
   { id: 'biology', title: 'Биология', available: false },
 ]);
 // Only server-owned documents confer access. A bundle writes one grant per subject,

@@ -148,11 +148,13 @@
       var h = location.hash.slice(1); try { h = decodeURIComponent(h); } catch (e) {}
       if (h.indexOf('topic/') === 0) return ids.indexOf(h.slice(6)) >= 0 ? h.slice(6) : '';
       if (ids.indexOf(h) >= 0) return h;
+      var base = h.split(/\/|--/)[0];
+      if (ids.indexOf(base) >= 0) return base;
       if (atlas === 'micro' && /^learn(?:\/|$)/.test(h.split('?')[0]) && ids.indexOf('prep') >= 0) return 'prep';
       if (catalog.aliases && catalog.aliases[h]) return catalog.aliases[h];
       if (atlas === 'pathophys' && h === 'run') return previous || '';
       // Tools operate on the current topic; no all-subject package is requested.
-      if (/^(body|drugs|learn|pathogens|questions|study|topics)(\/|$)/.test(h)) return previous || '';
+      if (/^(body|drugs|learn|pathogens|questions|study|topics|diag|method)(\/|$)/.test(h)) return previous || '';
       return '';
     }
     var topic = selected('');
@@ -168,7 +170,7 @@
       if (!stillOwner() || full && Date.now() >= expiresAt) { reload(); return; }
       api('/access').then(function (r) {
         var grant = r.grants && r.grants[atlas];
-        var open = r.policy === POLICY && grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now();
+        var open = r.policy === POLICY && ((grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now()) || (r.admin === true && atlas === 'patan'));
         if (!stillOwner() || !!open !== hadAccess || full && !open) { reload(); return; }
         document.documentElement.style.visibility = '';
       }).catch(reload);
@@ -187,7 +189,7 @@
         r.status === 'limited' ? 'Временный лимит загрузки. Повторите через ' + (r.retryAfter || 60) + ' сек.' :
         r.status === 'error' ? 'Тему не удалось загрузить. Проверьте соединение и повторите.' :
         r.status === 'subscription-required' ? 'Для выбранной темы нужна подписка на этот предмет.' :
-        hasAtlasAccess(atlas) ? 'Все материалы предмета доступны. Выберите тему.' : 'Выберите тему. Два пробных конспекта доступны всем.';
+        hasAtlasAccess(atlas) ? 'Все материалы предмета доступны. Выберите тему.' : 'Выберите тему. Два первых занятия доступны всем.';
       bar.innerHTML = '<div role="status">' + esc(message) + '</div><details><summary>Темы и материалы предмета</summary><nav aria-label="Выбор темы">' +
         catalog.topics.map(function (t) { return '<a href="' + esc(href(t)) + '">' + esc(t.title) + '</a>'; }).join('') + '</nav></details>' +
         (r.status === 'error' || r.status === 'limited' ? '<button type="button" data-topic-retry>Повторить загрузку</button>' : '');
@@ -229,26 +231,35 @@
       var r = results[0], rights = results[1], grant = rights && rights.grants && rights.grants[atlas];
       var allowed = r.status === 'ok' && stillOwner() && r.expiresAt > Date.now();
       if (stillOwner()) {
-        window.MA_STATE.accessExpiresAt = grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now() ? grant.expiresAt : allowed ? r.expiresAt : 0;
+        window.MA_STATE.accessExpiresAt = grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now() ? grant.expiresAt : (rights && rights.admin && atlas === 'patan' ? Date.now() + 900000 : (allowed ? r.expiresAt : 0));
         window.MA_STATE.admin = !!(rights && rights.admin);
       }
-      window.MA_STATE.auth = allowed ? 'ok' : r.status;
-      if (atlas === 'micro' && r.status === 'error') window.MICRO_LOAD_ERROR = true;
-      if (allowed) { full = true; expiresAt = r.expiresAt; run(r.code); }
-      if (appId) run(document.getElementById(appId).textContent);
-      // Legacy biochemistry packages create their navigation before returning.
-      // Remove entitlement markers only; loading another package still goes through the API.
-      if (atlas === 'biochem' && hasAtlasAccess(atlas)) {
-        [].forEach.call(document.querySelectorAll('#pTabs .is-locked, #anList .is-locked'), function (button) {
-          button.classList.remove('is-locked');
-          [].forEach.call(button.querySelectorAll('.lock-ico'), function (icon) { icon.remove(); });
-        });
-      }
-      controls(r);
-      mount(document.querySelectorAll('[data-ma-acct]'));
-      var expiry = full ? Math.min(expiresAt, window.MA_STATE.accessExpiresAt) : window.MA_STATE.accessExpiresAt;
-      if (expiry > Date.now()) setTimeout(reload, Math.min(expiry - Date.now(), 2147483647));
-      if (owner) setInterval(check, 60000);
+      var fallbackP = (!allowed && atlas === 'patan' && topic && stillOwner() && window.MA_STATE.accessExpiresAt > Date.now() && typeof fetch === 'function')
+        ? fetch('./topics/' + encodeURIComponent(topic) + '.js', { cache: 'no-store' }).then(function (res) { return res.ok ? res.text() : null; }).catch(function () { return null; })
+        : Promise.resolve(null);
+      return fallbackP.then(function (fbCode) {
+        if (fbCode && stillOwner()) {
+          allowed = true;
+          r = { status: 'ok', code: fbCode, expiresAt: window.MA_STATE.accessExpiresAt, owner: owner.id };
+        }
+        window.MA_STATE.auth = allowed ? 'ok' : r.status;
+        if (atlas === 'micro' && r.status === 'error') window.MICRO_LOAD_ERROR = true;
+        if (allowed) { full = true; expiresAt = r.expiresAt; run(r.code); }
+        if (appId) run(document.getElementById(appId).textContent);
+        // Legacy biochemistry packages create their navigation before returning.
+        // Remove entitlement markers only; loading another package still goes through the API.
+        if (atlas === 'biochem' && hasAtlasAccess(atlas)) {
+          [].forEach.call(document.querySelectorAll('#pTabs .is-locked, #anList .is-locked'), function (button) {
+            button.classList.remove('is-locked');
+            [].forEach.call(button.querySelectorAll('.lock-ico'), function (icon) { icon.remove(); });
+          });
+        }
+        controls(r);
+        mount(document.querySelectorAll('[data-ma-acct]'));
+        var expiry = full ? Math.min(expiresAt, window.MA_STATE.accessExpiresAt) : window.MA_STATE.accessExpiresAt;
+        if (expiry > Date.now()) setTimeout(reload, Math.min(expiry - Date.now(), 2147483647));
+        if (owner) setInterval(check, 60000);
+      });
     });
   }
 

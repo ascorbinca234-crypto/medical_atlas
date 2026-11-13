@@ -121,6 +121,15 @@
       return true;
     }
 
+    // 5. Атлас патологической анатомии (/patan-atlas/)
+    if (/\/patan-atlas(\/|$)/i.test(path)) {
+      if (!h || h === 'home' || h === 'diag' || h === 'method') return false;
+      if (/^(diag|method)(\/|--|$)/i.test(h)) return false;
+      if (document.querySelector('[data-patan-locked="true"]')) return false;
+      // Любая открытая тема (#norma, #necrosis, #infarction и др.) — это конспект
+      return true;
+    }
+
     // Главная страница (/), Личный кабинет (/cabinet/), Авторизация (/auth/) — НЕ конспекты
     return false;
   }

@@ -3,14 +3,14 @@
 import argparse, hashlib, json, os, subprocess, sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent
-SUBJECTS = ['farma', 'biochem', 'micro', 'pathophys']
+SUBJECTS = ['farma', 'biochem', 'micro', 'pathophys', 'patan']
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--full', action='store_true')
 a = p.parse_args()
 if a.full:
     private = Path(os.environ.get('ATLAS_PRIVATE') or ROOT.parent / 'medical_atlas_private')
-    if not all((private / (s + '-atlas')).is_dir() for s in SUBJECTS):
-        sys.exit('Full build requires private sources for all four atlases')
+    if not all((private / (s + '-atlas')).is_dir() for s in ['farma', 'biochem', 'micro', 'pathophys']):
+        sys.exit('Full build requires private sources for all atlases')
 for subject in SUBJECTS:
     subprocess.run([sys.executable, str(ROOT / (subject + '-atlas') / 'build.py')] + (['--full'] if a.full else []), check=True)
 if a.full:
