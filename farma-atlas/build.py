@@ -138,7 +138,7 @@ body{{margin:0}}
 <script>window.MA_TOPICS={read(root / "topics.json")};</script>
 <script>window.MA_FARMA_OVERVIEW={read(src / "overview.json")};</script>
 <script src="../auth/config.js"></script>
-<script src="../auth/auth.js?v=farma-20261113-v5"></script>
+<script src="../auth/auth.js?v=20261113-nav2"></script>
 <script src="../progress/progress.js?v=farma-20261113-v5"></script>
 <script>
 {data_js}

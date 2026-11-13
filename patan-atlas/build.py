@@ -384,6 +384,8 @@ else{var s=document.createElement('script');s.textContent=code;document.body.app
     assert old_boot in out_html, 'old_boot not found'
     out_html = out_html.replace(old_boot, new_boot, 1)
 
+    # Keep the shared navigation script fresh when rebuilding from private sources.
+    out_html = re.sub(r"auth/auth\.js\?v=[^\"'\s>]+", 'auth/auth.js?v=20261113-nav2', out_html)
     (ROOT / 'index.html').write_text(out_html, encoding='utf-8')
     print('Pathological Anatomy: 26 topics, 2 open lessons (3 demo topics), 26 protected packages')
 
