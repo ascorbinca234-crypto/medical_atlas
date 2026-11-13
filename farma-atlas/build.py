@@ -118,10 +118,11 @@ body{{margin:0}}
 </style>
 </head>
 <body>
-<div class="mbar" lang="ru"><a href="#">Атлас фармакологии</a><div class="acct" data-ma-acct="compact"></div><button type="button" id="menuBtn" aria-expanded="false" aria-controls="rail"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Листы</button></div>
+<div class="mbar" lang="ru"><a href="../" style="display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:8px 12px;border:1px solid #dce5f2;border-radius:10px;background:#f7f9fd;color:#315c99;font:600 14px/1.3 system-ui,sans-serif;text-decoration:none">← Главное меню</a><div class="acct" data-ma-acct="compact"></div><button type="button" id="menuBtn" aria-expanded="false" aria-controls="rail"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Листы</button></div>
 <div class="scrim" id="scrim"></div>
 <div class="app" lang="ru">
   <aside class="rail" id="rail">
+    <a href="../" style="display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:8px 12px;border:1px solid #dce5f2;border-radius:10px;background:#f7f9fd;color:#315c99;font:600 14px/1.3 system-ui,sans-serif;text-decoration:none">← Главное меню</a>
     <a class="brand" href="#"><b>Атлас фармакологии</b><span>3 курс · лечебный факультет</span></a>
     <div class="acct" data-ma-acct></div>
     <div class="search">
