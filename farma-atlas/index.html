@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html data-atlas-design="green" data-atlas-page="farma" lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -1932,8 +1932,11 @@ html.rd-focus .page{margin-inline:auto;max-width:860px}
 .locked-hero h1{font-size:clamp(30px,5.4vw,56px);line-height:1.05;overflow-wrap:anywhere;hyphens:auto}
 
 </style>
+<link rel="stylesheet" href="../design/unified.css?v=park-spacing-2">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('medical-atlas-theme') === 'dark' ? 'dark' : 'light'; } catch (_) { document.documentElement.dataset.theme = 'light'; }</script>
 </head>
 <body>
+<header class="atlas-global"><a class="atlas-logo" href="../index.html">Medical <span>Atlas</span></a><nav aria-label="Все атласы"><a href="../farma-atlas/index.html" aria-current="page">Фармакология</a><a href="../biochem-atlas/index.html">Биохимия</a><a href="../micro-atlas/index.html">Микробиология</a><a href="../pathophys-atlas/index.html">Патофизиология</a><a href="../chemistry-atlas/index.html">Химия</a><a href="../patan-atlas/index.html">Патанатомия</a><a href="../cabinet/index.html">Кабинет</a></nav><button id="atlas-theme" class="atlas-theme" type="button" role="switch" aria-label="Тёмная тема" aria-checked="false">Светлая</button></header>
 <div class="mbar" lang="ru"><a href="../" style="display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:8px 12px;border:1px solid #dce5f2;border-radius:10px;background:#f7f9fd;color:#315c99;font:600 14px/1.3 system-ui,sans-serif;text-decoration:none">← Главное меню</a><div class="acct" data-ma-acct="compact"></div><button type="button" id="menuBtn" aria-expanded="false" aria-controls="rail"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>Листы</button></div>
 <div class="scrim" id="scrim"></div>
 <div class="app" lang="ru">
@@ -4906,5 +4909,6 @@ if(document.fonts && document.fonts.status!=='loaded'){ let done=false; const go
 })();
 </script>
 <script src="../assets/anti-theft-guard.js?v=20261114-v6"></script>
+<script src="../design/unified.js?v=fda7b0c-search"></script>
 </body>
 </html>

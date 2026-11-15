@@ -1,0 +1,854 @@
+@font-face {
+  font-family: "Atlas Golos";
+  src: url("images/golos-text-medium.ttf") format("truetype");
+  font-weight: 500;
+  font-display: swap;
+}
+:root[data-atlas-design] {
+  --atlas-bg: #f3f6f3;
+  --atlas-surface: #ffffff;
+  --atlas-soft: #e8f0eb;
+  --atlas-ink: #17362b;
+  --atlas-muted: #60756a;
+  --atlas-line: #d7e2da;
+  --atlas-accent: #17654e;
+  --atlas-on-accent: #ffffff;
+  --atlas-header: 68px;
+  --atlas-space: 24px;
+  color-scheme: light;
+}
+:root[data-atlas-design][data-theme="dark"] {
+  --atlas-bg: #101b18;
+  --atlas-surface: #172720;
+  --atlas-soft: #20382e;
+  --atlas-ink: #e3eee7;
+  --atlas-muted: #a2b6ab;
+  --atlas-line: #32483e;
+  --atlas-accent: #81c7ab;
+  --atlas-on-accent: #10271c;
+  color-scheme: dark;
+}
+/* Neutral interface tokens only. Semantic pigment, molecule and process colors remain original. */
+:root[data-atlas-design][data-theme] {
+  --paper: var(--atlas-bg);
+  --bg: var(--atlas-bg);
+  --sheet: var(--atlas-surface);
+  --surface: var(--atlas-surface);
+  --surface-2: var(--atlas-soft);
+  --frost: var(--atlas-soft);
+  --ink: var(--atlas-ink);
+  --ink-2: var(--atlas-muted);
+  --ink-3: var(--atlas-muted);
+  --muted: var(--atlas-muted);
+  --mute: var(--atlas-muted);
+  --line: var(--atlas-line);
+  --edge: var(--atlas-line);
+  --rule: var(--atlas-line);
+  --rule-2: var(--atlas-line);
+  --accent: var(--atlas-accent);
+  --accent-ink: var(--atlas-on-accent);
+  --accent-soft: var(--atlas-soft);
+  --nav: #153e30;
+  --nav-2: #1d4b3a;
+  --nav-3: #28654e;
+  --nav-ink: #f0f6f2;
+  --nav-ink-2: #bdd1c5;
+  --f-body: "Atlas Golos", "Golos Text", system-ui, sans-serif;
+  --f-display: "Atlas Golos", "Golos Text", system-ui, sans-serif;
+  --font-sans: "Atlas Golos", system-ui, sans-serif;
+  --color-abyss: var(--atlas-bg);
+  --color-deep: var(--atlas-surface);
+  --color-ink: var(--atlas-ink);
+  --color-mute: var(--atlas-muted);
+}
+html[data-atlas-design],
+html[data-atlas-design] body {
+  background: var(--atlas-bg);
+  color: var(--atlas-ink);
+  font-family: var(--f-body);
+}
+html[data-atlas-design] {
+  scroll-padding-top: calc(var(--atlas-header) + 24px);
+}
+body {
+  margin: 0;
+}
+.atlas-global {
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 45;
+  min-height: var(--atlas-header);
+  padding: 12px clamp(16px, 3vw, 40px);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: var(--atlas-surface);
+  border-bottom: 1px solid var(--atlas-line);
+  font: 500 14px/1.4 var(--f-body);
+}
+.atlas-global a {
+  color: var(--atlas-muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.atlas-global .atlas-logo {
+  color: var(--atlas-ink);
+  font-size: 19px;
+  letter-spacing: -0.025em;
+}
+.atlas-logo span {
+  color: var(--atlas-accent);
+}
+.atlas-global nav {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+}
+.atlas-global nav a {
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.atlas-global nav a:hover,
+.atlas-global a[aria-current="page"] {
+  background: var(--atlas-soft);
+  color: var(--atlas-accent);
+}
+.atlas-theme {
+  margin-left: auto;
+  flex-shrink: 0;
+  border: 1px solid var(--atlas-line);
+  border-radius: 24px;
+  padding: 8px 13px;
+  color: var(--atlas-ink);
+  background: var(--atlas-soft);
+  font: inherit;
+  cursor: pointer;
+}
+.atlas-theme i {
+  font-style: normal;
+  color: var(--atlas-accent);
+  margin-right: 6px;
+}
+html[data-atlas-design] :focus-visible {
+  outline: 2px solid var(--atlas-accent);
+  outline-offset: 3px;
+}
+/* Keep original rail and mobile drawer behavior, with space for the shared header. */
+[data-atlas-page="farma"] .rail,
+[data-atlas-page="micro"] .rail {
+  top: var(--atlas-header);
+  height: calc(100dvh - var(--atlas-header));
+}
+[data-atlas-page] .mbar {
+  top: var(--atlas-header);
+}
+[data-atlas-page="cabinet"] .top {
+  top: var(--atlas-header);
+}
+[data-atlas-page="home"] > body > header:not(.atlas-global) {
+  top: var(--atlas-header);
+}
+[data-atlas-design] .nav a[aria-current="page"],
+[data-atlas-design] .mtabs a[aria-current="page"],
+[data-atlas-design] .views button[aria-selected="true"],
+[data-atlas-design] .tabs .tab[aria-selected="true"] {
+  background: var(--atlas-soft);
+  color: var(--atlas-accent);
+  border-color: var(--atlas-line);
+}
+[data-atlas-design] .nav a[aria-current="page"] .n {
+  color: var(--atlas-accent);
+}
+[data-atlas-design] .rail .brand {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--atlas-line);
+}
+[data-atlas-design] .search input {
+  border-radius: 10px;
+  background: var(--atlas-surface);
+}
+[data-atlas-design] .btn.pri:not(.pp-danger),
+[data-atlas-design] .ma-login {
+  background: var(--atlas-accent);
+  color: var(--atlas-on-accent);
+  border-color: var(--atlas-accent);
+}
+/* Legacy theme controls keep their handlers, but the shared switch is the visible control. */
+[data-atlas-design] #themeBtn,
+[data-atlas-design] #theme {
+  display: none;
+}
+/* Landing surfaces: do not recolor SVG/canvas scientific content. */
+[data-atlas-page="home"] .hero-bg,
+[data-atlas-page="home"] section,
+[data-atlas-page="home"] footer,
+[data-atlas-page="home"] body > header:not(.atlas-global) {
+  background: var(--atlas-bg);
+  border-color: var(--atlas-line);
+}
+[data-atlas-page="home"] .hero-bg::before {
+  opacity: 0.15;
+}
+[data-atlas-page="home"] .glass,
+[data-atlas-page="home"] .sheet,
+[data-atlas-page="home"] .auth-card {
+  background: var(--atlas-surface);
+  border-color: var(--atlas-line);
+}
+[data-atlas-page="home"] .text-grad {
+  background: none;
+  color: var(--atlas-ink);
+}
+[data-atlas-page="home"] .btn-grad {
+  background: var(--atlas-accent);
+  color: var(--atlas-on-accent);
+  box-shadow: none;
+}
+[data-atlas-page="home"] .input {
+  background: var(--atlas-bg);
+  color: var(--atlas-ink);
+  border-color: var(--atlas-line);
+}
+[data-atlas-page="home"] :is(h1, h2, h3, h4, dd, label) {
+  color: var(--atlas-ink);
+}
+[data-atlas-page="home"] :is(p, dt, small) {
+  color: var(--atlas-muted);
+}
+[data-atlas-page="home"] .text-white {
+  color: var(--atlas-ink);
+}
+[data-atlas-page="home"] .tab-btn[aria-selected="true"] {
+  color: var(--atlas-accent);
+  background: var(--atlas-soft);
+}
+[data-atlas-page="home"] .auth-shell {
+  background: var(--atlas-line);
+}
+[data-atlas-page="home"] .auth-shell::before {
+  opacity: 0.12;
+}
+.atlas-catalog {
+  max-width: 1280px;
+  margin: auto;
+  padding: 64px 32px;
+}
+.atlas-catalog-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.atlas-catalog h2 {
+  font-size: clamp(28px, 3vw, 40px);
+  letter-spacing: -0.025em;
+  margin: 0 0 12px;
+}
+.atlas-catalog p {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.atlas-catalog input {
+  padding: 12px 16px;
+  background: var(--atlas-surface);
+  color: var(--atlas-ink);
+  border: 1px solid var(--atlas-line);
+  border-radius: 9px;
+  width: 220px;
+}
+.atlas-grid-new {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.atlas-cover-card {
+  min-width: 0;
+  border: 1px solid var(--atlas-line);
+  background: var(--atlas-surface);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.atlas-cover-image {
+  width: 100%;
+  border: 0;
+  padding: 0;
+  cursor: zoom-in;
+  position: relative;
+  display: block;
+  background: #1b211e;
+  overflow: hidden;
+}
+.atlas-cover-image img {
+  width: 100%;
+  height: 170px;
+  display: block;
+  object-fit: cover;
+  filter: grayscale(1);
+}
+.atlas-cover-image span {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  font: 11px/1.4 var(--f-body);
+  color: white;
+  background: #10251dcc;
+  border-radius: 4px;
+  padding: 4px 7px;
+}
+.atlas-cover-content {
+  padding: 20px;
+}
+.atlas-card-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--atlas-muted);
+  font:
+    11px/1.4 ui-monospace,
+    monospace;
+}
+.atlas-cover-content h3 {
+  font-size: 21px;
+  letter-spacing: -0.025em;
+  margin: 18px 0 10px;
+}
+.atlas-cover-content p {
+  min-height: 72px;
+  font-size: 13px;
+}
+.atlas-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 22px;
+}
+.atlas-card-bottom strong {
+  display: block;
+  font: 500 23px/1.3 var(--f-body);
+  font-variant-numeric: tabular-nums;
+}
+.atlas-card-bottom small {
+  font-size: 11px;
+}
+.atlas-card-bottom a {
+  color: var(--atlas-accent);
+  text-decoration: none;
+  font-size: 12px;
+}
+.atlas-image-dialog {
+  max-width: min(900px, 94vw);
+  max-height: 92dvh;
+  border: 1px solid var(--atlas-line);
+  border-radius: 12px;
+  padding: 20px;
+  background: var(--atlas-surface);
+  color: var(--atlas-ink);
+}
+.atlas-image-dialog::backdrop {
+  background: #071b13cc;
+}
+.atlas-image-dialog img {
+  display: block;
+  max-width: 100%;
+  max-height: 65dvh;
+  margin: 12px auto;
+  object-fit: contain;
+}
+.atlas-image-dialog p {
+  max-width: 70ch;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.atlas-image-dialog a {
+  color: var(--atlas-accent);
+}
+.atlas-image-dialog button {
+  float: right;
+  border: 1px solid var(--atlas-line);
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: var(--atlas-soft);
+  color: var(--atlas-ink);
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .atlas-global,
+  .atlas-theme,
+  .atlas-cover-card {
+    transition:
+      background-color 0.25s,
+      color 0.25s,
+      border-color 0.25s,
+      transform 0.25s;
+  }
+  .atlas-cover-card:hover {
+    transform: translateY(-4px);
+  }
+  .atlas-cover-image img {
+    transition: transform 0.4s ease;
+  }
+  .atlas-cover-image:hover img {
+    transform: scale(1.045);
+  }
+  .atlas-image-dialog[open] {
+    animation: atlas-dialog-enter 0.22s ease-out;
+  }
+  @keyframes atlas-dialog-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+@media (max-width: 1100px) {
+  .atlas-global {
+    gap: 12px;
+  }
+  .atlas-global nav a {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  .atlas-grid-new {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  :root[data-atlas-design] {
+    --atlas-header: 108px;
+  }
+  .atlas-global {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    gap: 8px;
+  }
+  .atlas-global nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .atlas-global nav a {
+    font-size: 12px;
+  }
+  .atlas-catalog {
+    padding: 40px 16px;
+  }
+  .atlas-catalog-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .atlas-catalog input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 480px) {
+  .atlas-grid-new {
+    grid-template-columns: 1fr;
+  }
+  .atlas-cover-image img {
+    height: 200px;
+  }
+}
+
+/* Keep sticky topic navigation below the global navigation. */
+@media (min-width: 1024px) {
+  [data-atlas-page="pathophys"] #patho-root .lg\:sticky {
+    top: var(--atlas-header);
+    max-height: calc(100dvh - var(--atlas-header));
+  }
+}
+[data-atlas-page="home"] .atlas-cover-content {
+  color: var(--atlas-ink);
+}
+[data-atlas-page="home"] .atlas-cover-content small {
+  color: var(--atlas-muted);
+}
+[data-atlas-page="home"] .atlas-global a {
+  color: var(--atlas-muted);
+}
+[data-atlas-page="home"] .atlas-global .atlas-logo {
+  color: var(--atlas-ink);
+}
+
+.atlas-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 22px;
+  margin-top: 28px;
+}
+.atlas-hero-actions a {
+  font:
+    500 14px/1.45 "Atlas Golos",
+    system-ui,
+    sans-serif;
+  color: var(--atlas-accent);
+  text-decoration: none;
+}
+.atlas-hero-actions .atlas-primary {
+  padding: 14px 22px;
+  background: var(--atlas-accent);
+  color: var(--atlas-on-accent);
+  border-radius: 9px;
+}
+[data-atlas-page="home"] a[href="#atlases"]:not(.atlas-primary):not(.btn-grad) {
+  color: var(--atlas-accent);
+}
+
+/* Refreshed six-atlas navigation and real landing search. */
+.atlas-global nav {
+  flex: 1;
+  min-width: 0;
+}
+.atlas-global .atlas-logo {
+  flex-shrink: 0;
+}
+.atlas-instant-search {
+  margin-top: 24px;
+}
+.atlas-search-label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.atlas-search-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--atlas-surface);
+  border: 1px solid var(--atlas-line);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+.atlas-search-field:focus-within {
+  outline: 2px solid var(--atlas-accent);
+  outline-offset: 2px;
+}
+.atlas-search-field input {
+  min-width: 0;
+  flex: 1;
+  width: 100%;
+  padding: 8px 2px;
+  font: 500 14px/1.5 var(--f-body);
+  background: transparent;
+  color: var(--atlas-ink);
+  border: 0;
+  outline: none;
+}
+.atlas-search-field input::placeholder {
+  color: var(--atlas-muted);
+  opacity: 1;
+}
+#atlas-search-shortcut {
+  flex-shrink: 0;
+  color: var(--atlas-ink);
+  background: var(--atlas-soft);
+  border: 1px solid var(--atlas-line);
+  border-radius: 5px;
+  padding: 3px 7px;
+  cursor: pointer;
+}
+#atlas-search-shortcut kbd {
+  font:
+    12px/1.5 ui-monospace,
+    monospace;
+}
+#atlas-search-status {
+  margin-top: 10px;
+  font-size: 12px;
+}
+#atlas-search-results {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  max-height: 330px;
+  overflow-y: auto;
+}
+#atlas-search-results a {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  color: var(--atlas-ink);
+  border-bottom: 1px solid var(--atlas-line);
+  text-decoration: none;
+  font-size: 14px;
+}
+#atlas-search-results a:hover,
+#atlas-search-results a:focus-visible {
+  background: var(--atlas-soft);
+}
+#atlas-search-results small {
+  font-size: 11px;
+  color: var(--atlas-muted);
+}
+[data-atlas-page="home"] .fd-card {
+  background: var(--atlas-surface);
+  border-color: var(--atlas-line);
+}
+[data-atlas-page="home"] .fd-info {
+  background: var(--atlas-soft);
+  border-color: var(--atlas-line);
+}
+[data-atlas-page="home"] :is(.fd-pause, .fd-subject, .fd-eyebrow, .fd-source a) {
+  color: var(--atlas-accent);
+}
+[data-atlas-page="home"] .fd-controls button {
+  background: var(--atlas-surface);
+  color: var(--atlas-ink);
+  border-color: var(--atlas-line);
+}
+[data-atlas-page="home"] .fd-controls button[aria-pressed="true"] {
+  background: var(--atlas-soft);
+  border-color: var(--atlas-accent);
+  color: var(--atlas-accent);
+}
+:root[data-atlas-design][data-theme] {
+  --surface-subtle: var(--atlas-soft);
+  --border: var(--atlas-line);
+  --border-strong: var(--atlas-muted);
+  --ink-secondary: var(--atlas-muted);
+  --primary: var(--atlas-accent);
+  --primary-hover: var(--atlas-accent);
+  --primary-soft: var(--atlas-soft);
+}
+[data-atlas-page="chemistry"] .rail {
+  top: var(--atlas-header);
+  height: calc(100dvh - var(--atlas-header));
+}
+
+/* The longer lecture abbreviation needs room before its title. */
+[data-atlas-page="farma"] .pcard[href="#k-park"] .num {
+  transform: translateX(-10px);
+  white-space: nowrap;
+}
+
+/* Chemistry: theme-aware surfaces, including the original hard-coded white blocks. */
+:root[data-atlas-page="chemistry"][data-theme] {
+  --blue: var(--atlas-accent);
+  --deep: var(--atlas-ink);
+  --pale: var(--atlas-soft);
+}
+[data-atlas-page="chemistry"]
+  :is(
+    .rail,
+    .mbar,
+    .welcome,
+    .module,
+    .sheet,
+    .lab,
+    .process,
+    .secondary,
+    .pill,
+    .footnav button,
+    .lab-select button,
+    .quiz-reset,
+    .mbar button,
+    .formula-index a,
+    .formula-filter input,
+    .formula-card,
+    .math-guide-grid div,
+    .skip
+  ) {
+  background: var(--atlas-surface);
+  border-color: var(--atlas-line);
+  color: var(--atlas-ink);
+}
+[data-atlas-page="chemistry"]
+  :is(
+    .welcome,
+    .search,
+    .formula,
+    .clinical,
+    .exam,
+    .live,
+    .process-step,
+    .process-description,
+    .quiz-feedback,
+    .formula-dialog,
+    .enzyme-equation,
+    .formula-expression,
+    .math-guide,
+    .formula-badge,
+    .formula-example
+  ) {
+  background: var(--atlas-soft);
+  border-color: var(--atlas-line);
+  color: var(--atlas-ink);
+}
+[data-atlas-page="chemistry"]
+  :is(
+    .nav button,
+    .nav-group summary,
+    .rail-bottom,
+    .rail-bottom p,
+    .search > span,
+    .search kbd,
+    .quiet,
+    .topbar,
+    .topbar b,
+    .section-head > span,
+    .module small,
+    .sheet p,
+    .lab-note,
+    .legend,
+    .process-step b,
+    .chart-caption,
+    .learning-note,
+    .formula-card p,
+    .formula-card .formula-idea,
+    .formula-card-top,
+    .formula-example p,
+    footer
+  ) {
+  color: var(--atlas-muted);
+}
+[data-atlas-page="chemistry"]
+  :is(
+    .nav button.active,
+    .nav button:hover,
+    .lab-select button.active,
+    .process-step.current,
+    .quiz label:has(input:checked),
+    .module-icon,
+    .module:nth-child(2) .module-icon,
+    .module:nth-child(3) .module-icon
+  ) {
+  background: var(--atlas-soft);
+  color: var(--atlas-accent);
+  border-color: var(--atlas-accent);
+}
+[data-atlas-page="chemistry"] :is(.primary, .process-control, .quiz-check, .formula-dialog button) {
+  background: var(--atlas-accent);
+  color: var(--atlas-on-accent);
+}
+[data-atlas-page="chemistry"] .primary:hover {
+  filter: brightness(1.08);
+}
+[data-atlas-page="chemistry"] :is(.formula-card h3, .sheet h3, .stat strong) {
+  color: var(--atlas-ink);
+}
+[data-atlas-page="chemistry"] .search input {
+  background: transparent;
+  border: 0;
+  padding: 3px 0;
+  color: var(--atlas-ink);
+}
+[data-atlas-page="chemistry"] .search input::placeholder {
+  color: var(--atlas-muted);
+  opacity: 1;
+}
+[data-atlas-page="chemistry"] .chart text {
+  fill: var(--atlas-muted);
+}
+[data-atlas-page="chemistry"] .chart .gridline {
+  stroke: var(--atlas-line);
+}
+[data-atlas-page="chemistry"] .chart-area {
+  fill: var(--atlas-soft);
+}
+[data-atlas-page="chemistry"] .chart-dot {
+  stroke: var(--atlas-surface);
+}
+[data-atlas-page="chemistry"] .enzyme-track {
+  background: var(--atlas-line);
+}
+[data-atlas-page="chemistry"][data-theme="dark"] .quiz-feedback.wrong {
+  background: #44252b;
+  color: #ffc1c8;
+}
+[data-atlas-page="chemistry"][data-theme="dark"] .quiz-feedback.pending {
+  background: #3d3420;
+  color: #f0d58d;
+}
+/* Scientific raster formula images keep their original paper background. */
+
+/* Light-mode synapse: pale cellular fills; retain the original dark-mode palette and motion. */
+[data-atlas-page="home"][data-theme="light"] #gPre stop:first-child {
+  stop-color: #e3f3f5;
+}
+[data-atlas-page="home"][data-theme="light"] #gPre stop:last-child {
+  stop-color: #c3e2e7;
+}
+[data-atlas-page="home"][data-theme="light"] #gPost stop:first-child {
+  stop-color: #c4e5d8;
+}
+[data-atlas-page="home"][data-theme="light"] #gPost stop:last-child {
+  stop-color: #f4faf7;
+}
+[data-atlas-page="home"][data-theme="light"] .syn-label {
+  background: #edf4f1;
+  color: #34584c;
+  border-color: #b9d3c7;
+}
+[data-atlas-page="home"][data-theme="light"] #syn [data-part="pre"] > path {
+  stroke: #4b9bab;
+}
+[data-atlas-page="home"][data-theme="light"] #syn [data-part="post"] > path {
+  stroke: #3c9a79;
+}
+
+/* Decorative DNA stays fixed behind the complete home page. */
+[data-atlas-page="home"] .hero-bg {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+[data-atlas-page="home"] .hero-bg::before { display: none; }
+.atlas-dna-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.atlas-dna-backdrop video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: grayscale(1) invert(1) contrast(1.15);
+  mix-blend-mode: screen;
+  opacity: .95;
+}
+[data-theme="light"] .atlas-dna-backdrop video {
+  filter: grayscale(1) brightness(0.94) contrast(1.5);
+  mix-blend-mode: multiply;
+  opacity: .85;
+}
+.atlas-dna-toggle {
+  position: fixed;
+  right: clamp(16px, 3vw, 40px);
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  padding: 6px 10px;
+  border: 1px solid var(--atlas-line);
+  border-radius: 8px;
+  background: var(--atlas-surface);
+  color: var(--atlas-muted);
+  font: 500 11px/1.4 var(--f-body);
+  cursor: pointer;
+}
+@media (max-width: 760px) {
+  .atlas-dna-backdrop video { object-position: 55% center; }
+}
+
+[data-atlas-page="home"] body {
+  position: relative;
+  isolation: isolate;
+}
+[data-atlas-page="home"] main,
+[data-atlas-page="home"] main > section,
+[data-atlas-page="home"] .hero-bg {
+  background: transparent;
+}
+
+/* Molecular bonds are open strokes, never filled polygons. */
+[data-atlas-page="chemistry"] .molecule .bond { fill: none; }
+
+.atlas-access-note { padding: 0 20px 16px; margin: 0; color: var(--atlas-muted); font-size: 11px; }

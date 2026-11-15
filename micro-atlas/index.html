@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html data-atlas-design="green" data-atlas-page="micro" lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -1139,8 +1139,11 @@ html.pp-lock{overflow:hidden}
 }
 :root[data-theme="dark"] .btn.pri,:root[data-theme="dark"] .chip.on,:root[data-theme="dark"] .mtabs a[aria-current="page"],:root[data-theme="dark"] .btn.pp-danger.pri{color:#140F26}
 </style>
+<link rel="stylesheet" href="../design/unified.css?v=fda7b0c-search">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('medical-atlas-theme') === 'dark' ? 'dark' : 'light'; } catch (_) { document.documentElement.dataset.theme = 'light'; }</script>
 </head>
 <body>
+<header class="atlas-global"><a class="atlas-logo" href="../index.html">Medical <span>Atlas</span></a><nav aria-label="Все атласы"><a href="../farma-atlas/index.html">Фармакология</a><a href="../biochem-atlas/index.html">Биохимия</a><a href="../micro-atlas/index.html" aria-current="page">Микробиология</a><a href="../pathophys-atlas/index.html">Патофизиология</a><a href="../chemistry-atlas/index.html">Химия</a><a href="../patan-atlas/index.html">Патанатомия</a><a href="../cabinet/index.html">Кабинет</a></nav><button id="atlas-theme" class="atlas-theme" type="button" role="switch" aria-label="Тёмная тема" aria-checked="false">Светлая</button></header>
 
 <div class="app">
   <header class="mbar">
@@ -3629,5 +3632,6 @@ function photoPager(learn){
 })();
 </script>
 <script src="../assets/anti-theft-guard.js?v=20261114-v6"></script>
+<script src="../design/unified.js?v=fda7b0c-search"></script>
 </body>
 </html>

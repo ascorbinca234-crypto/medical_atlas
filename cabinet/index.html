@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html data-atlas-design="green" data-atlas-page="cabinet" lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -717,8 +717,11 @@ main{padding-block:30px 72px}.overview-intro{display:flex;align-items:end;justif
 @media(prefers-reduced-motion:reduce){.sweep,.m-heart,.monitor[data-state="flat"] .m-status .dot,.monitor[data-state="wait"] .m-status .dot,.wd[data-s="today"] .wd-dot{animation:none!important}}
 
 </style>
+<link rel="stylesheet" href="../design/unified.css?v=fda7b0c-search">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('medical-atlas-theme') === 'dark' ? 'dark' : 'light'; } catch (_) { document.documentElement.dataset.theme = 'light'; }</script>
 </head>
 <body>
+<header class="atlas-global"><a class="atlas-logo" href="../index.html">Medical <span>Atlas</span></a><nav aria-label="Все атласы"><a href="../farma-atlas/index.html">Фармакология</a><a href="../biochem-atlas/index.html">Биохимия</a><a href="../micro-atlas/index.html">Микробиология</a><a href="../pathophys-atlas/index.html">Патофизиология</a><a href="../chemistry-atlas/index.html">Химия</a><a href="../patan-atlas/index.html">Патанатомия</a><a href="../cabinet/index.html">Кабинет</a></nav><button id="atlas-theme" class="atlas-theme" type="button" role="switch" aria-label="Тёмная тема" aria-checked="false">Светлая</button></header>
 <a class="skip" href="#main">К содержимому</a>
 
 <header class="top">
@@ -1952,5 +1955,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <script src="../assets/anti-theft-guard.js?v=20261114-v6"></script>
+<script src="../design/unified.js?v=fda7b0c-search"></script>
 </body>
 </html>

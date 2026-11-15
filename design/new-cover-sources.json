@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "chemistry",
+    "file": "weddellite-sem.jpg",
+    "title": "Кристаллы оксалата кальция на поверхности почечного камня",
+    "author": "Kempf EK",
+    "source": "https://commons.wikimedia.org/wiki/File:Crystals_of_Weddellite_on_the_surface_of_a_kidney_stone_(SEM,_30_KV,_no.14).jpg",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  {
+    "slug": "patan",
+    "file": "cancer-cell-sem.jpg",
+    "title": "Опухолевая клетка молочной железы под электронным микроскопом",
+    "author": "National Cancer Institute · фотограф неизвестен",
+    "source": "https://commons.wikimedia.org/wiki/File:Breast_cancer_cell.jpg",
+    "license": "Public domain",
+    "license_url": "https://creativecommons.org/publicdomain/mark/1.0/"
+  }
+]

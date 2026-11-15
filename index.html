@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" class="no-js">
+<html data-atlas-design="green" data-atlas-page="home" lang="ru" class="no-js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -1937,9 +1937,14 @@ opacity: 0;
 /*tw:end*/
 </style>
 <link rel="stylesheet" href="assets/free-diagrams.css?v=motion1">
-<script defer src="assets/free-diagrams.js?v=motion1"></script>
+<script defer src="assets/free-diagrams.js?v=plaque-label-2"></script>
+<link rel="stylesheet" href="design/unified.css?v=dna-contrast-3">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem('medical-atlas-theme') === 'dark' ? 'dark' : 'light'; } catch (_) { document.documentElement.dataset.theme = 'light'; }</script>
 </head>
 <body class="min-h-screen overflow-x-hidden">
+<div class="atlas-dna-backdrop" aria-hidden="true"><video id="atlas-dna-video" data-src="design/video/dna-registration.mp4" poster="design/video/dna-poster.jpg" muted loop playsinline preload="none" tabindex="-1"></video></div>
+<button class="atlas-dna-toggle" id="atlas-dna-toggle" type="button" aria-pressed="false">Ⅱ Пауза анимации</button>
+<header class="atlas-global"><a class="atlas-logo" href="index.html">Medical <span>Atlas</span></a><nav aria-label="Все атласы"><a href="farma-atlas/?v=farma-20261113">Фармакология</a><a href="biochem-atlas/index.html">Биохимия</a><a href="micro-atlas/index.html">Микробиология</a><a href="pathophys-atlas/index.html">Патофизиология</a><a href="chemistry-atlas/index.html">Химия</a><a href="patan-atlas/index.html">Патанатомия</a><a href="cabinet/index.html">Кабинет</a></nav><button id="atlas-theme" class="atlas-theme" type="button" role="switch" aria-label="Тёмная тема" aria-checked="false">Светлая</button></header>
 
 <!-- ===================== Шапка ===================== -->
 <header class="sticky top-0 z-50 border-b border-white/[0.07] bg-abyss/70 backdrop-blur-lg">
@@ -1982,13 +1987,15 @@ opacity: 0;
 
 <!-- ===================== Первый экран ===================== -->
 <section class="hero-bg relative isolate overflow-x-clip">
+
+
   <div class="relative mx-auto grid max-w-7xl items-center gap-12 px-4 pb-20 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-[1.45fr_1fr] lg:gap-14 lg:px-8 lg:pb-28 lg:pt-20">
     <div>
       <p class="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[13.5px] leading-snug text-[#CBD5E1]">
         <span aria-hidden="true">🧬</span><span>Разработано исследователями ПСПбГМУ им. И.&nbsp;П.&nbsp;Павлова и командой Med404</span>
       </p>
-      <h1 class="text-grad mt-6 text-[33px] font-extrabold leading-[1.06] tracking-[-0.035em] min-[400px]:text-[37px] sm:text-[54px] sm:leading-[1.04] xl:text-[64px]">Фундаментальная медицина и&nbsp;биология без&nbsp;зубрежки и&nbsp;хаоса</h1>
-      <p class="mt-6 max-w-[38rem] text-[17px] leading-relaxed text-[#B6C2D4] sm:text-lg">Интерактивный атлас нового поколения. Изучай химию, фармакологию, биохимию, микробиологию, патофизиологию и патанатомию через схемы, клинические параллели и режим Active&nbsp;Recall. Биология — следующая.</p>
+      <h1 class="text-grad mt-6 text-[33px] font-extrabold leading-[1.06] tracking-[-0.035em] min-[400px]:text-[37px] sm:text-[54px] sm:leading-[1.04] xl:text-[64px]">Медицинский атлас.<br>От молекулы до клиники.</h1>
+      <p class="mt-6 max-w-[38rem] text-[17px] leading-relaxed text-[#B6C2D4] sm:text-lg">Интерактивный атлас нового поколения. Изучай химию, фармакологию, биохимию, микробиологию, патофизиологию и патанатомию через схемы, клинические параллели и режим Active&nbsp;Recall. Биология — следующая.</p><div class="atlas-hero-actions"><a href="#atlases" class="atlas-primary">Выбрать атлас ↗</a><a href="farma-atlas/?v=farma-20261113">Попробовать тему →</a></div>
       <p class="mt-6 flex items-center gap-3 text-[14.5px] text-[#CBD5E1]">
         <span class="live-dot" aria-hidden="true"></span>
         <span>Без регистрации в каждом атласе открыты первые два занятия или пробные разделы</span>
@@ -2136,6 +2143,42 @@ opacity: 0;
     </div>
   </div>
 </section>
+<section id="atlases"><div class="atlas-catalog">
+<div class="atlas-catalog-head"><div><h2>Выберите предмет</h2><p>Шесть дисциплин — единая картина. Пробные темы доступны без подписки.</p></div><input id="atlas-search" type="search" placeholder="Найти предмет…" aria-label="Найти атлас"></div>
+<div class="atlas-grid-new"><article data-ma-atlas="farma" class="atlas-cover-card" data-search="фармакология">
+  <button class="atlas-cover-image" type="button" data-atlas-photo="design/images/insulin-crystals.jpg" data-credit="Кристаллы инсулина. NASA / Marshall Space Flight Center. &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Insulincrystals.jpg&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Оригинал&lt;/a&gt; · &lt;a href=&quot;https://creativecommons.org/publicdomain/mark/1.0/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Public domain&lt;/a&gt;. На обложке: кадрирование и чёрно-белое отображение." aria-label="Рассмотреть: Кристаллы инсулина">
+    <img src="design/images/insulin-crystals.jpg" alt="Кристаллы инсулина" loading="lazy"><span>NASA / Marshall · Рассмотреть ↗</span>
+  </button>
+  <div class="atlas-cover-content"><div class="atlas-card-meta"><span data-ma-access-status>Пробная версия</span><span>MEDICAL ATLAS</span><span>01</span></div>
+    <h3>Фармакология</h3><p>Механизмы действия, группы препаратов, показания и побочные эффекты.</p><div class="atlas-card-bottom"><div><strong>523</strong><small>препарата</small></div>
+    <a  href="farma-atlas/?v=farma-20261113">Открыть атлас ↗</a></div>
+  </div>
+<p class="atlas-access-note" data-ma-access-note>Без подписки: два первых занятия</p></article><article data-ma-atlas="biochem" class="atlas-cover-card" data-search="биохимия">
+  <button class="atlas-cover-image" type="button" data-atlas-photo="design/images/collagen-cells-sem.jpg" data-credit="Клетки на коллагеновой губке. CSIRO. &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:CSIRO_ScienceImage_293_Cells_Interacting_With_Collagen.jpg&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Оригинал&lt;/a&gt; · &lt;a href=&quot;https://creativecommons.org/licenses/by/3.0/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;CC BY 3.0&lt;/a&gt;. На обложке: кадрирование и чёрно-белое отображение." aria-label="Рассмотреть: Клетки на коллагеновой губке">
+    <img src="design/images/collagen-cells-sem.jpg" alt="Клетки на коллагеновой губке" loading="lazy"><span>CSIRO · Рассмотреть ↗</span>
+  </button>
+  <div class="atlas-cover-content"><div class="atlas-card-meta"><span data-ma-access-status>Пробная версия</span><span>MEDICAL ATLAS</span><span>02</span></div>
+    <h3>Биохимия</h3><p>От структуры молекул до метаболических путей и клинических связей.</p><div class="atlas-card-bottom"><div><strong>275</strong><small>реакций</small></div>
+    <a  href="biochem-atlas/index.html">Открыть атлас ↗</a></div>
+  </div>
+<p class="atlas-access-note" data-ma-access-note>Без подписки: два первых занятия</p></article><article data-ma-atlas="micro" class="atlas-cover-card" data-search="микробиология">
+  <button class="atlas-cover-image" type="button" data-atlas-photo="design/images/ecoli-sem.jpg" data-credit="Escherichia coli. NIAID / National Institutes of Health. &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:E._coli_Bacteria_(7316101966).jpg&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Оригинал&lt;/a&gt; · &lt;a href=&quot;https://creativecommons.org/licenses/by/2.0/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;CC BY 2.0&lt;/a&gt;. На обложке: кадрирование и чёрно-белое отображение." aria-label="Рассмотреть: Escherichia coli">
+    <img src="design/images/ecoli-sem.jpg" alt="Escherichia coli" loading="lazy"><span>NIAID · Рассмотреть ↗</span>
+  </button>
+  <div class="atlas-cover-content"><div class="atlas-card-meta"><span data-ma-access-status>Пробная версия</span><span>MEDICAL ATLAS</span><span>03</span></div>
+    <h3>Микробиология</h3><p>Микроорганизмы, патогенность, лабораторная диагностика и лечение.</p><div class="atlas-card-bottom"><div><strong>118</strong><small>досье</small></div>
+    <a  href="micro-atlas/index.html">Открыть атлас ↗</a></div>
+  </div>
+<p class="atlas-access-note" data-ma-access-note>Без подписки: два первых занятия</p></article><article data-ma-atlas="pathophys" class="atlas-cover-card" data-search="патофизиология">
+  <button class="atlas-cover-image" type="button" data-atlas-photo="design/images/blood-cells-sem.jpg" data-credit="Клетки крови под электронным микроскопом. Bruce Wetzel, Harry Schaefer / National Cancer Institute. &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:SEM_blood_cells.jpg&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Оригинал&lt;/a&gt; · &lt;a href=&quot;https://creativecommons.org/publicdomain/mark/1.0/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Public domain&lt;/a&gt;. На обложке: кадрирование и чёрно-белое отображение." aria-label="Рассмотреть: Клетки крови под электронным микроскопом">
+    <img src="design/images/blood-cells-sem.jpg" alt="Клетки крови под электронным микроскопом" loading="lazy"><span>NCI · Рассмотреть ↗</span>
+  </button>
+  <div class="atlas-cover-content"><div class="atlas-card-meta"><span data-ma-access-status>Пробная версия</span><span>MEDICAL ATLAS</span><span>04</span></div>
+    <h3>Патофизиология</h3><p>Механизмы повреждения, компенсации и развития заболеваний.</p><div class="atlas-card-bottom"><div><strong>28</strong><small>тем</small></div>
+    <a  href="pathophys-atlas/index.html">Открыть атлас ↗</a></div>
+  </div>
+<p class="atlas-access-note" data-ma-access-note>Без подписки: два первых занятия</p></article><article data-ma-atlas="chemistry" class="atlas-cover-card" data-search="химия"><button type="button" class="atlas-cover-image" data-atlas-photo="design/images/weddellite-sem.jpg" data-credit="Кристаллы оксалата кальция на поверхности почечного камня. Kempf EK. &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Crystals_of_Weddellite_on_the_surface_of_a_kidney_stone_(SEM,_30_KV,_no.14).jpg&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Оригинал&lt;/a&gt; · &lt;a href=&quot;https://creativecommons.org/licenses/by-sa/3.0/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;CC BY-SA 3.0&lt;/a&gt;. Обложка: кадрирование средствами CSS; полный снимок без изменений." aria-label="Рассмотреть: Кристаллы оксалата кальция на поверхности почечного камня"><img src="design/images/weddellite-sem.jpg" alt="Кристаллы оксалата кальция на поверхности почечного камня" loading="lazy"><span>Kempf EK · Рассмотреть ↗</span></button><div class="atlas-cover-content"><div class="atlas-card-meta"><span data-ma-access-status>Пробная версия</span><span>MEDICAL ATLAS</span><span>05</span></div><h3>Медицинская химия</h3><p>Формулы, реакции и основы химии для медицинских дисциплин.</p><div class="atlas-card-bottom"><div><strong>15</strong><small>тем</small></div><a href="chemistry-atlas/index.html" >Открыть атлас ↗</a></div></div><p class="atlas-access-note" data-ma-access-note>Без подписки: два первых занятия</p></article><article data-ma-atlas="patan" class="atlas-cover-card" data-search="патанатомия"><button type="button" class="atlas-cover-image" data-atlas-photo="design/images/cancer-cell-sem.jpg" data-credit="Опухолевая клетка молочной железы под электронным микроскопом. National Cancer Institute · фотограф неизвестен. &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Breast_cancer_cell.jpg&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Оригинал&lt;/a&gt; · &lt;a href=&quot;https://creativecommons.org/publicdomain/mark/1.0/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Public domain&lt;/a&gt;. Обложка: кадрирование средствами CSS; полный снимок без изменений." aria-label="Рассмотреть: Опухолевая клетка молочной железы под электронным микроскопом"><img src="design/images/cancer-cell-sem.jpg" alt="Опухолевая клетка молочной железы под электронным микроскопом" loading="lazy"><span>NCI · Рассмотреть ↗</span></button><div class="atlas-cover-content"><div class="atlas-card-meta"><span data-ma-access-status>Пробная версия</span><span>MEDICAL ATLAS</span><span>06</span></div><h3>Патологическая анатомия</h3><p>Морфологические изменения, микро- и макропрепараты.</p><div class="atlas-card-bottom"><div><strong>26</strong><small>тем</small></div><a href="patan-atlas/index.html" >Открыть атлас ↗</a></div></div><p class="atlas-access-note" data-ma-access-note>Без подписки: два первых занятия</p></article></div><p id="atlas-search-empty" hidden role="status">Такого предмета пока нет.</p>
+</div></section>
 
 <!-- ===================== Интерактивная схема ===================== -->
 <section id="demo" class="scroll-mt-20 border-t border-white/[0.06] bg-[#0A101D]">
@@ -2296,117 +2339,7 @@ opacity: 0;
 </section>
 
 <!-- ===================== Атласы ===================== -->
-<section id="atlases" class="scroll-mt-20">
-  <div class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-    <div class="flex flex-wrap items-end justify-between gap-4" data-reveal>
-      <div class="max-w-2xl">
-        <h2 class="text-[32px] font-bold leading-tight tracking-[-0.02em] text-white sm:text-[40px]">Атласы</h2>
-        <p class="mt-4 text-[17px] leading-relaxed text-[#B6C2D4]">Шесть предметов уже на сайте: первые два занятия каждого атласа открыты без подписки, остальные материалы доступны в полной версии. Биология готовится.</p>
-      </div>
-    </div>
 
-    <div class="mt-10 grid gap-5 md:grid-cols-2" data-reveal>
-      <a data-ma-atlas="farma" href="farma-atlas/?v=farma-20261113" class="glass glow-card group relative overflow-hidden rounded-3xl p-6 sm:p-8">
-        <div class="absolute -right-16 -top-16 size-56 rounded-full bg-[#10B981]/15 blur-3xl" aria-hidden="true"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between gap-4">
-            <span class="grid size-12 place-items-center rounded-2xl border border-[#10B981]/40 bg-[#10B981]/10 text-[#6EE7B7]">
-              <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10.5 20.5 10-10a4.95 4.95 0 0 0-7-7l-10 10a4.95 4.95 0 0 0 7 7z"/><path d="m8.5 8.5 7 7"/></svg>
-            </span>
-            <span data-ma-access-status class="rounded-full border border-[#10B981]/40 bg-[#10B981]/10 px-3 py-1 text-[13px] font-medium text-[#A7F3D0]">Пробная версия</span>
-          </div>
-          <h3 class="mt-6 text-[26px] font-bold tracking-tight text-white">Фармакология</h3>
-          <p class="mt-2 text-[15.5px] leading-relaxed text-[#B6C2D4]">13 лекций в схемах, 523 препарата с дозами, показаниями и побочными эффектами, анимированная модель организма и тренажёр рецептов.</p>
-          <p data-ma-access-note class="mt-5 text-[14px] text-mute">Бесплатно: два конспекта и анимации действия 176 препаратов</p>
-          <span class="mt-6 inline-flex items-center gap-2 text-[15px] font-semibold text-[#6EE7B7]">Открыть атлас <svg class="size-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        </div>
-      </a>
-
-      <a data-ma-atlas="biochem" href="biochem-atlas/" class="glass glow-card group relative overflow-hidden rounded-3xl p-6 sm:p-8">
-        <div class="absolute -right-16 -top-16 size-56 rounded-full bg-[#06B6D4]/15 blur-3xl" aria-hidden="true"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between gap-4">
-            <span class="grid size-12 place-items-center rounded-2xl border border-[#06B6D4]/40 bg-[#06B6D4]/10 text-[#67E8F9]">
-              <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M12 8.2 15.4 10v4L12 15.8 8.6 14v-4z"/></svg>
-            </span>
-            <span data-ma-access-status class="rounded-full border border-[#06B6D4]/40 bg-[#06B6D4]/10 px-3 py-1 text-[13px] font-medium text-[#A5F3FC]">Пробная версия</span>
-          </div>
-          <h3 class="mt-6 text-[26px] font-bold tracking-tight text-white">Биохимия</h3>
-          <p class="mt-2 text-[15.5px] leading-relaxed text-[#B6C2D4]">131 вещество в учебных и скелетных формулах, 275 реакций с ферментами, метаболические пути, анимации и интервальное повторение.</p>
-          <p data-ma-access-note class="mt-5 text-[14px] text-mute">Без подписки: два первых занятия (белки и ферменты, аминокислоты и углеводы)</p>
-          <span class="mt-6 inline-flex items-center gap-2 text-[15px] font-semibold text-[#67E8F9]">Открыть атлас <svg class="size-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        </div>
-      </a>
-
-      <a data-ma-atlas="micro" href="micro-atlas/" class="glass glow-card group relative overflow-hidden rounded-3xl p-6 sm:p-8">
-        <div class="absolute -right-16 -top-16 size-56 rounded-full bg-[#06B6D4]/15 blur-3xl" aria-hidden="true"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between gap-4">
-            <span class="grid size-12 place-items-center rounded-2xl border border-[#06B6D4]/40 bg-[#06B6D4]/10 text-[#67E8F9]">
-              <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M12 8.2 15.4 10v4L12 15.8 8.6 14v-4z"/></svg>
-            </span>
-            <span data-ma-access-status class="rounded-full border border-[#06B6D4]/40 bg-[#06B6D4]/10 px-3 py-1 text-[13px] font-medium text-[#A5F3FC]">Пробная версия</span>
-          </div>
-          <h3 class="mt-6 text-[26px] font-bold tracking-tight text-white">Микробиология</h3>
-          <p class="mt-2 text-[15.5px] leading-relaxed text-[#B6C2D4]">29 тем в 7 зачётах. В полной версии — 118 досье, 440 вопросов, микрофотографии, анимации и карта антибиотиков.</p>
-          <p data-ma-access-note class="mt-5 text-[14px] text-mute">Без подписки: морфология и физиология микроорганизмов</p>
-          <span class="mt-6 inline-flex items-center gap-2 text-[15px] font-semibold text-[#67E8F9]">Открыть атлас <svg class="size-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        </div>
-      </a>
-
-      <a data-ma-atlas="pathophys" href="pathophys-atlas/" class="glass glow-card group relative overflow-hidden rounded-3xl p-6 sm:p-8">
-        <div class="absolute -right-16 -top-16 size-56 rounded-full bg-[#06B6D4]/15 blur-3xl" aria-hidden="true"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between gap-4">
-            <span class="grid size-12 place-items-center rounded-2xl border border-[#06B6D4]/40 bg-[#06B6D4]/10 text-[#67E8F9]">
-              <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M12 8.2 15.4 10v4L12 15.8 8.6 14v-4z"/></svg>
-            </span>
-            <span data-ma-access-status class="rounded-full border border-[#06B6D4]/40 bg-[#06B6D4]/10 px-3 py-1 text-[13px] font-medium text-[#A5F3FC]">Пробная версия</span>
-          </div>
-          <h3 class="mt-6 text-[26px] font-bold tracking-tight text-white">Патофизиология</h3>
-          <p class="mt-2 text-[15.5px] leading-relaxed text-[#B6C2D4]">28 тем по общей нозологии, типовым процессам и частной патофизиологии. Интерактивные схемы, патогенез, порочные круги и блиц-задачи.</p>
-          <p data-ma-access-note class="mt-5 text-[14px] text-mute">Без подписки: болезнь и этиология, общий патогенез</p>
-          <span class="mt-6 inline-flex items-center gap-2 text-[15px] font-semibold text-[#67E8F9]">Открыть атлас <svg class="size-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        </div>
-      </a>
-
-      <a data-ma-atlas="chemistry" href="chemistry-atlas/" class="glass glow-card group relative overflow-hidden rounded-3xl p-6 sm:p-8">
-        <div class="absolute -right-16 -top-16 size-56 rounded-full bg-[#06B6D4]/15 blur-3xl" aria-hidden="true"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between gap-4">
-            <span class="grid size-12 place-items-center rounded-2xl border border-[#06B6D4]/40 bg-[#06B6D4]/10 text-[#67E8F9]"><svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v7l-5.3 8.3A1.8 1.8 0 0 0 6.2 21h11.6a1.8 1.8 0 0 0 1.5-2.7L14 10V3M7.5 16h9"/></svg></span>
-            <span data-ma-access-status class="rounded-full border border-[#06B6D4]/40 bg-[#06B6D4]/10 px-3 py-1 text-[13px] font-medium text-[#A5F3FC]">Пробная версия</span>
-          </div>
-          <h3 class="mt-6 text-[26px] font-bold tracking-tight text-white">Медицинская химия</h3>
-          <p class="mt-2 text-[15.5px] leading-relaxed text-[#B6C2D4]">14 занятий первого семестра: конспекты, формулы, пошаговые схемы, 8 интерактивных графиков и 56 вопросов с объяснениями.</p>
-          <p data-ma-access-note class="mt-5 text-[14px] text-mute">Без подписки: два первых занятия (термодинамика и кинетика)</p>
-          <span class="mt-6 inline-flex items-center gap-2 text-[15px] font-semibold text-[#67E8F9]">Открыть атлас <svg class="size-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        </div>
-      </a>
-      <a data-ma-atlas="patan" href="patan-atlas/" class="glass glow-card group relative overflow-hidden rounded-3xl p-6 sm:p-8">
-        <div class="absolute -right-16 -top-16 size-56 rounded-full bg-[#10B981]/15 blur-3xl" aria-hidden="true"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between gap-4">
-            <span class="grid size-12 place-items-center rounded-2xl border border-[#10B981]/40 bg-[#10B981]/10 text-[#6EE7B7]">
-              <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h4l-1 6H10z"/><path d="M11 9v3"/><circle cx="11" cy="15" r="3"/><path d="M5 21h14"/><path d="M15 18a6 6 0 0 0 2-8"/></svg>
-            </span>
-            <span data-ma-access-status class="rounded-full border border-[#10B981]/40 bg-[#10B981]/10 px-3 py-1 text-[13px] font-medium text-[#A7F3D0]">Пробная версия</span>
-          </div>
-          <h3 class="mt-6 text-[26px] font-bold tracking-tight text-white">Патологическая анатомия</h3>
-          <p class="mt-2 max-w-3xl text-[15.5px] leading-relaxed text-[#B6C2D4]">12 занятий, 26 тем, 118 микропрепаратов со схемами в цветах окраски (56 из перечня кафедры + 62 дополнительных), 41 макропрепарат, 31 электронограмма, диагностикум и 184 теста.</p>
-          <p data-ma-access-note class="mt-5 text-[14px] text-mute">Без подписки: два первых занятия (норма, некроз, апоптоз и инфаркт)</p>
-          <span class="mt-6 inline-flex items-center gap-2 text-[15px] font-semibold text-[#6EE7B7]">Открыть атлас <svg class="size-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        </div>
-      </a>
-    </div>
-
-    <ul class="mt-5 grid gap-3 md:grid-cols-2" data-reveal>
-      <li class="flex items-center justify-between gap-3 rounded-2xl border border-dashed border-white/12 px-5 py-4">
-        <span class="text-[16px] font-semibold text-[#CBD5E1]">Биология</span><span class="text-[13px] text-mute">Готовится</span>
-      </li>
-    </ul>
-  </div>
-</section>
 
 <!-- ===================== Возможности ===================== -->
 <section id="features" class="scroll-mt-20 border-t border-white/[0.06] bg-[#0A101D]">
@@ -2441,12 +2374,8 @@ opacity: 0;
 
       <article class="glass glow-card rounded-3xl p-6 sm:p-8 lg:col-span-2">
         <h3 class="text-[22px] font-bold tracking-tight text-white">Мгновенный поиск</h3>
-        <p class="mt-2 text-[15.5px] leading-relaxed text-[#B6C2D4]">Препарат, группа, фермент, формула или болезнь — находится за секунду.</p>
-        <div class="mt-6 flex h-11 items-center gap-2.5 rounded-xl border border-white/10 bg-black/25 px-3.5 text-[14.5px] text-mute" aria-hidden="true">
-          <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <span class="flex-1">фенилкетонурия</span>
-          <kbd class="rounded-md border border-white/15 px-1.5 text-[12px] text-[#CBD5E1]">Ctrl K</kbd>
-        </div>
+        <p class="mt-2 text-[15.5px] leading-relaxed text-[#B6C2D4]">Найдите тему в любом атласе или вещество, формулу и клиническую связь в биохимии.</p>
+        <form id="atlas-global-search" class="atlas-instant-search" role="search"><label for="atlas-query" class="atlas-search-label">Поиск по темам шести атласов и веществам биохимии</label><div class="atlas-search-field"><input id="atlas-query" type="search" placeholder="Например, фенилкетонурия" autocomplete="off" aria-controls="atlas-search-results"><button type="button" id="atlas-search-shortcut" aria-label="Перейти к поиску, Control или Command K"><kbd>Ctrl K</kbd></button></div><p id="atlas-search-status" role="status" aria-live="polite"></p><ul id="atlas-search-results"></ul></form>
       </article>
 
       <article class="glass glow-card rounded-3xl p-6 sm:p-8 lg:col-span-2">
@@ -2893,5 +2822,7 @@ opacity: 0;
 })();
 </script>
 <script src="assets/anti-theft-guard.js?v=20261114-v6"></script>
+<dialog class="atlas-image-dialog" id="atlas-image-dialog" aria-label="Научная иллюстрация"><button type="button">Закрыть ×</button><img alt=""><p data-credit></p></dialog><script src="design/unified.js?v=fda7b0c-search"></script><script src="design/search-index.js"></script><script src="design/search.js"></script>
+<script src="design/dna-background.js?v=fixed-2"></script>
 </body>
 </html>
