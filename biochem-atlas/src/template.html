@@ -528,6 +528,37 @@ body.nocolor .glegend{display:none}
 .nin a{font-size:13.5px;padding:4px 11px;border:1px solid var(--line);border-radius:999px;color:var(--ink);text-decoration:none;background:var(--surface)}
 .nin a:hover{border-color:var(--sc)}
 .nsec{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 14px)}
+.lesson-tools{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:20px 0 16px;font-size:13px;color:var(--muted)}
+.lesson-tools>span{margin-right:auto}
+.lesson-section{border:1px solid var(--line);border-radius:14px;background:var(--surface);margin:10px 0;overflow:hidden}
+.lesson-section>summary{cursor:pointer;display:flex;align-items:center;gap:12px;padding:18px;list-style:none}
+.lesson-section>summary::-webkit-details-marker{display:none}
+.lesson-section>summary::after{content:'+';margin-left:auto;color:var(--accent);font-size:24px;line-height:1}
+.lesson-section[open]>summary::after{content:'−'}
+.nsec.lesson-section>summary h3{font-family:inherit;font-size:17px;line-height:1.45;margin:0;text-wrap:pretty}
+.lesson-section-num{color:var(--accent);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;flex:none}
+.lesson-section-body{padding:0 18px 18px;overflow-wrap:anywhere}
+.lesson-section-body>p:first-child{margin-top:0}
+.lesson-flow{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:20px;margin:18px 0}
+.flow-top{display:flex;justify-content:space-between;gap:12px;color:var(--accent);font-size:12px;font-weight:600;letter-spacing:.04em}
+.flow-track{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0 12px}
+.flow-track button{width:35px;height:35px;border:1px solid var(--line);background:var(--surface);border-radius:10px;cursor:pointer;font-size:13px;transition:background .2s,color .2s}
+.flow-track button[aria-pressed="true"]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.flow-progress{height:3px;border-radius:4px;background:var(--line);overflow:hidden;margin-bottom:20px}
+.flow-progress i{display:block;height:100%;background:var(--accent);transition:width .35s ease}
+.flow-panel h4{margin:0 0 12px;font-size:19px;line-height:1.4}
+.flow-panel:not([hidden]){animation:lesson-enter .28s ease-out}
+.lesson-equation{font-size:clamp(17px,2vw,21px);font-weight:500;line-height:1.7;padding:16px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;background:var(--surface);overflow-wrap:anywhere}
+.lesson-enzyme{color:var(--accent);font-size:13px;font-weight:500}
+.flow-controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.flow-hint{font-size:12px;color:var(--muted);margin:12px 0 0!important;line-height:1.6}
+.lesson-reaction{margin:18px 0;border-top:1px solid var(--line);padding-top:16px}
+.lesson-reaction figcaption{font-weight:600;margin:0 0 10px}
+.lesson-source a{color:var(--accent);text-underline-offset:3px}
+@keyframes lesson-enter{from{opacity:.25;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.flow-panel:not([hidden]){animation:none}.flow-progress i,.flow-track button{transition:none}}
+@media(max-width:600px){.lesson-section>summary{padding:14px}.lesson-section-body{padding:0 12px 14px}.lesson-flow{padding:14px}.lesson-tools>span{width:100%}.lesson-equation{padding:12px}.flow-controls .btn{min-height:42px}.flow-track button{width:38px;height:38px}}
+@media print{.lesson-tools,.flow-controls,.flow-track{display:none}.lesson-section{break-inside:auto}.flow-panel[hidden]{display:block!important}.lesson-flow{background:white}}
 .nsec h3,.nsubs h3,.nquiz h3{font-family:Spectral,Georgia,serif;font-weight:600;font-size:23px;line-height:1.2;margin:32px 0 10px;text-wrap:balance}
 .nbody p,.nbody li{font-size:16.5px;line-height:1.7}
 .nbody p{margin:0 0 12px;max-width:68ch}
@@ -2879,6 +2910,9 @@ const NBY = Object.fromEntries(NOTES.map(t => [t.id, t]));
 const SUBNOTES = {};
 const stripTags = s => String(s).replace(/<[^>]+>/g, " ");
 function blockText(b) {
+  if (b[0] === "steps") return b[1].map(s => s.join(" ")).join(" ");
+  if (b[0] === "reaction") return b.slice(1).join(" ");
+  if (b[0] === "source") return b[1];
   if (b[0] === "p") return b[1];
   if (b[0] === "ul" || b[0] === "ol") return b[1].join(" ");
   if (b[0] === "tbl") return b[1].concat.apply(b[1], b[2]).join(" ");
@@ -2934,7 +2968,31 @@ function renderNoteToc() {
     ? (shown ? "Найдено тем: " + shown : "Ничего не найдено. Попробуйте другое слово.")
     : "<span>Прочитано " + nr + " из " + NOTES.length + "</span>" + '<span class="sbar" aria-hidden="true"><i style="width:' + Math.round(nr / NOTES.length * 100) + '%"></i></span>';
 }
+let lessonTimer = null, lessonPlaying = null;
+function stopLessonFlow() {
+  if (lessonTimer !== null) clearInterval(lessonTimer);
+  lessonTimer = null;
+  if (lessonPlaying) {
+    const b = lessonPlaying.querySelector('[data-flow-play]');
+    if (b) { b.textContent = 'Воспроизвести'; b.setAttribute('aria-pressed','false'); }
+  }
+  lessonPlaying = null;
+}
+function setLessonStep(flow, index) {
+  const panels = Array.from(flow.querySelectorAll('[data-flow-panel]'));
+  index = Math.max(0, Math.min(panels.length-1, index));
+  flow.dataset.index = String(index);
+  panels.forEach((p,i) => { p.hidden = i !== index; });
+  flow.querySelectorAll('[data-flow-step]').forEach((b,i) => b.setAttribute('aria-pressed', String(i===index)));
+  flow.querySelector('[data-flow-count]').textContent = (index+1) + ' / ' + panels.length;
+  flow.querySelector('.flow-progress i').style.width = ((index+1)/panels.length*100) + '%';
+  flow.querySelector('[data-flow-prev]').disabled = index === 0;
+  flow.querySelector('[data-flow-next]').disabled = index === panels.length-1;
+}
 function blockHTML(b) {
+  if (b[0] === "steps") return '<div class="lesson-flow" data-flow><div class="flow-top"><span>Механизм по шагам</span><span data-flow-count>1 / ' + b[1].length + '</span></div><div class="flow-track" role="group" aria-label="Выбрать этап">' + b[1].map((s,i) => '<button type="button" data-flow-step="' + i + '" aria-label="Этап ' + (i+1) + ': ' + esc(stripTags(s[0])) + '" aria-pressed="' + (i===0) + '">' + (i+1) + '</button>').join('') + '</div><div class="flow-progress" aria-hidden="true"><i style="width:' + (100/b[1].length) + '%"></i></div><div class="flow-panels">' + b[1].map((s,i) => '<div class="flow-panel" data-flow-panel="' + i + '"' + (i ? ' hidden' : '') + '><h4>' + s[0] + '</h4><div class="lesson-equation">' + s[1] + '</div><p class="lesson-enzyme">' + s[2] + '</p><p>' + s[3] + '</p></div>').join('') + '</div><div class="flow-controls"><button class="btn sm" type="button" data-flow-prev disabled>Назад</button><button class="btn sm" type="button" data-flow-play aria-pressed="false">Воспроизвести</button><button class="btn sm" type="button" data-flow-next>Далее</button></div><p class="flow-hint">Выбирай этапы или запускай показ. Стрелки обозначают превращения; скорость показа не отражает скорость реакции.</p></div>';
+  if (b[0] === "reaction") return '<figure class="lesson-reaction"><figcaption>' + b[1] + '</figcaption><div class="lesson-equation">' + b[2] + '</div><p class="lesson-enzyme">' + b[3] + '</p><p>' + b[4] + '</p></figure>';
+  if (b[0] === "source") return '<p class="lesson-source"><a href="' + b[2] + '" target="_blank" rel="noopener noreferrer">' + b[1] + ' ↗</a></p>';
   if (b[0] === "p") return "<p>" + b[1] + "</p>";
   if (b[0] === "ul") return "<ul>" + b[1].map(x => "<li>" + x + "</li>").join("") + "</ul>";
   if (b[0] === "ol") return "<ol" + (b[2] ? ' start="' + b[2] + '"' : "") + ">" + b[1].map(x => "<li>" + x + "</li>").join("") + "</ol>";
@@ -2956,7 +3014,8 @@ function noteHTML(t) {
     '<h2 class="ntitle">' + esc(t.title) + "</h2>" + (acts ? '<div class="nacts">' + acts + "</div>" : "") + "</header>" +
     '<section class="nkey" aria-label="Главное"><h3>Главное</h3><ul>' + t.sum.map(s => "<li>" + s + "</li>").join("") + "</ul></section>" +
     '<nav class="nin" aria-label="Разделы темы">' + t.secs.map((s, k) => '<a href="#" data-nsec="' + k + '">' + s.h + "</a>").join("") + "</nav>" +
-    '<div class="nbody">' + t.secs.map((s, k) => '<section class="nsec" id="ns-' + t.id + "-" + k + '"><h3>' + s.h + "</h3>" + s.b.map(blockHTML).join("") + "</section>").join("") + "</div>" +
+    '<div class="lesson-tools"><span>Разбирай тему по блокам</span><button class="btn sm" type="button" data-notes-expand>Развернуть всё</button><button class="btn sm" type="button" data-notes-collapse>Свернуть всё</button><button class="btn sm" type="button" data-notes-quiz>К вопросам</button></div>' +
+    '<div class="nbody">' + t.secs.map((s, k) => '<details class="nsec lesson-section" id="ns-' + t.id + "-" + k + '"' + (k === 0 || s.b.some(b => b[0] === "steps") ? ' open' : '') + '><summary><span class="lesson-section-num">' + String(k+1).padStart(2,'0') + '</span><h3>' + s.h + '</h3></summary><div class="lesson-section-body">' + s.b.map(blockHTML).join("") + "</div></details>").join("") + "</div>" +
     (t.subs.length ? '<section class="nsubs"><h3>Вещества темы</h3><div class="pchips">' + t.subs.map(id => '<a href="#" class="lg" data-go="' + id + '" style="--sc:' + SEC[BY[id].s].c + '"><span class="dot"></span>' + esc(sname(BY[id])) + "</a>").join("") + "</div></section>" : "") +
     (t.quiz.length ? '<section class="nquiz"><h3>Проверь себя</h3>' + t.quiz.map(q => '<details class="nq"><summary>' + q[0] + '</summary><div class="nqa">' + q[1] + "</div></details>").join("") + "</section>" : "") +
     '<footer class="nfoot"><div class="nrd"><button type="button" class="btn" id="nRead" aria-pressed="' + read + '">' + (read ? "Тема прочитана" : "Отметить тему прочитанной") + "</button>" +
@@ -2987,6 +3046,7 @@ function markText(root, words) {
   root.querySelectorAll("mark").forEach(mk => { const d = mk.closest("details"); if (d) d.open = true; });
 }
 function openNote(id, o) {
+  stopLessonFlow();
   o = o || {};
   const t = NBY[id] || NOTES[0];
   NST.cur = t.id;
@@ -2996,11 +3056,17 @@ function openNote(id, o) {
   renderNoteToc();
   try { if (location.hash !== "#n-" + t.id) history.replaceState(null, "", "#n-" + t.id); } catch (e) {}
   const w = nWords();
-  if (w.length) markText(nArt, w);
+  if (w.length) {
+    markText(nArt, w);
+    nArt.querySelectorAll('[data-flow]').forEach(flow => {
+      const hit = flow.querySelector('.flow-panel mark');
+      if (hit) setLessonStep(flow, Number(hit.closest('[data-flow-panel]').dataset.flowPanel));
+    });
+  }
   let target = null;
   if (o.focus) {
     target = nArt.querySelector('.nbody a[data-go="' + o.focus + '"]') || nArt.querySelector('a[data-go="' + o.focus + '"]');
-    if (target) target.classList.add("flash");
+    if (target) { target.classList.add("flash"); const detail = target.closest("details"); if (detail) detail.open = true; }
   }
   if (!target && w.length) target = nArt.querySelector(".nbody mark, .nquiz mark, .nkey mark");
   const behavior = REDUCE ? "auto" : "smooth";
@@ -3035,11 +3101,42 @@ nArt.addEventListener("click", ev => {
   ev.preventDefault();
   if (el.dataset.nsec !== undefined) {
     const s = $("ns-" + NST.cur + "-" + el.dataset.nsec);
-    if (s) s.scrollIntoView({block: "start", behavior: REDUCE ? "auto" : "smooth"});
+    if (s) { s.open = true; s.scrollIntoView({block: "start", behavior: REDUCE ? "auto" : "smooth"}); }
   } else if (el.dataset.npath) { setView("paths"); renderPath(el.dataset.npath); }
   else if (el.dataset.nanim) { anCur = el.dataset.nanim; setView("anim"); anOpen(el.dataset.nanim); }
   else if (el.dataset.nt) openNote(el.dataset.nt, {scroll: true});
 });
+nArt.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-flow-step],[data-flow-prev],[data-flow-next],[data-flow-play],[data-notes-expand],[data-notes-collapse],[data-notes-quiz]');
+  if (!b) return;
+  if (b.hasAttribute('data-notes-expand') || b.hasAttribute('data-notes-collapse')) {
+    stopLessonFlow();
+    nArt.querySelectorAll('details.lesson-section').forEach(d => { d.open = b.hasAttribute('data-notes-expand'); });
+    return;
+  }
+  if (b.hasAttribute('data-notes-quiz')) { nArt.querySelector('.nquiz')?.scrollIntoView({block:'start',behavior:REDUCE?'auto':'smooth'}); return; }
+  const flow = b.closest('[data-flow]');
+  if (!flow) return;
+  const index = Number(flow.dataset.index || 0), count = flow.querySelectorAll('[data-flow-panel]').length;
+  if (b.hasAttribute('data-flow-play')) {
+    if (lessonPlaying === flow) { stopLessonFlow(); return; }
+    stopLessonFlow();
+    if (index === count-1) setLessonStep(flow,0);
+    lessonPlaying = flow; b.textContent = 'Пауза'; b.setAttribute('aria-pressed','true');
+    lessonTimer = setInterval(() => {
+      if (!flow.isConnected || document.hidden || view !== 'notes' || !flow.closest('details').open) { stopLessonFlow(); return; }
+      const next = Number(flow.dataset.index || 0)+1;
+      if (next >= count) { stopLessonFlow(); return; }
+      setLessonStep(flow,next);
+      if (next === count-1) stopLessonFlow();
+    },6500);
+  } else {
+    stopLessonFlow();
+    setLessonStep(flow, b.hasAttribute('data-flow-step') ? Number(b.dataset.flowStep) : index + (b.hasAttribute('data-flow-next') ? 1 : -1));
+  }
+});
+nArt.addEventListener('toggle', ev => { if (lessonPlaying && ev.target.contains(lessonPlaying) && !ev.target.open) stopLessonFlow(); }, true);
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopLessonFlow(); });
 $("nq").addEventListener("input", ev => {
   nQuery = ev.target.value;
   renderNoteToc();
@@ -3072,6 +3169,7 @@ NST.ready = true;
 /* ---------- views & theme ---------- */
 let view = "atlas";
 function setView(v) {
+  if (v !== "notes") stopLessonFlow();
   view = v;
   document.querySelectorAll(".views [role=tab]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.view === v)));
   $("v-atlas").hidden = v !== "atlas"; $("v-rx").hidden = v !== "rx"; $("v-paths").hidden = v !== "paths"; $("v-study").hidden = v !== "study"; $("v-anim").hidden = v !== "anim"; $("v-notes").hidden = v !== "notes";

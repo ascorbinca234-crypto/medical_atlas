@@ -76,6 +76,9 @@ def parse_note(path, num, names, problems):
     tid = re.sub(r"^\d+-", "", path.stem)
     where = f"notes/{path.name}"
     lines = path.read_text(encoding="utf-8").splitlines()
+    deep = NOTES_DIR / "deep" / path.name
+    if deep.exists():
+        lines += [""] + deep.read_text(encoding="utf-8").splitlines()
     meta, i = {}, 0
     while i < len(lines) and lines[i].strip():
         key, sep, val = lines[i].partition(":")
@@ -129,7 +132,28 @@ def parse_note(path, num, names, problems):
         if not s:
             flush()
             continue
-        if s.startswith("! "):
+        if s.startswith("@step ") or s.startswith("@reaction "):
+            flush()
+            tag, body = s.split(" ", 1)
+            cells = [c.strip() for c in body.split(" | ")]
+            if sec is None or len(cells) != 4 or not all(cells):
+                problems.append(f"{where}, строка {ln}: {tag} требует раздел и 4 непустых поля через ' | '")
+            else:
+                values = [fx(c, ln) for c in cells]
+                if tag == "@step":
+                    if not sec["b"] or sec["b"][-1][0] != "steps":
+                        sec["b"].append(["steps", []])
+                    sec["b"][-1][1].append(values)
+                else:
+                    sec["b"].append(["reaction", *values])
+        elif s.startswith("@source "):
+            flush()
+            label, sep, url = s[8:].partition(" | ")
+            if sec is None or not sep or not re.fullmatch(r"https://[^\s<>\"']+", url):
+                problems.append(f"{where}, строка {ln}: @source требует название и безопасный https URL")
+            else:
+                sec["b"].append(["source", html.escape(label), html.escape(url, quote=True)])
+        elif s.startswith("! "):
             flush()
             topic["sum"].append(fx(s[2:], ln))
         elif s.startswith("## "):
