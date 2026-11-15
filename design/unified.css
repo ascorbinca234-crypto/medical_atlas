@@ -852,3 +852,13 @@ html[data-atlas-design] :focus-visible {
 [data-atlas-page="chemistry"] .molecule .bond { fill: none; }
 
 .atlas-access-note { padding: 0 20px 16px; margin: 0; color: var(--atlas-muted); font-size: 11px; }
+
+/* Social sign-in needs an explicit border on both light and dark surfaces. */
+[data-atlas-design] :is(#pVk, #pYandex, #pV, #pY) {
+  border: 1px solid var(--atlas-line);
+  background: var(--atlas-soft);
+  color: var(--atlas-ink);
+}
+[data-atlas-design] :is(#pVk, #pYandex, #pV, #pY):hover {
+  border-color: var(--atlas-accent);
+}
