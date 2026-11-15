@@ -56,11 +56,19 @@ test('сбой общего хранилища и повреждённый па�
  let f=await setup(t);f.store.putDoc=async()=>{throw Error('db unavailable');};assert.equal((await f.call()).status,500);
  f=await setup(t);fs.writeFileSync(path.join(f.dir,'topics/farma/topic-a.js'),'tampered');assert.equal((await f.call()).status,500);
 });
-test('каждый собранный пакет синтаксически корректен; фармакология и микробиология содержат одну тему',{skip:!fs.existsSync(path.resolve(__dirname,'../content/topics'))},()=>{
+test('каждый собранный пакет синтаксически корректен; темы фармакологии, биохимии, химии и патанатомии изолированы',()=>{
  const root=path.resolve(__dirname,'../..');const out=path.join(root,'server/content/topics');
- assert.ok(fs.existsSync(out),'Run build.py --full before release verification');
- for(const atlas of ['farma','biochem','micro']){
-  const manifest=JSON.parse(fs.readFileSync(path.join(out,atlas,'manifest.json')));
+ assert.ok(fs.existsSync(out),'server/content/topics directory must exist');
+ for(const reqAtlas of ['farma','biochem','chemistry','patan']){
+  assert.ok(fs.existsSync(path.join(out,reqAtlas,'manifest.json')),'Missing manifest for '+reqAtlas);
+ }
+ const biochemCatalog=JSON.parse(fs.readFileSync(path.join(root,'biochem-atlas/topics.json'),'utf8'));
+ assert.equal(Object.keys(JSON.parse(fs.readFileSync(path.join(out,'biochem/manifest.json'),'utf8')).topics).length,34);
+ assert.equal(Object.keys(JSON.parse(fs.readFileSync(path.join(out,'chemistry/manifest.json'),'utf8')).topics).length,15);
+ for(const atlas of ['farma','biochem','chemistry','patan','micro']){
+  const mPath=path.join(out,atlas,'manifest.json');
+  if(!fs.existsSync(mPath))continue;
+  const manifest=JSON.parse(fs.readFileSync(mPath,'utf8'));
   for(const id of Object.keys(manifest.topics)) {
    const code=fs.readFileSync(path.join(out,atlas,id+'.js'),'utf8');new vm.Script(code,{filename:atlas+'/'+id});
    if(atlas==='farma' && id!=='atlas') {
@@ -69,6 +77,21 @@ test('каждый собранный пакет синтаксически ко
     const unlocked=JSON.parse(vm.runInContext('JSON.stringify([...P,...KP].filter(t=>!t.locked).map(t=>t.id))',ctx));
     assert.deepEqual(unlocked.filter(t=>!['k-gen','k-aff'].includes(t)),['k-gen','k-aff'].includes(id)?[]:[id]);
     assert.ok(vm.runInContext('Object.keys(DRUGS).length<273',ctx));
+   }
+   if(atlas==='biochem') {
+    const ctx=vm.createContext({window:{}});vm.runInContext(code,ctx);
+    const patch=ctx.window.BX_PATCH;assert.ok(patch&&typeof patch==='object',id+' must set window.BX_PATCH');
+    if(id.startsWith('sec-'))assert.ok(patch.kind==='sec'&&patch.sec===id.slice(4)&&Array.isArray(patch.substances)&&patch.substances.length>0,id+' substances');
+    if(id.startsWith('note-'))assert.ok(patch.kind==='note'&&patch.note&&patch.note.id===id.slice(5),id+' note');
+    if(id.startsWith('path-'))assert.ok(patch.kind==='path'&&patch.path&&patch.path.id===id.slice(5),id+' path');
+    if(id.startsWith('anim-'))assert.ok(patch.kind==='anim'&&patch.animId===id.slice(5)&&typeof patch.animFactory==='function',id+' anim');
+    assert.ok(biochemCatalog.topics.some(t=>t.id===id),'catalog includes '+id);
+   }
+   if(atlas==='chemistry') {
+    const ctx=vm.createContext({window:{},DATA:[],EXTRA:{},SCHEMES:{},LABS:{},FORMULA_CARDS:[],FORMULA_INTUITION:[],FORMULA_EXAMPLES:{}});
+    vm.runInContext(code,ctx);
+    if(id==='formulas'){assert.equal(ctx.window.CHEM_FORMULAS_UNLOCKED,true);assert.ok(ctx.FORMULA_CARDS.length>0);}
+    else{assert.equal(ctx.DATA.length,1);assert.equal(ctx.DATA[0].id,id);assert.equal(ctx.DATA[0].locked,false);assert.ok(ctx.EXTRA[id]);}
    }
    if(atlas==='micro') {
     const ctx=vm.createContext({window:{},document:{addEventListener(){}},localStorage:{getItem:()=>null}});

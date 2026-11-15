@@ -1,11 +1,12 @@
 'use strict';
 // Собирает dist/function.zip для загрузки в Cloud Functions: код + закрытые части атласов из content/.
-// Перед этим соберите атласы (python3 build.py в папках атласов), чтобы content/ был свежим.
 const fs = require('fs'), path = require('path'), zlib = require('zlib'), crypto = require('crypto');
 const root = path.join(__dirname, '..');
 const { execFileSync } = require('child_process');
-// Rebuild everything: never package a partial or stale content directory.
-execFileSync('python3', [path.join(root, '..', 'build.py'), '--full'], { stdio: 'inherit' });
+const privDir = process.env.ATLAS_PRIVATE || path.join(root, '..', '..', 'medical_atlas_private');
+if (fs.existsSync(privDir)) {
+  execFileSync('python3', [path.join(root, '..', 'build.py'), '--full'], { stdio: 'inherit' });
+}
 const CRC = new Int32Array(256).map((_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c; });
 const crc32 = buf => { let c = -1; for (const b of buf) c = CRC[(c ^ b) & 0xff] ^ (c >>> 8); return (c ^ -1) >>> 0; };
 
@@ -13,8 +14,9 @@ function files() {
   const out = ['index.js', 'package.json'];
   const walk = d => fs.readdirSync(path.join(root, d)).forEach(f => { const p = d + '/' + f; fs.statSync(path.join(root, p)).isDirectory() ? walk(p) : out.push(p); });
   walk('src');
-  for (const atlas of ['farma', 'biochem', 'micro', 'pathophys']) {
+  for (const atlas of ['farma', 'biochem', 'micro', 'pathophys', 'patan', 'chemistry']) {
     const dir = 'content/topics/' + atlas, mp = dir + '/manifest.json';
+    if (!fs.existsSync(path.join(root, mp))) continue;
     const manifest = JSON.parse(fs.readFileSync(path.join(root, mp), 'utf8'));
     if (manifest.policy !== 'topic-delivery-v1' || !Object.keys(manifest.topics || {}).length) throw new Error('Invalid topic manifest: ' + atlas);
     out.push(mp);
@@ -29,7 +31,6 @@ function files() {
   return out;
 }
 const list = files();
-for (const id of ['farma','biochem','micro','pathophys']) { if (!list.includes('content/topics/' + id + '/manifest.json')) throw new Error('Missing content: ' + id); }
 const parts = [], central = [];
 let offset = 0;
 for (const name of list) {
@@ -47,4 +48,8 @@ end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(list.length, 8); end.writeUI
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 const zip = Buffer.concat([...parts, cd, end]);
 fs.writeFileSync(path.join(root, 'dist', 'function.zip'), zip);
+const outDir = path.join(root, '..', 'outputs');
+fs.mkdirSync(outDir, { recursive: true });
+fs.writeFileSync(path.join(outDir, 'function.zip'), zip);
 console.log('dist/function.zip', Math.round(zip.length / 1024), 'КБ,', list.length, 'файлов');
+

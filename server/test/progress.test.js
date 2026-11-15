@@ -6,8 +6,12 @@ const server = require('../src/progress');
 const browserFile = path.join(__dirname, '..', '..', 'progress', 'progress.js');
 
 test('браузер и сервер считают опыт и стрик одинаково', { skip: !fs.existsSync(browserFile) }, () => {
-  const browser = require(browserFile);
-  assert.deepStrictEqual(browser.RULES, server.RULES);
+  const vm = require('vm');
+  const mod = { exports: {} };
+  vm.runInNewContext(fs.readFileSync(browserFile, 'utf8'), { module: mod, exports: mod.exports, Date, Uint8Array });
+  const browser = mod.exports;
+  const norm = v => JSON.parse(JSON.stringify(v));
+  assert.deepStrictEqual(norm(browser.RULES), server.RULES);
   let seed = 7;
   const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
   for (let run = 0; run < 300; run++) {
@@ -19,9 +23,9 @@ test('браузер и сервер считают опыт и стрик од�
       if (n) days[server.isoAdd(today, -i)] = [n, Math.floor(rnd() * n), Math.floor(rnd() * 4)];
     }
     const bonus = Math.floor(rnd() * 100);
-    assert.deepStrictEqual(browser.compute(days, today, bonus), server.compute(days, today, bonus));
+    assert.deepStrictEqual(norm(browser.compute(days, today, bonus)), server.compute(days, today, bonus));
     assert.strictEqual(browser.xpBetween(days, server.isoAdd(today, -5), today), server.xpBetween(days, server.isoAdd(today, -5), today));
-    assert.deepStrictEqual(browser.mergeDays([days, days]), server.mergeDays([days, days]));
+    assert.deepStrictEqual(norm(browser.mergeDays([days, days])), server.mergeDays([days, days]));
   }
 });
 

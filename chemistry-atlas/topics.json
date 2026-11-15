@@ -1,0 +1,84 @@
+{
+  "topics": [
+    {
+      "id": "lesson-1",
+      "title": "1. Термодинамика"
+    },
+    {
+      "id": "lesson-2",
+      "title": "2. Кинетика химических реакций"
+    },
+    {
+      "id": "lesson-3",
+      "title": "3. Коллигативные свойства растворов"
+    },
+    {
+      "id": "lesson-4",
+      "title": "4. Водородный показатель и буферы"
+    },
+    {
+      "id": "lesson-5",
+      "title": "5. Основы электрохимии"
+    },
+    {
+      "id": "lesson-6",
+      "title": "6. Лигандообменные равновесия"
+    },
+    {
+      "id": "lesson-7",
+      "title": "7. Гетерогенные равновесия"
+    },
+    {
+      "id": "lesson-8",
+      "title": "8. Классификация органических соединений"
+    },
+    {
+      "id": "lesson-9",
+      "title": "9. Сопряжение и ароматичность"
+    },
+    {
+      "id": "lesson-10",
+      "title": "10. Взаимное влияние атомов"
+    },
+    {
+      "id": "lesson-11",
+      "title": "11. Аминокислоты, пептиды, белки"
+    },
+    {
+      "id": "lesson-12",
+      "title": "12. Поверхностные явления"
+    },
+    {
+      "id": "lesson-13",
+      "title": "13. Дисперсные системы"
+    },
+    {
+      "id": "lesson-14",
+      "title": "14. Полимеры и растворы ВМС"
+    },
+    {
+      "id": "formulas",
+      "title": "Справочник формул"
+    }
+  ],
+  "aliases": {
+    "formula-section-0": "formulas",
+    "formula-section-1": "formulas",
+    "formula-section-2": "formulas",
+    "formula-section-3": "formulas",
+    "formula-section-4": "formulas",
+    "formula-section-5": "formulas",
+    "formula-section-6": "formulas",
+    "formula-section-7": "formulas",
+    "formula-section-8": "formulas",
+    "formula-section-9": "formulas",
+    "formula-section-10": "formulas"
+  },
+  "demo": [
+    "lesson-1",
+    "lesson-2"
+  ],
+  "publicRoutes": [
+    "start"
+  ]
+}

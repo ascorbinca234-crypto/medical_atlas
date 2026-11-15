@@ -53,10 +53,12 @@ function config(e = process.env) {
       leadTo: e.LEAD_TO || e.SMTP_USER || '',
     },
     requestTimeoutMs: 8000,
-    requiredContent: ['farma', 'biochem', 'micro', 'pathophys', 'patan'],
+    requiredContent: ['farma', 'biochem', 'micro', 'pathophys', 'patan', 'chemistry'],
     contentDir: e.CONTENT_DIR || path.join(__dirname, '..', 'content'),
     gzip: e.GZIP !== '0',
     contentLimits: { minute: 12, hour: 80, day: 250, bytesDay: 32 * 1024 * 1024 },
+    maxDevices: Number(e.MAX_DEVICES || 3),
+    maxShareDevices: Number(e.MAX_SHARE_DEVICES || 10),
     accessTtl: Number(e.ACCESS_TTL || 15 * 60),
     refreshTtl: Number(e.REFRESH_TTL || 30 * 24 * 3600),
   };

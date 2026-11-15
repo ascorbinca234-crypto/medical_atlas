@@ -5,8 +5,8 @@
      атласов (список тем / тренажёры) защита НЕ мешает пользователю и НЕ кидает страйки.
    - Как только студент открывает конспект (лекцию, лист схем, биохимический путь или тему):
      включаются водяные знаки, запрет копирования и мгновенный (0 мс) перехват
-     скриншотов (PrintScreen, Win+Shift+S, Cmd+Shift+3/4/5, Ножницы / потеря фокуса).
-   - 3 страйка на конспектах или вход 15 человек с одного аккаунта = авто-бан.
+     скриншотов (PrintScreen, Win+Shift+S, Cmd+Shift+3/4/5, печать/PDF, getDisplayMedia). Переключение вкладок и окон не вызывает ложных страйков.
+   - 3 страйка на конспектах или превышение лимита 3 устройств на аккаунте = авто-бан.
    ========================================================================== */
 (function () {
   'use strict';
@@ -18,26 +18,33 @@
 
   var style = document.createElement('style');
   style.textContent = [
-    /* Запрет выделения и перетаскивания ТОЛЬКО когда открыт конспект (body.ma-drm-active) */
+    /* Запрет выделения, системного callout на iOS/Android и перетаскивания ТОЛЬКО когда открыт конспект (body.ma-drm-active) */
     'body.ma-drm-active { -webkit-user-select: none !important; -moz-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; }',
-    'body.ma-drm-active input, body.ma-drm-active textarea { -webkit-user-select: text !important; -moz-user-select: text !important; user-select: text !important; }',
-    'body.ma-drm-active img, body.ma-drm-active svg { -webkit-user-drag: none !important; user-drag: none !important; }',
-    /* Мгновенное (0 мс) скрытие контента конспекта при попытке скриншота */
-    'body.ma-drm-shielded > *:not(#ma-drm-blur-shield):not(#ma-drm-ban-screen):not(#ma-drm-widget):not(#ma-drm-drawer):not(#ma-drm-toast) { filter: blur(36px) brightness(0.06) !important; opacity: 0.03 !important; transition: none !important; pointer-events: none !important; }',
-    /* Блокировка печати открытого конспекта */
-    '@media print { body.ma-drm-active * { display: none !important; } body.ma-drm-active::after { content: "Печать и сохранение конспектов Medical Atlas в PDF запрещены системой защиты авторских прав."; display: block !important; padding: 48px; font: 600 18px/1.5 system-ui, sans-serif; color: #1e293b; text-align: center; } }',
-    /* Диагональная сетка водяных знаков (видна только внутри конспектов) */
-    '#ma-drm-watermark { position: fixed; inset: 0; z-index: 2147482000; pointer-events: none; overflow: hidden; opacity: 0.055; display: none; grid-template-columns: repeat(4, 1fr); gap: 48px; padding: 32px; transform: rotate(-14deg) scale(1.25); font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; color: #0f172a; }',
+    'body.ma-drm-active * { -webkit-touch-callout: none !important; }',
+    'body.ma-drm-active input, body.ma-drm-active textarea { -webkit-user-select: text !important; -moz-user-select: text !important; user-select: text !important; -webkit-touch-callout: default !important; }',
+    'body.ma-drm-active img, body.ma-drm-active svg, body.ma-drm-active canvas { -webkit-user-drag: none !important; user-drag: none !important; -webkit-touch-callout: none !important; }',
+    /* Мгновенное (0 мс) размытие контента конспекта при попытке скриншота или переходе в другое окно */
+    'body.ma-drm-shielded > *:not(#ma-drm-blur-shield):not(#ma-drm-ban-screen):not(#ma-drm-widget):not(#ma-drm-drawer):not(#ma-drm-toast) { filter: blur(28px) brightness(0.18) !important; opacity: 0.12 !important; transition: none !important; pointer-events: none !important; }',
+    'body.ma-drm-window-blur > *:not(#ma-drm-blur-shield):not(#ma-drm-ban-screen):not(#ma-drm-widget):not(#ma-drm-drawer):not(#ma-drm-toast) { filter: blur(22px) !important; opacity: 0.32 !important; transition: none !important; pointer-events: none !important; user-select: none !important; }',
+    /* Блокировка печати и сохранения в PDF (в т.ч. через системное меню iOS/Android "Поделиться -> Печать") */
+    '@media print { body.ma-drm-active * { display: none !important; visibility: hidden !important; } body.ma-drm-active::after { content: "Печать и сохранение конспектов Medical Atlas в PDF запрещены системой защиты авторских прав."; display: block !important; visibility: visible !important; padding: 48px; font: 600 18px/1.5 system-ui, sans-serif; color: #1e293b; text-align: center; } }',
+    /* Адаптивная динамическая сетка водяных знаков (видна и на смартфоне, и на десктопе, не зависит от светлой/тёмной темы) */
+    '#ma-drm-watermark { position: fixed; inset: -12%; z-index: 2147482000; pointer-events: none; overflow: hidden; opacity: 0.34; display: none; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); align-content: start; gap: 38px 24px; padding: 28px; transform: rotate(-16deg) scale(1.1); transition: transform 1.2s ease; font: 700 12px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; color: rgba(100, 116, 139, 0.42); text-shadow: 0 0 1px rgba(255, 255, 255, 0.35), 0 0 1px rgba(15, 23, 42, 0.25); }',
+    '@media (min-width: 720px) { #ma-drm-watermark { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 48px 36px; opacity: 0.28; } }',
     'body.ma-drm-active #ma-drm-watermark { display: grid; }',
-    '.ma-drm-wm-cell { white-space: nowrap; user-select: none; }',
+    '.ma-drm-wm-cell { white-space: nowrap; user-select: none; overflow: hidden; text-overflow: ellipsis; }',
     /* Мгновенный экран блокировки кадра (0ms transition) */
-    '#ma-drm-blur-shield { position: fixed; inset: 0; z-index: 2147483640; background: #070b14; background: rgba(7, 11, 20, 0.98); backdrop-filter: blur(36px); -webkit-backdrop-filter: blur(36px); display: none; align-items: center; justify-content: center; padding: 24px; font-family: system-ui, -apple-system, sans-serif; transition: none !important; }',
+    '#ma-drm-blur-shield { position: fixed; inset: 0; z-index: 2147483640; background: rgba(7, 11, 20, 0.88); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); display: none; align-items: center; justify-content: center; padding: 24px; font-family: system-ui, -apple-system, sans-serif; transition: none !important; }',
+    '#ma-drm-blur-shield.is-passive { background: rgba(15, 23, 42, 0.58); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); cursor: pointer; }',
     '#ma-drm-blur-shield.is-open { display: flex !important; }',
-    '.ma-drm-modal { max-width: 500px; width: 100%; background: #ffffff; color: #0f172a; border: 2px solid #ef4444; border-radius: 16px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.85); }',
+    '.ma-drm-modal { max-width: 500px; width: 100%; background: #ffffff; color: #0f172a; border: 2px solid #ef4444; border-radius: 16px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.85); cursor: default; }',
+    '#ma-drm-blur-shield.is-passive .ma-drm-modal { border-color: #0284c7; }',
     '.ma-drm-modal-badge { display: inline-block; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font: 700 11px/1.2 ui-monospace, monospace; padding: 5px 10px; border-radius: 6px; margin-bottom: 12px; text-transform: uppercase; }',
+    '#ma-drm-blur-shield.is-passive .ma-drm-modal-badge { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }',
     '.ma-drm-modal h2 { margin: 0 0 8px; font-size: 20px; font-weight: 700; color: #0f172a; }',
     '.ma-drm-modal p { margin: 0 0 16px; font-size: 14px; line-height: 1.55; color: #334155; }',
     '.ma-drm-strike-box { background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; font-size: 13px; color: #881337; }',
+    '#ma-drm-blur-shield.is-passive .ma-drm-strike-box { background: #f0f9ff; border-color: #bae6fd; color: #0c4a6e; }',
     '.ma-drm-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 16px; border: 0; border-radius: 10px; background: #0f172a; color: #ffffff; font: 600 14px/1.2 system-ui, sans-serif; cursor: pointer; }',
     '.ma-drm-btn:hover { background: #1e293b; }',
     /* Экран полной блокировки аккаунта (BANNED за 15 человек или 3 страйка скриншотов конспекта) */
@@ -54,14 +61,14 @@
     '.ma-ban-log { background: #030712; border: 1px solid #1f2937; border-radius: 12px; padding: 12px 14px; margin-bottom: 20px; max-height: 150px; overflow-y: auto; font-size: 12px; color: #d1d5db; }',
     '.ma-ban-log-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid #111827; }',
     /* Компактный виджет управления защитой (отображается только внутри конспектов) */
-    '#ma-drm-widget { position: fixed; right: 16px; bottom: 16px; z-index: 2147483645; font-family: system-ui, -apple-system, sans-serif; display: none; }',
+    '#ma-drm-widget { position: fixed; right: 16px; bottom: 84px; z-index: 2147483645; font-family: system-ui, -apple-system, sans-serif; display: none; }',
     'body.ma-drm-active #ma-drm-widget { display: block; }',
     '#ma-drm-pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; background: #0f172a; color: #f8fafc; border: 1px solid rgba(148, 163, 184, 0.35); font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4); }',
     '#ma-drm-pill:hover { background: #1e293b; }',
     '.ma-drm-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }',
     '.ma-drm-dot.is-warn { background: #f59e0b; }',
     '.ma-drm-dot.is-danger { background: #ef4444; }',
-    '#ma-drm-drawer { position: fixed; right: 16px; bottom: 60px; z-index: 2147483645; width: 390px; max-width: calc(100vw - 32px); background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 16px; padding: 18px; box-shadow: 0 20px 45px rgba(15, 23, 42, 0.4); display: none; }',
+    '#ma-drm-drawer { position: fixed; right: 16px; bottom: 130px; z-index: 2147483645; width: 390px; max-width: calc(100vw - 32px); background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 16px; padding: 18px; box-shadow: 0 20px 45px rgba(15, 23, 42, 0.4); display: none; }',
     'body.ma-drm-active #ma-drm-drawer.is-open { display: block; }',
     '.ma-drm-drawer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; }',
     '.ma-drm-drawer-title { font-size: 14px; font-weight: 700; color: #0f172a; }',
@@ -89,6 +96,7 @@
     // 1. Атлас фармакологии (/farma-atlas/)
     if (/\/farma-atlas(\/|$)/i.test(path)) {
       if (!h || h === 'home' || h === 'topics') return false;
+      if (document.querySelector('[data-farma-locked="true"]')) return false;
       // Вспомогательные разделы меню/тренажёров — не конспекты
       if (/^(drugs|body|learn|train|cmp|find|topics)(\/|$)/i.test(h)) return false;
       // Все лекции (#k-gen, #k-aff, #k-pns...), подробные листы (#pk, #pd, #la...) и #sheet — это конспекты
@@ -97,17 +105,19 @@
 
     // 2. Атлас биохимии (/biochem-atlas/)
     if (/\/biochem-atlas(\/|$)/i.test(path)) {
+      if (document.querySelector('[data-biochem-locked="true"]')) return false;
       var vNotes = document.getElementById('v-notes');
       var vPaths = document.getElementById('v-paths');
       if (vNotes && !vNotes.hidden) return true;
       if (vPaths && !vPaths.hidden) return true;
-      if (/^(n-|topic\/)/i.test(h)) return true;
+      if (/^(n-|topic\/(note|path)-)/i.test(h)) return true;
       return false;
     }
 
     // 3. Атлас микробиологии (/micro-atlas/)
     if (/\/micro-atlas(\/|$)/i.test(path)) {
       if (!h || h === 'home') return false;
+      if (document.querySelector('[data-micro-locked="true"]')) return false;
       // Тренажёры, вопросы и анимации не считаем текстовыми конспектами
       if (/^(learn|questions|anim)(\/|$)/i.test(h)) return false;
       // Все конспекты (#g1..#g16, #t1.., #s1.., #v1.., #pathogens/..., #abx...) — защищаем
@@ -117,6 +127,7 @@
     // 4. Атлас патофизиологии (/pathophys-atlas/)
     if (/\/pathophys-atlas(\/|$)/i.test(path)) {
       if (!h || h === 'home' || h === 'run') return false;
+      if (document.querySelector('[data-pathophys-locked="true"]')) return false;
       // Любая открытая тема (#disease, #pathogenesis, #inflammation...) — это конспект
       return true;
     }
@@ -127,6 +138,14 @@
       if (/^(diag|method)(\/|--|$)/i.test(h)) return false;
       if (document.querySelector('[data-patan-locked="true"]')) return false;
       // Любая открытая тема (#norma, #necrosis, #infarction и др.) — это конспект
+      return true;
+    }
+
+    // 6. Атлас медицинской химии (/chemistry-atlas/)
+    if (/\/chemistry-atlas(\/|$)/i.test(path)) {
+      if (!h || h === 'start') return false;
+      if (document.querySelector('[data-chem-locked="true"]')) return false;
+      // Любое открытое занятие (#lesson-1..14) и справочник формул (#formulas) — это конспекты
       return true;
     }
 
@@ -237,17 +256,39 @@
 
   function activateInstantShield(reason, isStrike) {
     if (!isKonspektOpen()) return;
+    if (!blurShieldEl || state.status === 'BANNED') {
+      document.body.classList.add('ma-drm-shielded');
+      return;
+    }
+    // Если уже открыто модальное окно реального страйка, не перезаписываем его пассивным блюром фокуса
+    if (!isStrike && blurShieldEl.classList.contains('is-open') && !blurShieldEl.classList.contains('is-passive')) {
+      document.body.classList.add('ma-drm-shielded');
+      return;
+    }
     document.body.classList.add('ma-drm-shielded');
-    if (!blurShieldEl || state.status === 'BANNED') return;
+    document.body.classList.toggle('ma-drm-window-blur', !isStrike);
+    blurShieldEl.classList.toggle('is-passive', !isStrike);
+
+    var titleNode = blurShieldEl.querySelector('[data-drm-title]');
     var reasonNode = blurShieldEl.querySelector('[data-drm-blur-reason]');
-    var countNode = blurShieldEl.querySelector('[data-drm-strike-count]');
     var badgeNode = blurShieldEl.querySelector('[data-drm-badge]');
+    var boxNode = blurShieldEl.querySelector('[data-drm-strike-box]');
+
+    if (titleNode) {
+      titleNode.textContent = isStrike
+        ? 'Конспект скрыт системой защиты от скриншотов'
+        : 'Конспект размыт при переходе в другое окно';
+    }
     if (reasonNode) reasonNode.textContent = reason;
-    if (countNode) countNode.textContent = state.strikes.length + ' из ' + state.maxStrikes;
     if (badgeNode) {
       badgeNode.textContent = isStrike
         ? 'ЗАФИКСИРОВАН СТРАЙК НА КОНСПЕКТЕ (' + state.strikes.length + '/' + state.maxStrikes + ')'
-        : 'ЗАЩИТА КОНСПЕКТА ОТ СКРИНШОТОВ АКТИВНА';
+        : 'ЗАЩИТА ЭКРАНА · БЕЗ СТРАЙКА';
+    }
+    if (boxNode) {
+      boxNode.innerHTML = isStrike
+        ? '<b>Счётчик нарушений: <span data-drm-strike-count>' + state.strikes.length + ' из ' + state.maxStrikes + '</span>.</b><br>В главном меню и личном кабинете ограничений нет, но внутри конспектов при 3 попытках сделать скриншот или скопировать схему доступ блокируется автоматически.'
+        : '<b>Страйк за переход в другое окно не начисляется (нарушений: <span data-drm-strike-count>' + state.strikes.length + ' из ' + state.maxStrikes + '</span>).</b><br>Нажмите кнопку ниже или кликните по экрану, чтобы продолжить чтение конспекта.';
     }
     blurShieldEl.classList.add('is-open');
   }
@@ -259,7 +300,8 @@
     } else {
       document.body.classList.remove('ma-drm-active');
       document.body.classList.remove('ma-drm-shielded');
-      if (blurShieldEl) blurShieldEl.classList.remove('is-open');
+      document.body.classList.remove('ma-drm-window-blur');
+      if (blurShieldEl) blurShieldEl.classList.remove('is-open', 'is-passive');
       if (banScreenEl) banScreenEl.classList.remove('is-banned');
       if (drawerEl) {
         drawerOpen = false;
@@ -278,10 +320,10 @@
     if (authUser && authUser.email) state.email = authUser.email;
     if (authUser && authUser.id) state.userId = authUser.id;
 
-    // 1. Update Watermark cells
+    // 1. Update Watermark cells ("Медицинский атлас 2026")
     var wmHtml = '';
-    for (var i = 0; i < 20; i++) {
-      wmHtml += '<div class="ma-drm-wm-cell"><div>' + state.email + '</div><div>ID: ' + state.userId + ' · ЗАЩИТА АВТОРСКИХ ПРАВ</div></div>';
+    for (var i = 0; i < 24; i++) {
+      wmHtml += '<div class="ma-drm-wm-cell">Медицинский атлас 2026</div>';
     }
     watermarkEl.innerHTML = wmHtml;
 
@@ -416,6 +458,21 @@
 
     if (isStaticHost) return;
 
+    var ma = window.MA;
+    if (ma && typeof ma.signedIn === 'function' && ma.signedIn() && typeof ma.api === 'function') {
+      var apiPath = String(url).replace(/^\/api(?=\/)/, '');
+      ma.api(apiPath, { body: payload || {} })
+        .then(function (data) {
+          if (data && data.userId) {
+            state = data;
+            saveLocalState(state);
+            renderUI();
+          }
+        })
+        .catch(function () {});
+      return;
+    }
+
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -464,18 +521,24 @@
     blurShieldEl.innerHTML =
       '<div class="ma-drm-modal">' +
         '<div class="ma-drm-modal-badge" data-drm-badge>ЗАФИКСИРОВАН СТРАЙК НА КОНСПЕКТЕ</div>' +
-        '<h2>Конспект скрыт системой защиты от скриншотов</h2>' +
+        '<h2 data-drm-title>Конспект скрыт системой защиты от скриншотов</h2>' +
         '<p data-drm-blur-reason>Обнаружена попытка создания скриншота конспекта (PrintScreen / Win+Shift+S / Cmd+Shift+3/4) или вызова программы захвата экрана.</p>' +
-        '<div class="ma-drm-strike-box">' +
+        '<div class="ma-drm-strike-box" data-drm-strike-box>' +
           '<b>Счётчик нарушений: <span data-drm-strike-count>1 из 3</span>.</b><br>' +
           'В главном меню и личном кабинете ограничений нет, но внутри конспектов при 3 попытках сделать скриншот или скопировать схему доступ блокируется автоматически.' +
         '</div>' +
         '<button type="button" class="ma-drm-btn" data-drm-unblur>Я понял, вернуться к чтению конспекта</button>' +
       '</div>';
     document.body.appendChild(blurShieldEl);
-    blurShieldEl.querySelector('[data-drm-unblur]').addEventListener('click', function () {
-      document.body.classList.remove('ma-drm-shielded');
-      blurShieldEl.classList.remove('is-open');
+    function clearBlurShield() {
+      document.body.classList.remove('ma-drm-shielded', 'ma-drm-window-blur');
+      blurShieldEl.classList.remove('is-open', 'is-passive');
+    }
+    blurShieldEl.querySelector('[data-drm-unblur]').addEventListener('click', clearBlurShield);
+    blurShieldEl.addEventListener('click', function (e) {
+      if (blurShieldEl.classList.contains('is-passive') && e.target === blurShieldEl) {
+        clearBlurShield();
+      }
     });
 
     // Full-screen Ban Lockout
@@ -511,8 +574,7 @@
           return state;
         },
         function () {
-          document.body.classList.remove('ma-drm-shielded');
-          blurShieldEl.classList.remove('is-open');
+          clearBlurShield();
           showToast('Блокировка снята, счётчик устройств и страйков сброшен.');
         }
       );
@@ -615,8 +677,7 @@
           return state;
         },
         function () {
-          document.body.classList.remove('ma-drm-shielded');
-          blurShieldEl.classList.remove('is-open');
+          clearBlurShield();
           showToast('Счётчик устройств и страйков успешно сброшен.');
         }
       );
@@ -708,33 +769,67 @@
       }
     }, true);
 
-    // Потеря фокуса окна (вызов Ножниц Windows Win+Shift+S / Lightshot / ShareX) — ТОЛЬКО внутри конспекта!
-    window.addEventListener('blur', function () {
+    // Перехват печати и сохранения в PDF (в т.ч. через системное меню iOS/Android)
+    window.addEventListener('beforeprint', function () {
       if (!isKonspektOpen() || state.status === 'BANNED') return;
       document.body.classList.add('ma-drm-shielded');
       recordStrike(
         'SCREENSHOT',
-        'Вызов инструмента скриншотов / потеря фокуса на конспекте',
-        'Зафиксирован вызов инструмента скриншотов (Win+Shift+S / Ножницы / внешняя программа) при открытом конспекте. Экран скрыт, начислен страйк.'
+        'Попытка печати / сохранения конспекта в PDF',
+        'Печать и экспорт конспекта в PDF заблокированы системой защиты. Экран скрыт, начислен страйк.'
       );
     });
+    if (window.matchMedia) {
+      var printMq = window.matchMedia('print');
+      var onPrintMedia = function (m) {
+        if (m && m.matches && isKonspektOpen() && state.status !== 'BANNED') {
+          document.body.classList.add('ma-drm-shielded');
+          recordStrike(
+            'SCREENSHOT',
+            'Попытка печати / сохранения конспекта в PDF',
+            'Печать и экспорт конспекта в PDF заблокированы системой защиты. Экран скрыт, начислен страйк.'
+          );
+        }
+      };
+      if (printMq.addEventListener) printMq.addEventListener('change', onPrintMedia);
+      else if (printMq.addListener) printMq.addListener(onPrintMedia);
+    }
 
-    document.addEventListener('visibilitychange', function () {
-      if (!isKonspektOpen()) return;
-      if (document.hidden && state.status !== 'BANNED') {
-        document.body.classList.add('ma-drm-shielded');
-        recordStrike(
-          'SCREENSHOT',
-          'Фоновый захват экрана на открытом конспекте',
-          'Обнаружена попытка фонового захвата или переключения окна при открытом конспекте.'
-        );
-      }
-    });
+    // Перехват браузерного захвата / записи экрана (getDisplayMedia)
+    if (navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function') {
+      var origGetDisplayMedia = navigator.mediaDevices.getDisplayMedia;
+      navigator.mediaDevices.getDisplayMedia = function () {
+        if (isKonspektOpen()) {
+          document.body.classList.add('ma-drm-shielded');
+          recordStrike(
+            'SCREENSHOT',
+            'Попытка записи или трансляции экрана на конспекте',
+            'Запись и трансляция экрана на открытом конспекте заблокированы. Экран скрыт, начислен страйк.'
+          );
+          return Promise.reject(new DOMException('Screen capture blocked', 'NotAllowedError'));
+        }
+        return origGetDisplayMedia.apply(this, arguments);
+      };
+    }
 
     window.addEventListener('contextmenu', function (e) {
       if (!isKonspektOpen()) return;
       e.preventDefault();
       showToast('Правый клик и сохранение схем внутри конспектов отключены.');
+    }, true);
+
+    window.addEventListener('dragstart', function (e) {
+      if (!isKonspektOpen()) return;
+      var tag = e.target && e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      e.preventDefault();
+    }, true);
+
+    window.addEventListener('selectstart', function (e) {
+      if (!isKonspektOpen()) return;
+      var tag = e.target && e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      e.preventDefault();
     }, true);
 
     window.addEventListener('copy', function (e) {
@@ -752,6 +847,41 @@
       );
     }, true);
 
+    // Периодическое смещение сетки водяных знаков и обновление метки времени на открытом конспекте
+    var wmPhase = 0;
+    var wmOffsets = [
+      ['0px', '0px'],
+      ['16px', '-10px'],
+      ['-14px', '12px'],
+      ['10px', '16px']
+    ];
+    setInterval(function () {
+      if (!isKonspektOpen() || !watermarkEl) return;
+      wmPhase = (wmPhase + 1) % wmOffsets.length;
+      var off = wmOffsets[wmPhase];
+      watermarkEl.style.transform = 'rotate(-16deg) scale(1.1) translate(' + off[0] + ', ' + off[1] + ')';
+      renderUI();
+    }, 12000);
+
+    // Размытие конспекта при переходе в другое окно / потере фокуса (БЕЗ начисления страйка)
+    function triggerWindowBlurShield() {
+      if (!isKonspektOpen() || state.status === 'BANNED') return;
+      activateInstantShield(
+        'Вы переключились в другое окно или вкладку. Конспект временно размыт для защиты от стороннего захвата экрана — страйк за переход в другое окно не начисляется.',
+        false
+      );
+    }
+
+    window.addEventListener('blur', function () {
+      triggerWindowBlurShield();
+    });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        triggerWindowBlurShield();
+      }
+    });
+
     // Отслеживаем переходы между главным меню атласа и конспектами
     window.addEventListener('hashchange', syncProtectionScope);
     window.addEventListener('popstate', syncProtectionScope);
@@ -762,11 +892,14 @@
     syncProtectionScope();
 
     if (!isStaticHost) {
-      fetch('/api/security/state')
-        .then(function (r) {
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          return r.json();
-        })
+      var ma = window.MA;
+      var stateReq = (ma && typeof ma.signedIn === 'function' && ma.signedIn() && typeof ma.api === 'function')
+        ? ma.api('/security/state')
+        : fetch('/api/security/state').then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          });
+      stateReq
         .then(function (data) {
           if (data && data.userId) {
             state = data;

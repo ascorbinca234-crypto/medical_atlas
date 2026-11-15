@@ -175,6 +175,10 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
       MA.call('/auth/login', { email: email, password: f.pw.value }).then(function (r) { MA.setSession(r); goNext(); }, function (e) {
         busy(btn, false);
         if (e.code === 'unverified') { location.hash = 'sent?email=' + encodeURIComponent(email) + '&again=1'; return; }
+        if (e.code === 'device_limit_exceeded') {
+          setMsg('err', e.message + ' Откройте «Аккаунт» или «Личный кабинет» на одном из уже подключённых устройств и отвяжите неиспользуемое устройство (или используйте «Выйти на всех устройствах»).');
+          return;
+        }
         setMsg('err', e.message);
       });
     });
@@ -318,18 +322,44 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
     label('06', 'Аккаунт');
     if (!MA.signedIn()) { location.hash = 'login'; return; }
     view.innerHTML = '<h1>Аккаунт</h1><p class="sub" data-msg><span class="spin" aria-hidden="true"></span>Загружаем…</p>';
-    MA.api('/me').then(function (r) {
+    Promise.all([
+      MA.api('/me'),
+      MA.api('/security/state').catch(function () { return null; })
+    ]).then(function (results) {
+      var r = results[0], sec = results[1];
       var u = r.user, names = { email: 'почта и пароль', yandex: 'Яндекс ID', vk: 'VK ID' };
       var ways = u.providers.filter(function (p) { return p !== 'email' || u.hasPassword; }).map(function (p) { return names[p] || p; });
       var ava = u.avatar ? '<img src="' + esc(u.avatar) + '" alt="" referrerpolicy="no-referrer">' : esc((u.name || u.email || '?').charAt(0).toUpperCase());
+      var curDevId = typeof MA.deviceId === 'function' ? MA.deviceId() : '';
+      var devs = (sec && Array.isArray(sec.registeredDevices)) ? sec.registeredDevices : [];
+      var maxDev = (sec && sec.maxDevices) || u.maxDevices || 3;
+      var devHtml = '<div id="devicesBlock" style="margin-top:22px"><h2 style="margin:0 0 8px;font-size:17px">Подключённые устройства (' + devs.length + ' из ' + maxDev + ')</h2>' +
+        (devs.length ? devs.map(function (d) {
+          var isCur = d.deviceId === curDevId;
+          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid rgba(148,163,184,.25);border-radius:10px;margin-bottom:8px;font-size:13.5px">' +
+            '<div><b>' + esc(d.name || 'Устройство') + '</b>' + (isCur ? ' <span style="color:#10b981;font-weight:600">· это устройство</span>' : '') +
+            '<div style="opacity:.72;font-size:12px">' + esc((d.ip ? 'IP ' + d.ip + ' · ' : '') + (d.lastActive || '')) + '</div></div>' +
+            '<button class="btn" type="button" data-unlink-dev="' + esc(d.deviceId) + '" style="padding:6px 10px;font-size:12.5px">Отвязать</button></div>';
+        }).join('') : '<p class="foot" style="text-align:left;margin:6px 0">Активные устройства появятся после входа с них.</p>') + '</div>';
       view.innerHTML = '<h1>Аккаунт</h1><p class="sub" data-msg>' + (u.isAdmin ? 'Администратор: все материалы доступны без подписки.' : 'Профиль и настройки аккаунта.') + '</p>' +
         '<div class="who"><span class="ava" aria-hidden="true">' + ava + '</span><div><b>' + esc(u.name || 'Без имени') + '</b><span>' + esc(u.email || 'почта не указана') + '</span></div></div>' +
-        '<dl class="props"><dt>Вход</dt><dd>' + esc(ways.join(', ') || '—') + '</dd><dt>С нами с</dt><dd>' + esc(new Date(u.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })) + '</dd></dl>' +
+        '<dl class="props"><dt>Вход</dt><dd>' + esc(ways.join(', ') || '—') + '</dd><dt>Устройства</dt><dd>' + esc(devs.length + ' из ' + maxDev) + '</dd><dt>С нами с</dt><dd>' + esc(new Date(u.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })) + '</dd></dl>' +
         '<form id="fn" novalidate><label class="f" for="name">Имя</label><div class="row"><input id="name" type="text" maxlength="60" value="' + esc(u.name) + '"><button class="btn" type="submit">Сохранить</button></div></form>' +
+        devHtml +
         (u.isAdmin ? '<form id="credentials" style="margin-top:22px" novalidate><h2>Логин и пароль</h2><label class="f" for="adminLogin">Логин (в формате почты)</label><input id="adminLogin" type="email" autocomplete="username" value="' + esc(u.email) + '">' + pwField('currentPw', 'Текущий пароль', 'current-password') + pwField('newPw', 'Новый пароль', 'new-password', 'оставьте пустым, чтобы сохранить').replace(' required', '') + '<button class="btn" type="submit" style="margin-top:14px">Изменить логин и пароль</button></form>' : '') +
-        '<div class="stack" style="margin-top:22px"><a class="btn pri" href="' + esc(next()) + '">К атласам</a><a class="btn" href="../cabinet/">Личный кабинет</a><button class="btn" id="out" type="button">Выйти</button><button class="btn" id="outAll" type="button">Выйти на всех устройствах</button>' +
+        '<div class="stack" style="margin-top:22px"><a class="btn pri" href="' + esc(next()) + '">К атласам</a><a class="btn" href="../cabinet/">Личный кабинет</a><a class="btn" href="../admin/">Панель администратора</a><button class="btn" id="out" type="button">Выйти</button><button class="btn" id="outAll" type="button">Выйти на всех устройствах</button>' +
         (u.email && !u.hasPassword ? '<a class="btn" href="#forgot">Задать пароль для входа по почте</a>' : '') +
         '<button class="btn danger" id="del" type="button">Удалить аккаунт</button></div>';
+      view.querySelectorAll('[data-unlink-dev]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var targetId = btn.dataset.unlinkDev;
+          busy(btn, true, '…');
+          MA.api('/security/remove-device', { method: 'POST', body: { deviceId: targetId } }).then(function () {
+            V.account();
+            setMsg('ok', 'Устройство отвязано.');
+          }, function (err) { busy(btn, false); setMsg('err', err.message); });
+        });
+      });
       var fn = document.getElementById('fn');
       fn.addEventListener('submit', function (ev) {
         ev.preventDefault(); var b = fn.querySelector('button'); busy(b, true, '…');
@@ -384,6 +414,6 @@ dl.props dd { margin: 0; overflow-wrap: anywhere; }
   route();
 })();
 </script>
-<script src="../assets/anti-theft-guard.js?v=20261113-v4"></script>
+<script src="../assets/anti-theft-guard.js?v=20261114-v6"></script>
 </body>
 </html>

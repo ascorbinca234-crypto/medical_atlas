@@ -30,10 +30,38 @@
   function signedIn() { var s = load(); return !!(API && s && s.refresh && s.refreshExp > now() + 30); }
   function user() { var s = load(); return signedIn() && s.user ? s.user : null; }
 
+  var memDevId = '';
+  function getDeviceId() {
+    if (memDevId) return memDevId;
+    try {
+      var probe = localStorage.getItem('ma-device-id');
+      if (probe && /^[A-Za-z0-9_.:-]{4,64}$/.test(probe)) { memDevId = probe; return memDevId; }
+      var id = 'dev-' + (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID().replace(/-/g, '').slice(0, 16)
+        : Math.random().toString(36).slice(2, 10) + Date.now().toString(36));
+      var before = localStorage.getItem(KEY);
+      localStorage.setItem('ma-device-id', id);
+      if (before !== null && localStorage.getItem(KEY) !== before) localStorage.setItem(KEY, before);
+      memDevId = id;
+      return id;
+    } catch (e) {
+      memDevId = 'dev-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+      return memDevId;
+    }
+  }
+  function getDeviceName() {
+    try {
+      var ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+      var os = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : /Android/.test(ua) ? 'Android' : /Mac OS X/.test(ua) ? 'macOS' : /Windows/.test(ua) ? 'Windows' : /Linux/.test(ua) ? 'Linux' : 'Устройство';
+      var br = /Edg\//.test(ua) ? 'Edge' : /YaBrowser/.test(ua) ? 'Yandex' : /OPR\//.test(ua) ? 'Opera' : /Firefox\//.test(ua) ? 'Firefox' : (/Chrome\//.test(ua) || /CriOS\//.test(ua)) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Браузер';
+      return os + ' · ' + br;
+    } catch (e) { return 'Браузер'; }
+  }
+
   // ---------- запросы ----------
   function request(path, opts) {
     opts = opts || {};
-    var headers = { 'Accept': 'application/json' };
+    var headers = { 'Accept': 'application/json', 'X-Device-Id': getDeviceId(), 'X-Device-Name': encodeURIComponent(getDeviceName()) };
     if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
     if (opts.token) headers.Authorization = 'Bearer ' + opts.token;
     var controller = new AbortController(), timer;
@@ -159,7 +187,7 @@
     }
     var topic = selected('');
     window.MA_TOPIC = topic;
-    window.MA_STATE = { auth: 'none', atlas: atlas, owner: owner && owner.id, accessExpiresAt: 0, admin: false };
+    window.MA_STATE = { auth: 'none', atlas: atlas, owner: owner && owner.id, accessExpiresAt: 0, topicGrants: {}, admin: false, adminPreview: false };
     function run(code) { var el = document.createElement('script'); el.textContent = code; document.body.appendChild(el); el.remove(); }
     function reload() { document.documentElement.style.visibility = 'hidden'; location.reload(); }
     function stillOwner() { var current = user(); return !!(current && owner && current.id === owner.id); }
@@ -170,8 +198,10 @@
       if (!stillOwner() || full && Date.now() >= expiresAt) { reload(); return; }
       api('/access').then(function (r) {
         var grant = r.grants && r.grants[atlas];
-        var open = r.policy === POLICY && ((grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now()) || (r.admin === true && atlas === 'patan'));
-        if (!stillOwner() || !!open !== hadAccess || full && !open) { reload(); return; }
+        var tGrant = topic && r.topicGrants && r.topicGrants[atlas] && r.topicGrants[atlas][topic];
+        var subjectOpen = r.policy === POLICY && ((grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now()) || (r.admin === true && atlas === 'patan'));
+        var topicOpen = subjectOpen || (r.policy === POLICY && tGrant && Number.isFinite(tGrant.expiresAt) && tGrant.expiresAt > Date.now());
+        if (!stillOwner() || !!subjectOpen !== hadAccess || full && !topicOpen) { reload(); return; }
         document.documentElement.style.visibility = '';
       }).catch(reload);
     }
@@ -196,16 +226,15 @@
         '<div class="ma-topic-panel"><div class="ma-topic-heading">Материалы предмета</div><div role="status" class="ma-topic-status">' + esc(message) + '</div>' +
         (r.status === 'error' || r.status === 'limited' ? '<button type="button" data-topic-retry>Повторить загрузку</button>' : '') +
         '<nav aria-label="Выбор темы">' + catalog.topics.map(function (t) { return '<a href="' + esc(href(t)) + '">' + esc(t.title) + '</a>'; }).join('') + '</nav>' +
-        '<div class="ma-topic-links"><a href="' + esc(SITE_URL) + '#atlases">Все атласы</a><a href="' + esc(SITE_URL) + 'cabinet/">Личный кабинет</a></div></div></details>';
+        '<div class="ma-topic-links"><a href="' + esc(SITE_URL) + '#atlases">Все атласы</a><a href="' + esc(SITE_URL) + 'cabinet/">Личный кабинет</a><a href="' + esc(SITE_URL) + 'admin/">Админ-панель</a></div></div></details>';
       document.body.prepend(bar);
       var retry = bar.querySelector('[data-topic-retry]'); if (retry) retry.onclick = function () { location.reload(); };
       var style = document.createElement('style');
       style.textContent = '#ma-topic-controls{position:fixed;right:18px;bottom:42px;z-index:10000;font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;color:#e7edf8}#ma-topic-controls details{position:relative}#ma-topic-controls summary{display:flex;align-items:center;justify-content:center;gap:12px;list-style:none;cursor:pointer;background:#1c2940;color:#fff;border:1px solid #43536d;border-radius:12px;padding:9px 14px;font-weight:650;box-shadow:0 5px 18px #07122340}#ma-topic-controls summary::-webkit-details-marker{display:none}#ma-topic-controls summary:hover{background:#283b58}#ma-topic-controls summary:focus-visible,#ma-topic-controls a:focus-visible,#ma-topic-controls button:focus-visible{outline:3px solid #7cb7f4;outline-offset:3px}#ma-topic-controls .ma-topic-panel{position:absolute;right:0;bottom:calc(100% + 8px);width:min(360px,calc(100vw - 28px));max-height:min(65vh,520px);display:flex;flex-direction:column;overflow:hidden;background:#172238;color:#e7edf8;border:1px solid #445675;border-radius:15px;box-shadow:0 16px 48px #07122370}#ma-topic-controls .ma-topic-heading{font-weight:700;font-size:15px;padding:16px 16px 0}#ma-topic-controls .ma-topic-status{font-size:12px;line-height:1.45;color:#bac9df;padding:7px 16px 12px}#ma-topic-controls nav{display:grid;gap:2px;overflow:auto;overscroll-behavior:contain;border-top:1px solid #33435c;padding:8px}#ma-topic-controls nav a{padding:8px 10px;border-radius:8px;text-decoration:none;line-height:1.35;color:#e7edf8}#ma-topic-controls nav a:hover{background:#2b3d5a;color:#fff}#ma-topic-controls .ma-topic-links{display:flex;gap:16px;flex-wrap:wrap;border-top:1px solid #33435c;padding:12px 16px}#ma-topic-controls .ma-topic-links a{color:#91c9ff;text-decoration:none;font-size:12px}#ma-topic-controls button{margin:0 16px 10px;padding:8px 10px;background:#315c9a;color:#fff;border:0;border-radius:8px;font:inherit;cursor:pointer}@media(max-width:600px){#ma-topic-controls{right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px))}#ma-topic-controls summary{padding:8px 12px;font-size:13px}#ma-topic-controls .ma-topic-panel{max-height:60dvh}}#ma-copy-label{position:fixed;right:8px;bottom:8px;z-index:2147483000;pointer-events:none;background:#fffdf2e8;color:#514c39;padding:4px 8px;border:1px solid #cbc5b3;font:11px/1.4 system-ui;max-width:90vw}.ma-copy-print{display:none}@media print{#ma-topic-controls{display:none}#ma-copy-label{position:fixed;display:block!important}.ma-copy-print{display:block;font:10px system-ui;margin:10px 0}}';
       document.head.appendChild(style);
       if (full && window.MA_COPY) {
-        var c = window.MA_COPY;
         var label = document.createElement('div'); label.id = 'ma-copy-label';
-        label.textContent = 'Личная копия · ' + c.account + ' · ' + c.receipt + ' · ' + c.issuedAt;
+        label.textContent = 'Медицинский атлас 2026';
         document.body.appendChild(label);
         // Repeated text survives ordinary copy/paste and print as well as screenshots.
         function marks() {
@@ -227,24 +256,54 @@
     window.addEventListener('pageshow', function (e) { if (e.persisted) reload(); });
     document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
     var publicRoute = !catalog.fullAtlas && (catalog.publicRoutes || []).indexOf(location.hash.slice(1).split('/')[0]) >= 0;
-    var delivery = publicRoute || catalog.demo && catalog.demo.indexOf(topic) >= 0 ? Promise.resolve({ status: 'public', code: null }) : loadLocked(atlas, topic);
+    var isDemo = publicRoute || !!(catalog.demo && catalog.demo.indexOf(topic) >= 0);
+    var adminPreview = null;
+    try { adminPreview = JSON.parse(localStorage.getItem('ma-admin-preview-v1') || 'null'); } catch (e) { adminPreview = null; }
+
+    var delivery = isDemo ? Promise.resolve({ status: 'public', code: null }) : loadLocked(atlas, topic);
     // A title-only stub means "not loaded", not "no subscription".
     // Resolve subject rights even when the current page is a free lesson/tool.
     var rights = owner ? api('/access').then(function (r) { return r.policy === POLICY ? r : null; }).catch(function () { return null; }) : Promise.resolve(null);
-    Promise.all([delivery, rights]).then(function (results) {
-      var r = results[0], rights = results[1], grant = rights && rights.grants && rights.grants[atlas];
+    var localRightsP = (adminPreview && typeof fetch === 'function')
+      ? fetch('/api/access?userId=' + encodeURIComponent(adminPreview.userId || ''), { cache: 'no-store' })
+          .then(function (res) { return res.ok ? res.json() : null; })
+          .catch(function () { return adminPreview; })
+      : Promise.resolve(null);
+
+    Promise.all([delivery, rights, localRightsP]).then(function (results) {
+      var r = results[0], rights = results[1], localRights = results[2];
+      var effRights = rights || localRights;
+      var grant = effRights && effRights.grants && effRights.grants[atlas];
+      var tGrants = (effRights && effRights.topicGrants && effRights.topicGrants[atlas]) || {};
       var allowed = r.status === 'ok' && stillOwner() && r.expiresAt > Date.now();
-      if (stillOwner()) {
-        window.MA_STATE.accessExpiresAt = grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now() ? grant.expiresAt : (rights && rights.admin && atlas === 'patan' ? Date.now() + 900000 : (allowed ? r.expiresAt : 0));
-        window.MA_STATE.admin = !!(rights && rights.admin);
+      if (stillOwner() || localRights) {
+        window.MA_STATE.topicGrants = tGrants;
+        window.MA_STATE.adminPreview = !!localRights;
+        window.MA_STATE.accessExpiresAt = grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now()
+          ? grant.expiresAt
+          : (effRights && effRights.admin && atlas === 'patan' ? Date.now() + 900000 : (allowed ? r.expiresAt : 0));
+        window.MA_STATE.admin = !!(effRights && effRights.admin);
       }
-      var fallbackP = (!allowed && atlas === 'patan' && topic && stillOwner() && window.MA_STATE.accessExpiresAt > Date.now() && typeof fetch === 'function')
-        ? fetch('./topics/' + encodeURIComponent(topic) + '.js', { cache: 'no-store' }).then(function (res) { return res.ok ? res.text() : null; }).catch(function () { return null; })
-        : Promise.resolve(null);
-      return fallbackP.then(function (fbCode) {
-        if (fbCode && stillOwner()) {
+      var hasLocalTopicOrAtlas = !!(localRights && localRights.securityStatus !== 'BANNED' && (
+        (grant && grant.expiresAt > Date.now()) ||
+        (topic && tGrants[topic] && tGrants[topic].expiresAt > Date.now())
+      ));
+      var fallbackP = (!allowed && !isDemo && topic && hasLocalTopicOrAtlas && typeof fetch === 'function')
+        ? fetch('/api/content-v3/' + encodeURIComponent(atlas) + '/' + encodeURIComponent(topic) + '?userId=' + encodeURIComponent((adminPreview && adminPreview.userId) || ''), { cache: 'no-store' })
+            .then(function (res) {
+              if (!res.ok) return null;
+              var exp = Number(res.headers.get('X-Access-Expires')) || (grant && grant.expiresAt) || (tGrants[topic] && tGrants[topic].expiresAt) || (Date.now() + 86400000);
+              return res.text().then(function (txt) { return { code: txt, expiresAt: exp }; });
+            })
+            .catch(function () { return null; })
+        : ((!allowed && atlas === 'patan' && topic && stillOwner() && window.MA_STATE.accessExpiresAt > Date.now() && typeof fetch === 'function')
+            ? fetch('./topics/' + encodeURIComponent(topic) + '.js', { cache: 'no-store' }).then(function (res) { return res.ok ? res.text() : null; }).then(function (txt) { return txt ? { code: txt, expiresAt: window.MA_STATE.accessExpiresAt } : null; }).catch(function () { return null; })
+            : Promise.resolve(null));
+
+      return fallbackP.then(function (fb) {
+        if (fb && fb.code && (stillOwner() || localRights)) {
           allowed = true;
-          r = { status: 'ok', code: fbCode, expiresAt: window.MA_STATE.accessExpiresAt, owner: owner.id };
+          r = { status: 'ok', code: fb.code, expiresAt: fb.expiresAt, owner: (owner && owner.id) || (adminPreview && adminPreview.userId) || 'admin' };
         }
         window.MA_STATE.auth = allowed ? 'ok' : r.status;
         if (atlas === 'micro' && r.status === 'error') window.MICRO_LOAD_ERROR = true;
@@ -260,7 +319,7 @@
         }
         controls(r);
         mount(document.querySelectorAll('[data-ma-acct]'));
-        var expiry = full ? Math.min(expiresAt, window.MA_STATE.accessExpiresAt) : window.MA_STATE.accessExpiresAt;
+        var expiry = full ? Math.min(expiresAt, window.MA_STATE.accessExpiresAt || expiresAt) : window.MA_STATE.accessExpiresAt;
         if (expiry > Date.now()) setTimeout(reload, Math.min(expiry - Date.now(), 2147483647));
         if (owner) setInterval(check, 60000);
       });
@@ -269,7 +328,18 @@
 
   function hasAtlasAccess(atlas) {
     var state = window.MA_STATE, current = user();
-    return !!(state && current && state.owner === current.id && state.atlas === atlas && state.accessExpiresAt > Date.now());
+    if (!state || state.atlas !== atlas || !(state.accessExpiresAt > Date.now())) return false;
+    if (state.adminPreview) return true;
+    return !!(current && state.owner === current.id);
+  }
+
+  function hasTopicAccess(atlas, topicId) {
+    if (hasAtlasAccess(atlas)) return true;
+    var state = window.MA_STATE, current = user();
+    if (!state || state.atlas !== atlas || !state.topicGrants || !topicId) return false;
+    if (!state.adminPreview && !(current && state.owner === current.id)) return false;
+    var tg = state.topicGrants[topicId];
+    return !!(tg && Number.isFinite(tg.expiresAt) && tg.expiresAt > Date.now());
   }
 
   // ---------- вход и выход ----------
@@ -296,7 +366,7 @@
       var ava = u.avatar ? '<img src="' + esc(u.avatar) + '" alt="" referrerpolicy="no-referrer">' : initials(u);
       el.innerHTML = '<div class="ma-user"><button type="button" class="ma-chip" aria-haspopup="menu" aria-expanded="false" title="' + esc(u.name || u.email || 'Аккаунт') + '">' +
         '<span class="ma-ava" aria-hidden="true">' + ava + '</span><span class="ma-name">' + esc(u.name || u.email || 'Аккаунт') + '</span></button>' +
-        '<div class="ma-menu" role="menu" hidden><a role="menuitem" href="' + esc(SITE_URL + 'cabinet/') + '">Личный кабинет</a><a role="menuitem" href="' + esc(AUTH_URL + '#account') + '">Аккаунт</a><button type="button" role="menuitem" data-ma-out>Выйти</button></div></div>';
+        '<div class="ma-menu" role="menu" hidden><a role="menuitem" href="' + esc(SITE_URL + 'cabinet/') + '">Личный кабинет</a><a role="menuitem" href="' + esc(SITE_URL + 'admin/') + '">Панель админа</a><a role="menuitem" href="' + esc(AUTH_URL + '#account') + '">Аккаунт</a><button type="button" role="menuitem" data-ma-out>Выйти</button></div></div>';
       var btn = el.querySelector('.ma-chip'), menu = el.querySelector('.ma-menu');
       btn.addEventListener('click', function (ev) { ev.stopPropagation(); var open = menu.hidden; closeMenus(); menu.hidden = !open; btn.setAttribute('aria-expanded', String(open)); });
       el.querySelector('[data-ma-out]').addEventListener('click', function () { logout(false).then(function () { location.reload(); }); });
@@ -310,9 +380,10 @@
 
   window.MA = {
     enabled: enabled, signedIn: signedIn, user: user, loginUrl: loginUrl, AUTH_URL: AUTH_URL, SITE_URL: SITE_URL, API: API,
-    mount: mount, bootAtlas: bootAtlas, hasAtlasAccess: hasAtlasAccess, onChange: function (f) { listeners.push(f); }, loadLocked: loadLocked,
+    mount: mount, bootAtlas: bootAtlas, hasAtlasAccess: hasAtlasAccess, hasTopicAccess: hasTopicAccess, onChange: function (f) { listeners.push(f); }, loadLocked: loadLocked,
     call: call, api: api, setSession: setSession, logout: logout, refresh: refresh,
+    deviceId: getDeviceId, deviceName: getDeviceName,
   };
 })();
 
-;(function(){try{var s=document.createElement("script");s.src=(window.MA&&window.MA.SITE_URL?window.MA.SITE_URL:"/")+"assets/anti-theft-guard.js?v=20261113-v4";document.head.appendChild(s);}catch(e){}})();
+;(function(){try{if(typeof document!=='undefined'&&document.head&&!document.querySelector('script[src*="anti-theft-guard.js"]')){var s=document.createElement("script");s.src=(window.MA&&window.MA.SITE_URL?window.MA.SITE_URL:"/")+"assets/anti-theft-guard.js?v=20261114-v6";document.head.appendChild(s);}}catch(e){}})();

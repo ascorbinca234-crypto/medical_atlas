@@ -5,7 +5,7 @@ const root = path.resolve(__dirname, '../..');
 const tick = () => new Promise(resolve => setImmediate(resolve));
 function home(api, owner = {id: 'admin'}) {
   let change, visibility, timer, user = owner;
-  const cards = ['farma', 'biochem', 'micro', 'pathophys', 'patan'].map(atlas => {
+  const cards = ['farma', 'biochem', 'micro', 'pathophys', 'chemistry', 'patan'].map(atlas => {
     const status = {}, note = {textContent: 'demo:' + atlas};
     return {dataset: {maAtlas: atlas}, status, note, querySelector: selector => selector.includes('status') ? status : note};
   });
@@ -16,8 +16,8 @@ function home(api, owner = {id: 'admin'}) {
   return {cards, logout() {user = null; change();}, refresh() {visibility();}, expire() {timer();}};
 }
 const grants = subjects => Object.fromEntries(subjects.map(s => [s, {expiresAt: Date.now() + 60000}]));
-test('главная показывает администратору полный доступ ко всем пяти атласам', async () => {
-  const h = home(async () => ({policy: 'subject-subscription-v1', admin: true, grants: grants(['farma', 'biochem', 'micro', 'pathophys', 'patan'])}));
+test('главная показывает администратору полный доступ ко всем шести атласам', async () => {
+  const h = home(async () => ({policy: 'subject-subscription-v1', admin: true, grants: grants(['farma', 'biochem', 'micro', 'pathophys', 'chemistry', 'patan'])}));
   await tick();
   assert.ok(h.cards.every(c => c.status.textContent === 'Открыт' && c.note.textContent.includes('администратору')));
   h.logout();
@@ -27,7 +27,7 @@ test('главная учитывает отдельные подписки, и�
   let result = {policy: 'subject-subscription-v1', grants: grants(['micro', 'patan'])};
   const h = home(async () => {if (result instanceof Error) throw result; return result;});
   await tick();
-  assert.deepEqual(h.cards.map(c => c.status.textContent), ['Пробная версия', 'Пробная версия', 'Открыт', 'Пробная версия', 'Открыт']);
+  assert.deepEqual(h.cards.map(c => c.status.textContent), ['Пробная версия', 'Пробная версия', 'Открыт', 'Пробная версия', 'Пробная версия', 'Открыт']);
   result.grants.micro.expiresAt = Date.now() - 1;
   result.grants.patan.expiresAt = Date.now() - 1;
   h.expire(); await tick(); assert.ok(h.cards.every(c => c.status.textContent === 'Пробная версия'));
@@ -39,7 +39,7 @@ test('гость не запрашивает права; поздний отве
   const guest = home(() => {calls++;}, null);
   assert.equal(calls, 0); assert.ok(guest.cards.every(c => c.status.textContent === 'Пробная версия'));
   const h = home(() => new Promise(resolve => {finish = resolve;})); h.logout();
-  finish({policy: 'subject-subscription-v1', admin: true, grants: grants(['farma', 'biochem', 'micro', 'pathophys', 'patan'])});
+  finish({policy: 'subject-subscription-v1', admin: true, grants: grants(['farma', 'biochem', 'micro', 'pathophys', 'chemistry', 'patan'])});
   await tick(); assert.ok(h.cards.every(c => c.status.textContent === 'Пробная версия'));
 });
 test('очистка кеша удаляет только три фотографии команды, сохраняя другие изображения', async () => {

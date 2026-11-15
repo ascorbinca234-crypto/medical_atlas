@@ -149,7 +149,7 @@ body{{margin:0}}
 <script>
 {boot}
 </script>
-<script src="../assets/anti-theft-guard.js?v=20261113-v5"></script>
+<script src="../assets/anti-theft-guard.js?v=20261114-v6"></script>
 </body>
 </html>
 '''

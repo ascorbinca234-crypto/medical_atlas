@@ -747,7 +747,7 @@ main{padding-block:30px 72px}.overview-intro{display:flex;align-items:end;justif
 
   <!-- ===================== ОБЗОР ===================== -->
   <section role="tabpanel" id="panel-overview" aria-labelledby="tab-overview">
-    <div class="overview-intro"><div><span class="eyebrow">Личный кабинет</span><h1>Ваше обучение</h1><p>Продолжайте с того места, где остановились, и следите за прогрессом.</p></div><a href="../#atlases" class="btn btn-ghost">Все атласы <span aria-hidden="true">↗</span></a></div>
+    <div class="overview-intro"><div><span class="eyebrow">Личный кабинет</span><h1>Ваше обучение</h1><p>Продолжайте с того места, где остановились, и следите за прогрессом.</p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><a href="../admin/" class="btn btn-soft" id="adminCabinetLink">Панель администратора</a><a href="../#atlases" class="btn btn-ghost">Все атласы <span aria-hidden="true">↗</span></a></div></div>
     <div class="bento">
 
       <!-- Профиль и ранг -->
@@ -792,6 +792,7 @@ main{padding-block:30px 72px}.overview-intro{display:flex;align-items:end;justif
           <button type="button" role="radio" data-atlas="micro" aria-checked="false">Микробиология</button>
           <button type="button" role="radio" data-atlas="pathophys" aria-checked="false">Патофизиология</button>
           <button type="button" role="radio" data-atlas="patan" aria-checked="false">Патанатомия</button>
+          <button type="button" role="radio" data-atlas="chemistry" aria-checked="false">Химия</button>
         </div>
         <div class="sys-scroll" id="masBody"></div>
         <p class="mastery-foot"><span><span class="dot-ok" aria-hidden="true"></span><span id="masteryHint">Закреплено: карточку вспомнили 3 раза с растущим интервалом</span></span></p>
@@ -847,7 +848,7 @@ main{padding-block:30px 72px}.overview-intro{display:flex;align-items:end;justif
         </div>
         <p class="m-note" id="mNote"></p>
         <a class="btn btn-coral" id="learnBtn" href="../farma-atlas/#learn"><i data-lucide="layers"></i><span id="learnLabel">Повторить карточки</span></a>
-        <p class="m-links">Учить: <a href="../farma-atlas/#learn">фармакология</a>, <a href="../biochem-atlas/#study">биохимия</a>, <a href="../micro-atlas/">микробиология</a>, <a href="../pathophys-atlas/">патофизиология</a>, <a href="../patan-atlas/">патанатомия</a></p>
+        <p class="m-links">Учить: <a href="../farma-atlas/#learn">фармакология</a>, <a href="../biochem-atlas/#study">биохимия</a>, <a href="../micro-atlas/">микробиология</a>, <a href="../pathophys-atlas/">патофизиология</a>, <a href="../patan-atlas/">патанатомия</a>, <a href="../chemistry-atlas/">химия</a></p>
       </article>
 
       <!-- Теплокарта -->
@@ -1005,7 +1006,7 @@ main{padding-block:30px 72px}.overview-intro{display:flex;align-items:end;justif
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
 <script src="../auth/config.js"></script>
-<script src="../auth/auth.js?v=20261113-v4"></script>
+<script src="../auth/auth.js?v=20261114-v6"></script>
 <script src="../progress/progress.js?v=topic-delivery-v1"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -1129,7 +1130,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const user = () => (signedIn() && MA.user()) || null;
   let ACCESS = null, accessOwner = null, accessState = 'idle', accessRequest = 0, accessTimer;
   function hasAtlasAccess(atlas) {
-    if (atlas === 'chemistry') return true; // открытая версия
     const u = user(), grant = ACCESS && ACCESS.grants && ACCESS.grants[atlas];
     if (u && accessOwner === u.id && ACCESS && ACCESS.admin === true) return true;
     return !!(u && accessOwner === u.id && grant && Number.isFinite(grant.expiresAt) && grant.expiresAt > Date.now());
@@ -1308,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function renderMastery() {
-    $('#masteryHint').textContent = (masAtlas === 'pathophys' || masAtlas === 'patan') ? 'Закреплено: тема отмечена вами как изученная' : masAtlas === 'micro' ? 'Закреплено: конспект отмечен вами как изученный' : 'Закреплено: карточку вспомнили 3 раза с растущим интервалом';
+    $('#masteryHint').textContent = (masAtlas === 'pathophys' || masAtlas === 'patan') ? 'Закреплено: тема отмечена вами как изученная' : masAtlas === 'micro' ? 'Закреплено: конспект отмечен вами как изученный' : masAtlas === 'chemistry' ? 'Закреплено: занятие отмечено вами как изученное' : 'Закреплено: карточку вспомнили 3 раза с растущим интервалом';
     $$('#masSeg [data-atlas]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.atlas === masAtlas)));
     const A = ATLASES[masAtlas], sec = V.sec[masAtlas], list = ((sec && sec.list) || []).filter(x => x.total > 0 || x.locked);
     const tot = atlasTotals(masAtlas);
@@ -1532,7 +1532,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (V.code) rows.push(['ID', V.code]);
     $('#props').innerHTML = rows.map(([k, v]) => '<dt>' + k + '</dt><dd>' + esc(v) + '</dd>').join('');
     $('#accessBody').innerHTML = '<dl class="props">' + Object.entries(ATLASES).map(([id, atlas]) => {
-      const label = id === 'chemistry' ? 'Открыт для всех' : DEMO ? 'Демо-режим' : hasAtlasAccess(id) ? (adminAccess() ? 'Полный доступ · администратор' : 'Подписка активна') : signedIn() && accessState !== 'ok' ? (accessState === 'error' ? 'Не удалось проверить доступ' : 'Проверяем доступ…') : 'Пробная версия';
+      const label = DEMO ? 'Демо-режим' : hasAtlasAccess(id) ? (adminAccess() ? 'Полный доступ · администратор' : 'Подписка активна') : signedIn() && accessState !== 'ok' ? (accessState === 'error' ? 'Не удалось проверить доступ' : 'Проверяем доступ…') : 'Пробная версия';
       return '<dt><a href="' + esc(atlas.url) + '">' + esc(atlas.name) + '</a></dt><dd data-atlas-access="' + id + '">' + label + '</dd>';
     }).join('') + '</dl>';
     $('#propsActs').innerHTML = (u || DEMO) ? '<button class="btn btn-soft" type="button" data-edit-profile><i data-lucide="pencil"></i>Редактировать профиль</button>' : '<p class="muted">Профиль появится после входа.</p>';
@@ -1545,10 +1545,15 @@ document.addEventListener('DOMContentLoaded', function () {
     if (u) acts = '<button class="btn btn-ghost btn-sm" type="button" id="syncNow"><i data-lucide="refresh-cw"></i>Синхронизировать сейчас</button>';
     $('#syncLine').innerHTML = line;
     $('#syncActs').innerHTML = acts;
+    const devRows = (!DEMO && u && SEC_STATE && Array.isArray(SEC_STATE.registeredDevices)) ? SEC_STATE.registeredDevices : [];
+    const maxDev = (SEC_STATE && SEC_STATE.maxDevices) || (u && u.maxDevices) || 3;
+    const curDevId = (MA && typeof MA.deviceId === 'function') ? MA.deviceId() : '';
+    const devHtml = (!DEMO && u && SEC_STATE) ? '<div style="margin-top:14px"><div class="muted" style="font-size:13px;margin-bottom:8px">Устройства: <b>' + devRows.length + ' из ' + maxDev + '</b></div>' +
+      devRows.map(d => '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;font-size:13px"><div><b>' + esc(d.name || 'Устройство') + '</b>' + (d.deviceId === curDevId ? ' · <span style="color:var(--mint)">это устройство</span>' : '') + '<div class="muted" style="font-size:12px">' + esc((d.ip ? 'IP ' + d.ip + ' · ' : '') + (d.lastActive || '')) + '</div></div><button class="btn btn-ghost btn-sm" type="button" data-unlink-dev="' + esc(d.deviceId) + '">Отвязать</button></div>').join('') + '</div>' : '';
     $('#acctBody').innerHTML = DEMO
       ? '<p class="muted">В демо-режиме аккаунт не используется.</p>'
       : u
-        ? '<dl class="props"><dt>Вход</dt><dd>' + esc(u.email || 'через ' + (u.providers || []).join(', ')) + '</dd></dl><div class="stack-btn"><a class="btn btn-ghost btn-sm" href="' + URLS.account + '"><i data-lucide="user-cog"></i>Почта, пароль, удаление аккаунта</a><button class="btn btn-ghost btn-sm" type="button" id="logout"><i data-lucide="log-out"></i>Выйти</button></div>'
+        ? '<dl class="props"><dt>Вход</dt><dd>' + esc(u.email || 'через ' + (u.providers || []).join(', ')) + '</dd></dl>' + devHtml + '<div class="stack-btn" style="margin-top:12px"><a class="btn btn-ghost btn-sm" href="' + URLS.account + '"><i data-lucide="user-cog"></i>Почта, пароль, удаление аккаунта</a><button class="btn btn-ghost btn-sm" type="button" id="logout"><i data-lucide="log-out"></i>Выйти</button></div>'
         : (MA && MA.enabled() ? '<p class="muted" style="margin-bottom:14px">Вы не вошли. Войдите, чтобы прогресс не потерялся и открылась ординаторская.</p><div class="stack-btn"><a class="btn btn-primary btn-sm" href="' + esc(MA.loginUrl()) + '">Войти</a><a class="btn btn-ghost btn-sm" href="' + esc(MA.loginUrl('register')) + '">Зарегистрироваться</a></div>' : '<p class="muted">Вход на этой копии сайта не настроен.</p>');
     $$('[data-theme-set]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.themeSet === theme)));
   }
@@ -1601,9 +1606,14 @@ document.addEventListener('DOMContentLoaded', function () {
       socErr = errText(e);
     }
   }
+  let SEC_STATE = null;
   async function refreshAll() {
-    await Promise.all([syncNow(), loadSocial(), loadAccess()]);
+    await Promise.all([syncNow(), loadSocial(), loadAccess(), loadSecurity()]);
     renderAll();
+  }
+  async function loadSecurity() {
+    if (DEMO || !signedIn()) { SEC_STATE = null; return; }
+    try { SEC_STATE = await MA.api('/security/state'); } catch (e) { SEC_STATE = null; }
   }
   async function loadAccess() {
     const request = ++accessRequest, owner = user();
@@ -1750,6 +1760,19 @@ document.addEventListener('DOMContentLoaded', function () {
     if (t.closest('[data-retry-social]')) { socState = 'loading'; renderAll(); await loadSocial(); renderAll(); return; }
     if (t.closest('#syncNow')) { await refreshAll(); toast({ tone: syncState === 'ok' ? 'cyan' : 'coral', icon: syncState === 'ok' ? 'check' : 'circle-alert', title: syncState === 'ok' ? 'Прогресс синхронизирован' : 'Не получилось синхронизировать', text: syncState === 'ok' ? '' : 'Проверьте интернет и попробуйте ещё раз.' }); return; }
     if (t.closest('#logout')) { MA.logout(false).then(() => location.reload()); return; }
+    const devBtn = t.closest('[data-unlink-dev]');
+    if (devBtn) {
+      devBtn.disabled = true;
+      try {
+        SEC_STATE = await MA.api('/security/remove-device', { method: 'POST', body: { deviceId: devBtn.dataset.unlinkDev } });
+        toast({ tone: 'cyan', icon: 'check', title: 'Устройство отвязано' });
+        renderSettings(); icons();
+      } catch (err) {
+        devBtn.disabled = false;
+        toast({ tone: 'coral', icon: 'circle-alert', title: 'Не получилось', text: errText(err) });
+      }
+      return;
+    }
     if (t.closest('#copyId')) { copyText(SOC.me.code, 'ID скопирован'); return; }
     if (t.closest('#copyLink')) { copyText($('#inviteLink').value, 'Ссылка скопирована'); return; }
     const d = t.closest('[data-duel]'), h = t.closest('[data-hand]'), un = t.closest('[data-unfriend]');
@@ -1928,6 +1951,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
-<script src="../assets/anti-theft-guard.js?v=20261113-v4"></script>
+<script src="../assets/anti-theft-guard.js?v=20261114-v6"></script>
 </body>
 </html>

@@ -28,10 +28,10 @@ function createContent({ cfg, store, authUser, HttpError, json }) {
     try { const m = manifest(atlas); for (const topic of Object.keys(m.topics)) source(atlas, topic, m); return true; }
     catch (_) { return false; }
   }
-  async function allowed(req, atlas) {
+  async function allowed(req, atlas, topicName = null) {
     const user = await authUser(req);
     if (!SUBJECTS.some(s => s.id === atlas)) throw new HttpError(404, 'not_found', 'Нет такого предмета.');
-    const record = await store.getDoc('access:' + user.id), grant = grantForUser(user, record && record.d, atlas);
+    const record = await store.getDoc('access:' + user.id), grant = grantForUser(user, record && record.d, atlas, Date.now(), topicName);
     if (!grant) throw new HttpError(403, 'subscription_required', 'Для этого предмета нужна действующая подписка.');
     return { user, grant };
   }
@@ -62,13 +62,13 @@ function createContent({ cfg, store, authUser, HttpError, json }) {
     throw new HttpError(503, 'content_busy', 'Материалы сейчас загружаются в другой вкладке. Повторите запрос.', { retryAfter: 2 });
   }
   async function topic(req, atlas, topic) {
-    const { user } = await allowed(req, atlas);
+    const { user } = await allowed(req, atlas, topic);
     let m;
     try { m = manifest(atlas); } catch (e) { if (e instanceof HttpError) throw e; throw new HttpError(503, 'content_unavailable', 'Материалы предмета временно недоступны.'); }
     const raw = source(atlas, topic, m);
     const stamp = await reserve(user, atlas, topic, raw.length);
     // Recheck after quota/database work: a revoked subscription cannot use a warm cache.
-    const { grant } = await allowed(req, atlas);
+    const { grant } = await allowed(req, atlas, topic);
     const mark = JSON.stringify(stamp);
     const code = '/* Medical Atlas personal copy: ' + mark + ' */\nwindow.MA_COPY=' + mark + ';\n' + raw.toString('utf8');
     const headers = { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'private, no-store, max-age=0',

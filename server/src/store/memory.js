@@ -41,6 +41,7 @@ function memoryStore(file) {
       db.users[id] = clone(u); save(); return clone(u);
     },
     async getUser(id) { return clone(db.users[id]); },
+    async listUsers() { return Object.values(db.users || {}).filter(u => u && !u.deleted).map(clone); },
     async putUser(u) { db.users[u.id] = clone(u); save(); },
     async deleteUser(id) { delete db.users[id]; save(); },
     async getIdentity(k) { return db.identities[k] || null; },

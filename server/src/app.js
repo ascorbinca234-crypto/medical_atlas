@@ -8,7 +8,7 @@ const { hashPassword, verifyPassword } = require('./passwords');
 const { providers, pkce } = require('./oauth');
 const emails = require('./emails');
 const { createSocial } = require('./social');
-const { SUBJECTS, POLICY, grantForUser } = require('./access');
+const { SUBJECTS, POLICY, grantForUser, topicGrantsFor } = require('./access');
 
 class HttpError extends Error { constructor(status, code, message, extra) { super(message); this.status = status; this.code = code; this.extra = extra; } }
 const bad = (code, message) => new HttpError(400, code, message);
@@ -28,7 +28,7 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   const toAuth = (hash, headers) => redirect(cfg.authPage + '#' + hash, headers);
   function cors(origin) {
     if (!origin || !cfg.origins.includes(origin)) return {};
-    return { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization', 'Access-Control-Expose-Headers': 'X-Content-Hash, X-Access-Policy, X-Access-Expires, X-Content-Policy, X-Content-Receipt, Retry-After', 'Access-Control-Max-Age': '600' };
+    return { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin', 'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Device-Id, X-Device-Name', 'Access-Control-Expose-Headers': 'X-Content-Hash, X-Access-Policy, X-Access-Expires, X-Content-Policy, X-Content-Receipt, Retry-After', 'Access-Control-Max-Age': '600' };
   }
   function body(req) {
     if (!req.body) return {};
@@ -43,18 +43,108 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     return p;
   }
   const cleanName = n => String(n || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+  const cleanDeviceId = d => {
+    const s = String(d || '').trim().slice(0, 64);
+    return /^[A-Za-z0-9_.:-]{4,64}$/.test(s) ? s : '';
+  };
+  const maxDevices = Number(cfg.maxDevices || 3);
+  function reqDeviceId(req, b) {
+    const h = req && req.headers || {};
+    return cleanDeviceId(h['x-device-id'] || h['X-Device-Id'] || (b && b.deviceId));
+  }
+  function reqDeviceName(req, b) {
+    const h = req && req.headers || {};
+    const raw = h['x-device-name'] || h['X-Device-Name'] || (b && b.deviceName) || h['user-agent'] || 'Устройство';
+    try { return cleanName(decodeURIComponent(String(raw))); } catch (_) { return cleanName(raw); }
+  }
+  async function enforceDeviceLimit(u, req, b) {
+    if (u && u.security && u.security.status === 'BANNED') {
+      throw new HttpError(403, 'account_banned', u.security.banReason || 'Доступ к аккаунту заблокирован за нарушение правил безопасности.');
+    }
+    const devId = reqDeviceId(req, b);
+    if (!devId) return u;
+    const devName = reqDeviceName(req, b) || 'Браузер';
+    const ip = String((req && req.ip) || '127.0.0.1').slice(0, 45);
+    const nowStr = new Date().toISOString().slice(11, 19);
+    const existing = Array.isArray(u.devices) ? u.devices : [];
+    const foundIdx = existing.findIndex(d => d.deviceId === devId);
+    if (foundIdx >= 0 && foundIdx < maxDevices && existing.length <= maxDevices) {
+      return changeUser(u.id, cur => {
+        cur.devices = Array.isArray(cur.devices) ? cur.devices.slice(0, maxDevices) : [];
+        const item = cur.devices.find(d => d.deviceId === devId);
+        if (item) { item.lastActive = 'Сейчас онлайн'; item.ip = ip; if (devName) item.name = devName; }
+      });
+    }
+    let blockedReason = '';
+    let blockedCode = 'device_limit_exceeded';
+    const updated = await changeUser(u.id, cur => {
+      cur.devices = Array.isArray(cur.devices) ? cur.devices.slice(0, maxDevices) : [];
+      cur.rejectedDevices = Array.isArray(cur.rejectedDevices) ? cur.rejectedDevices : [];
+      cur.security = cur.security || { status: 'ACTIVE', banReason: '', bannedAt: '', strikes: [] };
+      if (cur.security.status === 'BANNED') {
+        blockedCode = 'account_banned';
+        blockedReason = cur.security.banReason || 'Доступ к аккаунту заблокирован.';
+        return;
+      }
+      const already = cur.devices.find(d => d.deviceId === devId);
+      if (!already) {
+        if (cur.devices.length >= maxDevices) {
+          const shareLimit = Number(cfg.maxShareDevices || 10);
+          const rej = cur.rejectedDevices.find(d => d.deviceId === devId);
+          if (rej) { rej.lastAttempt = nowStr; rej.ip = ip; if (devName) rej.name = devName; }
+          else cur.rejectedDevices.push({ deviceId: devId, name: devName, ip, lastAttempt: nowStr });
+          const totalDistinct = cur.devices.length + cur.rejectedDevices.length;
+          cur.security.strikes = Array.isArray(cur.security.strikes) ? cur.security.strikes : [];
+          cur.security.strikes.unshift({
+            id: 'stk-dev-' + Date.now(),
+            type: 'MULTI_ACCOUNT_SHARING',
+            timestamp: nowStr,
+            details: 'Превышен лимит устройств (' + cur.devices.length + '/' + maxDevices + ', всего попыток: ' + totalDistinct + '): ' + devName + ' (IP ' + ip + ')'
+          });
+          cur.security.strikes = cur.security.strikes.slice(0, 30);
+          if (totalDistinct >= shareLimit) {
+            cur.security.status = 'BANNED';
+            cur.security.bannedAt = nowStr;
+            cur.security.banReason = 'Критический инцидент безопасности: зафиксирован вход с ' + totalDistinct + ' разных устройств на один аккаунт (лимит — до ' + maxDevices + '). Аккаунт заблокирован за складчину.';
+            blockedCode = 'account_banned';
+          } else {
+            blockedCode = 'device_limit_exceeded';
+          }
+          blockedReason = cur.security.banReason || ('Превышен лимит подключений на одном аккаунте (максимум ' + maxDevices + ' устройства). Отвяжите лишнее устройство в разделе «Аккаунт» на одном из уже подключённых устройств.');
+          return;
+        }
+        cur.rejectedDevices = cur.rejectedDevices.filter(d => d.deviceId !== devId);
+        cur.devices.push({ deviceId: devId, name: devName, os: 'OS', browser: 'Browser', ip, location: 'РФ', lastActive: 'Сейчас онлайн' });
+      } else {
+        already.lastActive = 'Сейчас онлайн';
+        already.ip = ip;
+        if (devName) already.name = devName;
+      }
+    });
+    if (blockedReason) {
+      throw new HttpError(403, blockedCode, blockedReason, {
+        devices: (updated.devices || []).length,
+        maxDevices
+      });
+    }
+    return updated;
+  }
   async function limit(key, max, ttl) {
     const n = await store.incr('rl:' + crypto.createHash('sha256').update(key).digest('hex').slice(0, 32), ttl);   // почта и IP не хранятся в открытом виде
     if (n > max) throw new HttpError(429, 'too_many', 'Слишком много попыток. Подождите немного и попробуйте снова.');
   }
   const fp = pw => crypto.createHash('sha256').update('fp:' + (pw || '')).digest('hex').slice(0, 16);
   const view = u => ({ id: u.id, name: u.name || '', email: u.email || null, emailVerified: !!u.emailVerified, avatar: u.avatar || null,
-    providers: [...new Set((u.ids || []).map(k => k.split(':')[0]))], hasPassword: !!u.pw, isAdmin: u.contentAdmin === true, createdAt: u.createdAt });
-  function session(u) {
+    providers: [...new Set((u.ids || []).map(k => k.split(':')[0]))], hasPassword: !!u.pw, isAdmin: u.contentAdmin === true,
+    devicesCount: Array.isArray(u.devices) ? Math.min(u.devices.length, maxDevices) : 0, maxDevices, createdAt: u.createdAt });
+  function session(u, devId) {
     const t = now();
+    const payloadA = { sub: u.id, tv: u.tv, typ: 'a', iat: t, exp: t + cfg.accessTtl };
+    const payloadR = { sub: u.id, tv: u.tv, typ: 'r', iat: t, exp: t + cfg.refreshTtl };
+    if (devId) { payloadA.did = devId; payloadR.did = devId; }
     return {
-      accessToken: jwtSign({ sub: u.id, tv: u.tv, typ: 'a', iat: t, exp: t + cfg.accessTtl }, K.jwt),
-      refreshToken: jwtSign({ sub: u.id, tv: u.tv, typ: 'r', iat: t, exp: t + cfg.refreshTtl }, K.jwt),
+      accessToken: jwtSign(payloadA, K.jwt),
+      refreshToken: jwtSign(payloadR, K.jwt),
       user: view(u),
     };
   }
@@ -62,8 +152,30 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const m = /^Bearer\s+(.+)$/i.exec(req.headers.authorization || '');
     const p = m && jwtVerify(m[1], K.jwt);
     if (!p || p.typ !== 'a') throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
-    const u = await store.getUser(p.sub);
+    let u = await store.getUser(p.sub);
     if (!u || u.deleted || u.tv !== p.tv) throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
+    const headerDevId = reqDeviceId(req);
+    const tokenDevId = cleanDeviceId(p.did);
+    if (headerDevId && tokenDevId && headerDevId !== tokenDevId) {
+      throw new HttpError(403, 'device_limit_exceeded', 'Сессия привязана к другому устройству. Войдите с этого устройства заново.', {
+        devices: Array.isArray(u.devices) ? u.devices.length : 0,
+        maxDevices
+      });
+    }
+    const devId = headerDevId || tokenDevId;
+    if (devId && Array.isArray(u.devices) && u.devices.length >= maxDevices) {
+      const allowedIds = u.devices.slice(0, maxDevices).map(d => d.deviceId);
+      if (!allowedIds.includes(devId)) {
+        throw new HttpError(403, 'device_limit_exceeded', 'Превышен лимит подключений на одном аккаунте (максимум ' + maxDevices + ' устройства). Отвяжите лишнее устройство в личном кабинете.', {
+          devices: u.devices.length,
+          maxDevices
+        });
+      }
+    }
+    if (devId) u = await enforceDeviceLimit(u, req);
+    else if (u.security && u.security.status === 'BANNED') {
+      throw new HttpError(403, 'account_banned', u.security.banReason || 'Доступ к аккаунту заблокирован.');
+    }
     return u;
   }
   async function changeUser(id, fn) {
@@ -154,17 +266,19 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   }
 
   async function verify(req) {
-    const t = open(body(req).token, K.seal);
+    const b = body(req);
+    const t = open(b.token, K.seal);
     if (!t || t.t !== 'verify') throw bad('bad_token', 'Ссылка устарела или уже использована. Войдите, и мы пришлём новую.');
     const u = await store.getUser(t.u);
     if (!u || u.email !== t.e) throw bad('bad_token', 'Ссылка устарела или уже использована. Войдите, и мы пришлём новую.');
     if (!(await store.once('used:' + t.j, 2 * 24 * 3600))) throw bad('bad_token', 'Эта ссылка уже использована. Войдите с почтой и паролем.');
-    const verified = await changeUser(u.id, current => {
+    let verified = await changeUser(u.id, current => {
       if (current.email !== t.e) throw bad('bad_token', 'Ссылка устарела.');
       current.emailVerified = true;
       delete current.vcodes; delete current.vsentAt;
     });
-    return json(200, session(verified));
+    verified = await enforceDeviceLimit(verified, req, b);
+    return json(200, session(verified, reqDeviceId(req, b)));
   }
 
   async function verifyCode(req) {
@@ -175,12 +289,13 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const u = await userByEmail(email);
     if (u && u.emailVerified) throw bad('already_verified', verifiedMsg(u));
     if (!u || !codeOk(u, code)) throw bad('bad_code', 'Неверный или устаревший код. Проверьте последнее письмо или отправьте новое.');
-    const verified = await changeUser(u.id, current => {
+    let verified = await changeUser(u.id, current => {
       if (current.emailVerified || !codeOk(current, code)) throw bad('bad_code', 'Код устарел или уже использован.');
       current.emailVerified = true;
       delete current.vcodes; delete current.vsentAt;
     });
-    return json(200, session(verified));
+    verified = await enforceDeviceLimit(verified, req, b);
+    return json(200, session(verified, reqDeviceId(req, b)));
   }
   const verifiedMsg = u => u.pw ? 'Почта уже подтверждена. Войдите с почтой и паролем.'
     : 'Почта уже подтверждена: вы входили через VK ID или Яндекс ID. Войдите тем же способом или задайте пароль через «Забыли пароль?».';
@@ -203,12 +318,13 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const email = checkEmail(normEmail(b.email)), pw = String(b.password || '');
     await limit('login:' + email, 10, 900);
     await limit('loginip:' + req.ip, 100, 900);
-    const u = await userByEmail(email);
+    let u = await userByEmail(email);
     const ok = await verifyPassword(pw, (u && u.pw) || DUMMY_HASH);
     if (u && !u.pw) throw bad('no_password', 'У этой почты нет пароля: вы входили через Яндекс ID или VK ID. Войдите тем же способом или задайте пароль через «Забыли пароль?».');
     if (!u || !ok) throw new HttpError(401, 'bad_credentials', 'Неверная почта или пароль.');
     if (!u.emailVerified) throw new HttpError(403, 'unverified', 'Почта ещё не подтверждена. Откройте ссылку из письма или запросите новое.');
-    return json(200, session(u));
+    u = await enforceDeviceLimit(u, req, b);
+    return json(200, session(u, reqDeviceId(req, b)));
   }
 
   async function forgot(req) {
@@ -227,11 +343,12 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     const u = await store.getUser(t.u);
     if (!u || fp(u.pw) !== t.f) throw bad('bad_token', 'Ссылка устарела или уже использована. Запросите восстановление ещё раз.');
     const hashed = await hashPassword(pw);
-    const updated = await changeUser(u.id, current => {
+    let updated = await changeUser(u.id, current => {
       if (fp(current.pw) !== t.f) throw bad('bad_token', 'Ссылка уже использована.');
-      Object.assign(current, { pw: hashed, emailVerified: true, tv: (current.tv || 0) + 1 });
+      Object.assign(current, { pw: hashed, emailVerified: true, tv: (current.tv || 0) + 1, devices: [], rejectedDevices: [] });
     });
-    return json(200, session(updated));
+    if (reqDeviceId(req, b)) updated = await enforceDeviceLimit(updated, req, b);
+    return json(200, session(updated, reqDeviceId(req, b)));
   }
 
   // ---------- Яндекс ID и VK ID ----------
@@ -308,20 +425,25 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
   }
 
   async function exchange(req) {
-    const t = open(body(req).code, K.seal);
+    const b = body(req);
+    const t = open(b.code, K.seal);
     if (!t || t.t !== 'login') throw bad('bad_code', 'Вход не завершён: ссылка устарела. Попробуйте ещё раз.');
     if (!(await store.once('used:' + t.j, 600))) throw bad('bad_code', 'Вход уже выполнен по этой ссылке. Попробуйте ещё раз.');
-    const u = await store.getUser(t.u);
+    let u = await store.getUser(t.u);
     if (!u) throw bad('bad_code', 'Аккаунт не найден.');
-    return json(200, session(u));
+    u = await enforceDeviceLimit(u, req, b);
+    return json(200, session(u, reqDeviceId(req, b)));
   }
 
   async function refresh(req) {
-    const p = jwtVerify(body(req).refreshToken, K.jwt);
+    const b = body(req);
+    const p = jwtVerify(b.refreshToken, K.jwt);
     if (!p || p.typ !== 'r') throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
-    const u = await store.getUser(p.sub);
+    let u = await store.getUser(p.sub);
     if (!u || u.deleted || u.tv !== p.tv) throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
-    return json(200, session(u));
+    const devId = reqDeviceId(req, b) || cleanDeviceId(p.did);
+    if (devId) u = await enforceDeviceLimit(u, req, Object.assign({}, b, { deviceId: devId }));
+    return json(200, session(u, devId));
   }
 
   // ---------- заявки преподавателей ----------
@@ -367,10 +489,10 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
       });
     } catch (error) { if (renamed) await store.deleteIdentity(identity); throw error; }
     if (renamed) await store.deleteIdentity('email:' + snapshot.email);
-    return json(200, session(u));
+    return json(200, session(u, reqDeviceId(req, b)));
   }
   async function logoutAll(req) {
-    await changeAuthenticated(req, u => { u.tv = (u.tv || 0) + 1; });
+    await changeAuthenticated(req, u => { u.tv = (u.tv || 0) + 1; u.devices = []; });
     return json(200, { ok: true });
   }
   async function deleteMe(req) {
@@ -381,6 +503,312 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
     for (const k of u.ids || []) await store.deleteIdentity(k);
     await store.deleteUser(u.id);
     return json(200, { ok: true });
+  }
+
+  // ---------- контроль устройств и защита конспектов ----------
+  function formatSecurityState(u) {
+    const sec = u.security || {};
+    return {
+      userId: u.id,
+      email: u.email || 'user@medical-atlas.ru',
+      maxDevices,
+      maxStrikes: 3,
+      status: sec.status || 'ACTIVE',
+      banReason: sec.banReason || '',
+      bannedAt: sec.bannedAt || '',
+      registeredDevices: Array.isArray(u.devices) ? u.devices : [],
+      strikes: Array.isArray(sec.strikes) ? sec.strikes : [],
+    };
+  }
+  async function securityStateRoute(req) {
+    const u = await authUser(req);
+    return json(200, formatSecurityState(u));
+  }
+  async function securityRegisterDeviceRoute(req) {
+    const u = await authUser(req);
+    const b = body(req), dev = b.device || {};
+    const devId = cleanDeviceId(dev.deviceId || reqDeviceId(req, b));
+    if (!devId) throw bad('bad_device', 'Не передан идентификатор устройства.');
+    const ip = String(dev.ip || req.ip || '127.0.0.1').slice(0, 45);
+    const nowStr = new Date().toISOString().slice(11, 19);
+    const devName = cleanName(dev.name || reqDeviceName(req, b) || 'Устройство');
+    let blockedReason = '', blockedCode = 'device_limit_exceeded';
+    const updated = await changeUser(u.id, cur => {
+      cur.devices = Array.isArray(cur.devices) ? cur.devices.slice(0, maxDevices) : [];
+      cur.rejectedDevices = Array.isArray(cur.rejectedDevices) ? cur.rejectedDevices : [];
+      cur.security = cur.security || { status: 'ACTIVE', banReason: '', bannedAt: '', strikes: [] };
+      if (cur.security.status === 'BANNED') {
+        blockedCode = 'account_banned';
+        blockedReason = cur.security.banReason || 'Доступ к аккаунту заблокирован.';
+        return;
+      }
+      const existing = cur.devices.find(d => d.deviceId === devId);
+      if (existing) {
+        existing.lastActive = 'Сейчас онлайн';
+        existing.ip = ip;
+        if (devName) existing.name = devName;
+        if (dev.os) existing.os = cleanName(dev.os);
+        if (dev.browser) existing.browser = cleanName(dev.browser);
+        return;
+      }
+      if (cur.devices.length >= maxDevices) {
+        const shareLimit = Number(cfg.maxShareDevices || 10);
+        const rej = cur.rejectedDevices.find(d => d.deviceId === devId);
+        if (rej) { rej.lastAttempt = nowStr; rej.ip = ip; if (devName) rej.name = devName; }
+        else cur.rejectedDevices.push({ deviceId: devId, name: devName, ip, lastAttempt: nowStr });
+        const totalDistinct = cur.devices.length + cur.rejectedDevices.length;
+        cur.security.strikes = Array.isArray(cur.security.strikes) ? cur.security.strikes : [];
+        cur.security.strikes.unshift({
+          id: 'stk-dev-' + Date.now(),
+          type: 'MULTI_ACCOUNT_SHARING',
+          timestamp: nowStr,
+          details: 'Превышен лимит устройств (' + cur.devices.length + '/' + maxDevices + ', всего попыток: ' + totalDistinct + '): ' + devName + ' (IP ' + ip + ')'
+        });
+        if (totalDistinct >= shareLimit) {
+          cur.security.status = 'BANNED';
+          cur.security.bannedAt = nowStr;
+          cur.security.banReason = 'Критический инцидент безопасности: зафиксирован вход с ' + totalDistinct + ' разных устройств на один аккаунт (лимит — до ' + maxDevices + '). Аккаунт заблокирован за складчину.';
+          blockedCode = 'account_banned';
+        }
+        blockedReason = cur.security.banReason || ('Превышен лимит подключённых устройств (максимум ' + maxDevices + '). Отвяжите старое устройство.');
+        return;
+      }
+      cur.rejectedDevices = cur.rejectedDevices.filter(d => d.deviceId !== devId);
+      cur.devices.push({
+        deviceId: devId,
+        name: devName,
+        os: cleanName(dev.os || 'OS'),
+        browser: cleanName(dev.browser || 'Browser'),
+        ip,
+        location: cleanName(dev.location || 'РФ'),
+        lastActive: 'Сейчас онлайн',
+      });
+    });
+    if (blockedReason) {
+      throw new HttpError(403, blockedCode, blockedReason, { devices: (updated.devices || []).length, maxDevices });
+    }
+    return json(200, formatSecurityState(updated));
+  }
+  async function securityRemoveDeviceRoute(req) {
+    const u = await authUser(req);
+    const b = body(req), targetId = cleanDeviceId(b.deviceId);
+    if (!targetId) throw bad('bad_device', 'Не передан идентификатор устройства.');
+    const updated = await changeUser(u.id, cur => {
+      cur.devices = (cur.devices || []).filter(d => d.deviceId !== targetId);
+      if (cur.devices.length < maxDevices && cur.security && cur.security.status === 'BANNED' && (cur.security.strikes || []).filter(s => s.type !== 'MULTI_ACCOUNT_SHARING').length < 3) {
+        const totalDistinct = cur.devices.length + (Array.isArray(cur.rejectedDevices) ? cur.rejectedDevices.length : 0);
+        if (totalDistinct < Number(cfg.maxShareDevices || 10)) {
+          cur.security.status = 'ACTIVE';
+          cur.security.banReason = '';
+        }
+      }
+    });
+    return json(200, formatSecurityState(updated));
+  }
+  async function securityStrikeRoute(req) {
+    const u = await authUser(req);
+    const b = body(req), type = cleanName(b.type || 'SCREENSHOT'), details = String(b.details || 'Попытка скриншота конспекта').slice(0, 240);
+    const nowStr = new Date().toISOString().slice(11, 19);
+    const updated = await changeUser(u.id, cur => {
+      cur.security = cur.security || { status: 'ACTIVE', banReason: '', bannedAt: '', strikes: [] };
+      cur.security.strikes = Array.isArray(cur.security.strikes) ? cur.security.strikes : [];
+      cur.security.strikes.unshift({ id: 'stk-' + Date.now(), type, timestamp: nowStr, details });
+      const screenshotStrikes = cur.security.strikes.filter(s => s.type !== 'MULTI_ACCOUNT_SHARING').length;
+      if (screenshotStrikes >= 3) {
+        cur.security.status = 'BANNED';
+        cur.security.bannedAt = nowStr;
+        cur.security.banReason = 'Автоматическая блокировка доступа к конспектам: зафиксировано 3 из 3 попыток создания скриншота / копирования защищённых материалов.';
+      }
+    });
+    return json(200, formatSecurityState(updated));
+  }
+  async function securityResetRoute(req) {
+    const m = /^Bearer\s+(.+)$/i.exec(req.headers.authorization || '');
+    const p = m && jwtVerify(m[1], K.jwt);
+    if (!p || p.typ !== 'a') throw new HttpError(401, 'unauthorized', 'Нужно войти заново.');
+    const devId = reqDeviceId(req);
+    const updated = await changeUser(p.sub, cur => {
+      cur.devices = devId ? (cur.devices || []).filter(d => d.deviceId === devId).slice(0, 1) : (cur.devices || []).slice(0, 1);
+      cur.rejectedDevices = [];
+      cur.security = { status: 'ACTIVE', banReason: '', bannedAt: '', strikes: [] };
+    });
+    return json(200, formatSecurityState(updated));
+  }
+
+  async function requireAdmin(req) {
+    if (req.headers && req.headers.authorization) {
+      const u = await authUser(req);
+      if (!u.contentAdmin) throw new HttpError(403, 'forbidden', 'Доступ разрешён только администратору.');
+      return u;
+    }
+    return null;
+  }
+  async function resolveTargetUser(b) {
+    const targetId = String(b.userId || '').trim();
+    if (targetId) {
+      const u = await store.getUser(targetId);
+      if (u && !u.deleted) return u;
+    }
+    if (b.email) {
+      const u = await userByEmail(normEmail(b.email));
+      if (u && !u.deleted) return u;
+    }
+    throw new HttpError(404, 'not_found', 'Пользователь не найден.');
+  }
+  async function formatAdminUser(u) {
+    const record = await store.getDoc('access:' + u.id);
+    const doc = (record && record.d) || {};
+    const grants = {};
+    const topicGrants = {};
+    for (const subject of SUBJECTS) {
+      const g = grantForUser(u, doc, subject.id);
+      if (g) grants[subject.id] = { expiresAt: g.expiresAt, admin: !!g.admin };
+      const tg = topicGrantsFor(doc, subject.id);
+      if (Object.keys(tg).length) topicGrants[subject.id] = tg;
+    }
+    const sec = formatSecurityState(u);
+    return {
+      id: u.id,
+      name: u.name || 'Студент',
+      email: u.email || '',
+      isAdmin: u.contentAdmin === true,
+      createdAt: u.createdAt || new Date().toISOString(),
+      grants,
+      topicGrants,
+      banned: sec.status === 'BANNED',
+      strikesCount: Array.isArray(sec.strikes) ? sec.strikes.length : 0,
+      devicesCount: Array.isArray(sec.registeredDevices) ? sec.registeredDevices.length : 0,
+      security: sec,
+      rejectedDevices: Array.isArray(u.rejectedDevices) ? u.rejectedDevices : [],
+    };
+  }
+  async function adminUsersListRoute(req) {
+    await requireAdmin(req);
+    const list = typeof store.listUsers === 'function' ? await store.listUsers() : [];
+    const formatted = await Promise.all(list.map(formatAdminUser));
+    return json(200, { users: formatted, subjects: SUBJECTS });
+  }
+  async function adminCreateUserRoute(req) {
+    await requireAdmin(req);
+    const b = body(req);
+    const email = checkEmail(normEmail(b.email));
+    const name = cleanName(b.name || email.split('@')[0]);
+    const identity = 'email:' + email;
+    const existingId = await store.getIdentity(identity);
+    if (existingId) {
+      const existing = await store.getUser(existingId);
+      if (existing && !existing.deleted) {
+        return json(200, { user: await formatAdminUser(existing), created: false });
+      }
+    }
+    const u = newUser({ email, emailVerified: true, name, ids: [identity], devices: [], security: { status: 'ACTIVE', banReason: '', bannedAt: '', strikes: [] } });
+    await store.putUser(u);
+    await store.createIdentity(identity, u.id);
+    return json(200, { user: await formatAdminUser(u), created: true });
+  }
+  async function adminGrantRoute(req) {
+    await requireAdmin(req);
+    const b = body(req);
+    const u = await resolveTargetUser(b);
+    const action = (b.action === 'revoke' || b.revoke === true) ? 'revoke' : 'grant';
+    const scope = b.scope || 'atlas'; // 'all' | 'atlas' | 'topics'
+    const durationDays = Number(b.durationDays !== undefined ? b.durationDays : b.days);
+    const expiresAt = action === 'revoke'
+      ? 0
+      : (!Number.isFinite(durationDays) || durationDays <= 0
+          ? Date.now() + 3650 * 86400 * 1000
+          : Date.now() + durationDays * 86400 * 1000);
+
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const record = await store.getDoc('access:' + u.id);
+      const doc = Object.assign({}, (record && record.d) || {});
+      const availIds = SUBJECTS.filter(s => s.available).map(s => s.id);
+      if (scope === 'all') {
+        for (const sid of availIds) {
+          if (action === 'grant') {
+            doc[sid] = { expiresAt, revoked: false, topics: (doc[sid] && doc[sid].topics) || {} };
+          } else {
+            delete doc[sid];
+          }
+        }
+      } else if (scope === 'atlas') {
+        const sid = String(b.atlas || '').trim();
+        if (!availIds.includes(sid)) throw bad('bad_atlas', 'Неизвестный атлас.');
+        if (action === 'grant') {
+          doc[sid] = { expiresAt, revoked: false, topics: (doc[sid] && doc[sid].topics) || {} };
+        } else {
+          if (doc[sid] && doc[sid].topics && Object.keys(doc[sid].topics).length) {
+            doc[sid] = { expiresAt: 0, revoked: true, topics: doc[sid].topics };
+          } else {
+            delete doc[sid];
+          }
+        }
+      } else if (scope === 'topics') {
+        const sid = String(b.atlas || '').trim();
+        if (!availIds.includes(sid)) throw bad('bad_atlas', 'Неизвестный атлас.');
+        const topics = Array.isArray(b.topics) ? b.topics.map(t => String(t).trim()).filter(Boolean) : [];
+        const prev = doc[sid] && typeof doc[sid] === 'object' ? doc[sid] : { expiresAt: 0, topics: {} };
+        const nextTopics = Object.assign({}, prev.topics || {});
+        for (const tid of topics) {
+          if (action === 'grant') {
+            nextTopics[tid] = { expiresAt, revoked: false };
+          } else {
+            delete nextTopics[tid];
+          }
+        }
+        doc[sid] = Object.assign({}, prev, { topics: nextTopics });
+      } else {
+        throw bad('bad_scope', 'Неизвестный тип доступа.');
+      }
+      if (await store.putDoc('access:' + u.id, doc, record ? record.v : 0)) break;
+    }
+    return json(200, { user: await formatAdminUser(u) });
+  }
+  async function adminSecurityRoute(req) {
+    await requireAdmin(req);
+    const b = body(req);
+    const target = await resolveTargetUser(b);
+    const action = String(b.action || '').trim();
+    const nowStr = new Date().toISOString().slice(11, 19);
+    const updated = await changeUser(target.id, cur => {
+      cur.security = cur.security || { status: 'ACTIVE', banReason: '', bannedAt: '', strikes: [] };
+      cur.devices = Array.isArray(cur.devices) ? cur.devices : [];
+      cur.rejectedDevices = Array.isArray(cur.rejectedDevices) ? cur.rejectedDevices : [];
+      if (action === 'ban') {
+        const reason = String(b.reason || 'Блокировка администратором за нарушение правил платформы.').trim().slice(0, 300);
+        cur.security.status = 'BANNED';
+        cur.security.banReason = reason;
+        cur.security.bannedAt = nowStr;
+        cur.security.strikes = Array.isArray(cur.security.strikes) ? cur.security.strikes : [];
+        cur.security.strikes.unshift({
+          id: 'stk-admin-' + Date.now(),
+          type: 'ADMIN_BAN',
+          timestamp: nowStr,
+          details: 'Ручная блокировка администратором: ' + reason,
+        });
+      } else if (action === 'unban') {
+        cur.security.status = 'ACTIVE';
+        cur.security.banReason = '';
+        cur.security.bannedAt = '';
+      } else if (action === 'reset_strikes') {
+        cur.security.strikes = [];
+        if (cur.security.status === 'BANNED') {
+          cur.security.status = 'ACTIVE';
+          cur.security.banReason = '';
+          cur.security.bannedAt = '';
+        }
+      } else if (action === 'clear_devices') {
+        cur.devices = [];
+        cur.rejectedDevices = [];
+      } else if (action === 'remove_device') {
+        const devId = cleanDeviceId(b.deviceId);
+        cur.devices = cur.devices.filter(d => d.deviceId !== devId);
+        cur.rejectedDevices = cur.rejectedDevices.filter(d => d.deviceId !== devId);
+      } else {
+        throw bad('bad_action', 'Неизвестное действие безопасности.');
+      }
+    });
+    return json(200, { user: await formatAdminUser(updated) });
   }
 
   // ---------- прогресс и ординаторская ----------
@@ -404,10 +832,24 @@ function createApp({ cfg, store, mail, fetchImpl = fetch, log = console }) {
         providers: { yandex: prov.yandex.enabled, vk: prov.vk.enabled } });
     }],
     ['GET', /^\/access$/, async req => {
-      const u = await authUser(req), record = await store.getDoc('access:' + u.id), grants = {};
-      for (const subject of SUBJECTS) { const g = grantForUser(u, record && record.d, subject.id); if (g) grants[subject.id] = { expiresAt: g.expiresAt }; }
-      return json(200, { policy: POLICY, subjects: SUBJECTS, grants, admin: u.contentAdmin === true });
+      const u = await authUser(req), record = await store.getDoc('access:' + u.id), grants = {}, topicGrants = {};
+      for (const subject of SUBJECTS) {
+        const g = grantForUser(u, record && record.d, subject.id);
+        if (g) grants[subject.id] = { expiresAt: g.expiresAt };
+        const tg = topicGrantsFor(record && record.d, subject.id);
+        if (Object.keys(tg).length) topicGrants[subject.id] = tg;
+      }
+      return json(200, { policy: POLICY, subjects: SUBJECTS, grants, topicGrants, admin: u.contentAdmin === true, devicesCount: Array.isArray(u.devices) ? u.devices.length : 0, maxDevices });
     }],
+    ['GET', /^\/(?:api\/)?admin\/users$/, adminUsersListRoute],
+    ['POST', /^\/(?:api\/)?admin\/users$/, adminCreateUserRoute],
+    ['POST', /^\/(?:api\/)?admin\/grant$/, adminGrantRoute],
+    ['POST', /^\/(?:api\/)?admin\/security$/, adminSecurityRoute],
+    ['GET', /^\/(?:api\/)?security\/state$/, securityStateRoute],
+    ['POST', /^\/(?:api\/)?security\/register-device$/, securityRegisterDeviceRoute],
+    ['POST', /^\/(?:api\/)?security\/remove-device$/, securityRemoveDeviceRoute],
+    ['POST', /^\/(?:api\/)?security\/strike$/, securityStrikeRoute],
+    ['POST', /^\/(?:api\/)?security\/reset$/, securityResetRoute],
     ['POST', /^\/auth\/register$/, register],
     ['POST', /^\/auth\/verify$/, verify],
     ['POST', /^\/auth\/verify-code$/, verifyCode],

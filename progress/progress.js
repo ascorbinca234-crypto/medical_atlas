@@ -223,8 +223,8 @@
   }
   function pickLast(a, b) { if (!a) return b; if (!b) return a; return (b.t || 0) > (a.t || 0) ? b : a; }
 
-  window.addEventListener('storage', function (e) { if (e.key === KEY) emit(); });
-  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && syncT) sync().catch(function () { /* */ }); });
+  if (typeof window !== 'undefined' && window.addEventListener) window.addEventListener('storage', function (e) { if (e.key === KEY) emit(); });
+  if (typeof document !== 'undefined' && document.addEventListener) document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && syncT) sync().catch(function () { /* */ }); });
   if (root.MA && root.MA.onChange) root.MA.onChange(function (u) { if (u) schedule(500); });
 
   root.MAP = {
@@ -235,4 +235,4 @@
   };
   // на страницах атласов отправляем накопленное, если вошли
   if (signedIn()) schedule(4000);
-})(typeof window !== 'undefined' ? window : this);
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));

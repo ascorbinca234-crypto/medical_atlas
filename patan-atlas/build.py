@@ -380,7 +380,7 @@ window.PATAN_USE_BOOT = true;
 if(window.PATAN_USE_BOOT&&window.MA&&typeof window.MA.bootAtlas==='function'){window.MA.bootAtlas('patan','patan-app');}
 else{var s=document.createElement('script');s.textContent=code;document.body.appendChild(s);}})();
 </script>
-<script src="../assets/anti-theft-guard.js?v=20261113-v5"></script>'''
+<script src="../assets/anti-theft-guard.js?v=20261114-v6"></script>'''
     assert old_boot in out_html, 'old_boot not found'
     out_html = out_html.replace(old_boot, new_boot, 1)
 

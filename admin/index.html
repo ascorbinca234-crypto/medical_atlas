@@ -1,0 +1,1494 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Панель администратора — Медицинский атлас 2026</title>
+<meta name="description" content="Административная панель управления доступами к атласам и темам, блокировками (банами), страйками и устройствами пользователей платформы Медицинский атлас 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-subtle: #f1f5f9;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --ink: #0f172a;
+    --ink-secondary: #334155;
+    --mute: #64748b;
+    --primary: #0284c7;
+    --primary-hover: #0369a1;
+    --primary-soft: #f0f9ff;
+    --emerald: #16a34a;
+    --emerald-soft: #f0fdf4;
+    --amber: #d97706;
+    --amber-soft: #fffbeb;
+    --crimson: #dc2626;
+    --crimson-hover: #b91c1c;
+    --crimson-soft: #fef2f2;
+    --font-sans: "Golos Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 3-Zone Top Bar Contract */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .brand-wordmark {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .topnav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    overflow-x: auto;
+  }
+  .topnav a {
+    color: var(--ink-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: color 0.15s ease;
+  }
+  .topnav a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .topbar-cta {
+    flex-shrink: 0;
+  }
+
+  /* Main Container */
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 28px 24px 64px;
+  }
+
+  /* Page Header */
+  .page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .page-title {
+    margin: 0 0 6px;
+    font-size: clamp(24px, 2.6vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .page-subtitle {
+    margin: 0;
+    color: var(--mute);
+    font-size: 15px;
+    max-width: 68ch;
+  }
+
+  /* Metrics Strip */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 960px) {
+    .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .metrics-grid { grid-template-columns: 1fr; }
+  }
+  .metric-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .metric-label {
+    font-size: 13px;
+    color: var(--mute);
+    margin-bottom: 6px;
+  }
+  .metric-value {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+  }
+  .metric-note {
+    font-size: 12px;
+    color: var(--mute);
+    margin-top: 6px;
+  }
+
+  /* Workspace 2-Column Split */
+  .workspace {
+    display: grid;
+    grid-template-columns: 400px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 1100px) {
+    .workspace {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* Controls & Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .btn:hover {
+    background: var(--surface-subtle);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+  }
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+  }
+  .btn-danger {
+    background: var(--crimson);
+    border-color: var(--crimson);
+    color: #ffffff;
+  }
+  .btn-danger:hover {
+    background: var(--crimson-hover);
+    border-color: var(--crimson-hover);
+  }
+  .btn-danger-outline {
+    background: var(--crimson-soft);
+    border-color: #fecaca;
+    color: var(--crimson);
+  }
+  .btn-danger-outline:hover {
+    background: #fee2e2;
+  }
+  .btn-emerald {
+    background: var(--emerald);
+    border-color: var(--emerald);
+    color: #ffffff;
+  }
+  .btn-emerald:hover {
+    background: #15803d;
+  }
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 12.5px;
+  }
+
+  .input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--surface);
+  }
+  .input:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+    border-color: var(--primary);
+  }
+
+  /* Segmented Filter / Duration Bar */
+  .seg-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px;
+    background: var(--surface-subtle);
+    border-radius: 9px;
+    border: 1px solid var(--border);
+  }
+  .seg-btn {
+    flex: 1 1 auto;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ink-secondary);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .seg-btn:hover {
+    color: var(--ink);
+  }
+  .seg-btn.is-active {
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  }
+
+  /* User Registry List */
+  .user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+    max-height: 620px;
+    overflow-y: auto;
+  }
+  .user-row {
+    width: 100%;
+    text-align: left;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+  .user-row:hover {
+    background: var(--surface-subtle);
+  }
+  .user-row.is-selected {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .user-row-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .user-row-name {
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .user-row-id {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .user-row-email {
+    font-size: 13px;
+    color: var(--ink-secondary);
+    margin-bottom: 6px;
+    word-break: break-all;
+  }
+  .user-row-meta {
+    font-size: 12px;
+    color: var(--mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .status-text-active {
+    color: var(--emerald);
+    font-weight: 600;
+  }
+  .status-text-banned {
+    color: var(--crimson);
+    font-weight: 700;
+  }
+  .status-text-warn {
+    color: var(--amber);
+    font-weight: 600;
+  }
+
+  /* Add User Form */
+  .add-user-box {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .add-user-grid {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  /* Right Column Sections */
+  .user-detail-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .user-detail-title {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .user-detail-meta {
+    font-size: 13.5px;
+    color: var(--mute);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .section-block {
+    margin-bottom: 32px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-block:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+  .section-heading {
+    margin: 0 0 6px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .section-desc {
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    color: var(--mute);
+  }
+
+  /* Toolbar for Duration + All Atlases */
+  .grant-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 18px;
+  }
+
+  /* Subject Access Table / List */
+  .subjects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .subject-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .subject-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .subject-info {
+    min-width: 220px;
+    flex: 1;
+  }
+  .subject-title {
+    font-weight: 700;
+    font-size: 15.5px;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .subject-meta {
+    font-size: 12.5px;
+    color: var(--mute);
+    font-variant-numeric: tabular-nums;
+  }
+  .subject-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Expandable Topic Drawer inside Subject */
+  .topics-details {
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .topics-details summary {
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-secondary);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .topics-details summary:hover {
+    color: var(--primary);
+  }
+  .topics-drawer-body {
+    padding: 12px 16px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .topics-drawer-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .topic-check-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 12.5px;
+  }
+  .topic-check-item.is-granted {
+    border-color: #7dd3fc;
+    background: var(--primary-soft);
+  }
+  .topic-check-item.is-demo {
+    background: var(--surface-subtle);
+  }
+  .topic-check-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--ink);
+    line-height: 1.35;
+    flex: 1;
+  }
+  .topic-check-label input {
+    margin-top: 2px;
+    cursor: pointer;
+  }
+  .topic-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--mute);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Ban & Security Moderation Box */
+  .security-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  @media (max-width: 760px) {
+    .security-grid { grid-template-columns: 1fr; }
+  }
+  .sec-box {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    background: var(--surface);
+  }
+  .sec-box.is-banned-box {
+    border-color: #fca5a5;
+    background: var(--crimson-soft);
+  }
+  .preset-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0 12px;
+  }
+  .preset-btn {
+    padding: 4px 9px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface-subtle);
+    color: var(--ink-secondary);
+    cursor: pointer;
+  }
+  .preset-btn:hover {
+    color: var(--ink);
+    border-color: var(--ink-secondary);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  .data-table th, .data-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .data-table th {
+    color: var(--mute);
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .mono-cell {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+  }
+
+  /* Notification Toast */
+  #adminToast {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 100;
+    max-width: 420px;
+    background: var(--ink);
+    color: #ffffff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.25);
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- 3-Zone Top Bar Contract -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="../" class="brand-wordmark">Медицинский атлас 2026 · Админ</a>
+    <nav class="topnav" aria-label="Быстрая навигация">
+      <a href="../#atlases">Все атласы</a>
+      <a href="../cabinet/">Личный кабинет</a>
+      <a href="../chemistry-atlas/">Химия</a>
+      <a href="../biochem-atlas/">Биохимия</a>
+      <a href="../patan-atlas/">Патанатомия</a>
+    </nav>
+    <div class="topbar-cta">
+      <button type="button" class="btn btn-primary" id="syncBrowserBtn">Применить к текущему браузеру</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Управление доступами к атласам, темам и блокировками</h1>
+      <p class="page-subtitle">
+        Выдавайте доступ ко всем 6 атласам сразу, к отдельным предметам или к конкретным занятиям на выбранный срок, а также управляйте банами, страйками за скриншоты и лимитом устройств.
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a href="../outputs/medical_atlas_full_repo.zip" download="medical_atlas_full_repo.zip" class="btn btn-primary">⬇ Весь репозиторий для GitHub (.zip)</a>
+      <a href="../outputs/medical_atlas_public_site.zip" download="medical_atlas_public_site.zip" class="btn">⬇ Публичный сайт GitHub Pages (.zip)</a>
+      <a href="../outputs/function.zip" download="function.zip" class="btn">⬇ Сервер function.zip</a>
+      <a href="../cabinet/" class="btn">← В личный кабинет</a>
+      <button type="button" class="btn" id="refreshAllBtn">Обновить список</button>
+    </div>
+  </div>
+
+  <!-- Metrics Strip -->
+  <section class="metrics-grid" aria-label="Сводная статистика">
+    <div class="metric-box">
+      <div class="metric-label">Зарегистрировано аккаунтов</div>
+      <div class="metric-value" id="statTotalUsers">0</div>
+      <div class="metric-note" id="statActivePreviewNote">Текущий профиль синхронизирован</div>
+    </div>
+    <div class="metric-box">
+      <div class="metric-label">Активных полных доступов (предметы)</div>
+      <div class="metric-value" id="statSubjectGrants">0</div>
+      <div class="metric-note">Из 6 доступных атласов на платформе</div>
+    </div>
+    <div class="metric-box">
+      <div class="metric-label">Точечных доступов к отдельным темам</div>
+      <div class="metric-value" id="statTopicGrants">0</div>
+      <div class="metric-note">Индивидуально открытые занятия</div>
+    </div>
+    <div class="metric-box">
+      <div class="metric-label">Заблокировано аккаунтов (БАН)</div>
+      <div class="metric-value" id="statBannedUsers">0</div>
+      <div class="metric-note">Анти-складчина (до 3 устр.) и DRM (до 3 стр.)</div>
+    </div>
+  </section>
+
+  <div class="workspace">
+    <!-- Left Column: User Registry & Filters -->
+    <aside class="panel" aria-label="Список пользователей">
+      <div class="panel-head">
+        <h2 class="panel-title">Аккаунты студентов</h2>
+        <span class="mono-cell" id="userCountLabel">0 акк.</span>
+      </div>
+
+      <div style="margin-bottom:10px">
+        <input type="search" class="input" id="userSearchInput" placeholder="Поиск по Email, имени или ID..." aria-label="Поиск пользователя">
+      </div>
+
+      <div class="seg-bar" role="tablist" aria-label="Фильтр пользователей">
+        <button type="button" class="seg-btn is-active" data-user-filter="all">Все</button>
+        <button type="button" class="seg-btn" data-user-filter="active">Активные</button>
+        <button type="button" class="seg-btn" data-user-filter="banned">В бане</button>
+        <button type="button" class="seg-btn" data-user-filter="strikes">Со страйками</button>
+      </div>
+
+      <div class="user-list" id="userListContainer" role="list"></div>
+
+      <form class="add-user-box" id="addUserForm" novalidate>
+        <div style="font-size:13.5px;font-weight:700;color:var(--ink)">Добавить или найти студента по Email</div>
+        <div class="add-user-grid">
+          <input type="email" class="input" id="newUserEmail" placeholder="student@med-uni.ru" required>
+          <input type="text" class="input" id="newUserName" placeholder="Имя и фамилия (необязательно)">
+          <button type="submit" class="btn btn-primary" style="width:100%">Добавить / Выбрать аккаунт</button>
+        </div>
+      </form>
+    </aside>
+
+    <!-- Right Column: Selected User Management -->
+    <section class="panel" id="userDetailPanel" aria-live="polite">
+      <div class="user-detail-header">
+        <div>
+          <h2 class="user-detail-title" id="detailUserName">Загрузка...</h2>
+          <div class="user-detail-meta" id="detailUserMeta"></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn btn-sm" id="setAsBrowserUserBtn">Сделать активным в этом браузере</button>
+          <a href="../#atlases" class="btn btn-sm btn-primary" id="openAtlasesBtn">Проверить в атласах ↗</a>
+        </div>
+      </div>
+
+      <!-- SECTION 1: ACCESS TO ATLASES AND LESSONS -->
+      <div class="section-block">
+        <h3 class="section-heading">01. Выдача доступа к атласам и отдельным занятиям</h3>
+        <p class="section-desc">
+          Выберите срок действия и откройте пользователю все 6 атласов сразу, отдельные предметы целиком или точечные занятия/темы внутри любого предмета. Первые 2 занятия каждого атласа открыты по умолчанию.
+        </p>
+
+        <div class="grant-toolbar">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:600;color:var(--ink-secondary)">Срок выдаваемого доступа:</span>
+            <div class="seg-bar" id="durationSelector">
+              <button type="button" class="seg-btn" data-days="30">30 дней</button>
+              <button type="button" class="seg-btn" data-days="90">90 дней</button>
+              <button type="button" class="seg-btn is-active" data-days="180">180 дней</button>
+              <button type="button" class="seg-btn" data-days="365">1 год</button>
+              <button type="button" class="seg-btn" data-days="0">Бессрочно</button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn-primary" id="grantAllAtlasesBtn">Выдать все 6 атласов сразу</button>
+            <button type="button" class="btn btn-danger-outline" id="revokeAllAtlasesBtn">Отозвать все доступы</button>
+          </div>
+        </div>
+
+        <div class="subjects-list" id="subjectsListContainer"></div>
+      </div>
+
+      <!-- SECTION 2: BAN / UNBAN / STRIKES / DEVICES -->
+      <div class="section-block">
+        <h3 class="section-heading">02. Управление блокировками (Бан / Разбан), страйками и устройствами</h3>
+        <p class="section-desc">
+          Мгновенная блокировка за складчину или слив скриншотов, снятие бана в один клик, сброс счётчика страйков (0/3) и отвязка устройств (лимит до 3 устройств на аккаунт).
+        </p>
+
+        <div class="security-grid">
+          <!-- Ban / Unban Card -->
+          <div class="sec-box" id="banControlBox">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px">
+              <strong style="font-size:15px">Статус блокировки аккаунта</strong>
+              <span id="banStatusLabel" class="status-text-active">АКТИВЕН</span>
+            </div>
+            <p id="banCurrentReason" style="margin:0 0 12px;font-size:13px;color:var(--ink-secondary)">
+              Ограничений нет. Пользователь может открывать доступные конспекты.
+            </p>
+
+            <label for="banReasonInput" style="display:block;font-size:12.5px;font-weight:600;color:var(--ink-secondary);margin-bottom:4px">
+              Причина бана (отобразится пользователю на экране блокировки):
+            </label>
+            <input type="text" class="input" id="banReasonInput" placeholder="Например: Передача аккаунта третьим лицам (складчина)">
+
+            <div class="preset-bar">
+              <button type="button" class="preset-btn" data-ban-preset="Складчина: одновременный вход с разных IP и передача аккаунта третьим лицам.">Шаблон: Складчина</button>
+              <button type="button" class="preset-btn" data-ban-preset="Распространение скриншотов и копирование авторских схем «Медицинский атлас 2026».">Шаблон: Слив скриншотов</button>
+              <button type="button" class="preset-btn" data-ban-preset="Нарушение правил пользовательского соглашения платформы.">Шаблон: Нарушение правил</button>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+              <button type="button" class="btn btn-danger" id="issueBanBtn">Выдать БАН аккаунту</button>
+              <button type="button" class="btn btn-emerald" id="liftBanBtn">Снять бан (Разбанить)</button>
+            </div>
+          </div>
+
+          <!-- Strikes & Devices Quick Reset Card -->
+          <div class="sec-box">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px">
+              <strong style="font-size:15px">Счётчик страйков и привязанные устройства</strong>
+              <span class="mono-cell" id="strikeDeviceSummaryLabel">Стр: 0/3 · Устр: 0/3</span>
+            </div>
+            <p style="margin:0 0 14px;font-size:13px;color:var(--ink-secondary)">
+              При 3 страйках на открытых конспектах или при входе с 10+ устройств срабатывает автоматический бан. Вы можете обнулить страйки или очистить список устройств.
+            </p>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button type="button" class="btn" id="resetStrikesBtn" style="justify-content:space-between">
+                <span>Сбросить страйки за скриншоты до нуля</span>
+                <span class="mono-cell">0/3 →</span>
+              </button>
+              <button type="button" class="btn" id="clearDevicesBtn" style="justify-content:space-between">
+                <span>Очистить и отвязать все устройства аккаунта</span>
+                <span class="mono-cell">0/3 →</span>
+              </button>
+            </div>
+
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+              <div style="font-size:12.5px;font-weight:600;color:var(--ink-secondary);margin-bottom:6px">Журнал инцидентов и страйков DRM:</div>
+              <div id="strikesLogContainer" style="font-size:12.5px;color:var(--mute);max-height:130px;overflow-y:auto"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Devices Table -->
+        <div style="margin-top:18px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+            <strong style="font-size:14.5px">Привязанные устройства пользователя (максимум 3)</strong>
+            <span class="mono-cell" id="devicesTableCount">0 / 3</span>
+          </div>
+          <div id="devicesTableWrapper"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="adminToast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var PREVIEW_STORAGE_KEY = 'ma-admin-preview-v1';
+  var DRM_STORAGE_KEY = 'ma-drm-security-state-v4';
+
+  var state = {
+    users: [],
+    subjects: [],
+    selectedUserId: 'MED-84920-RU',
+    activeBrowserUserId: 'MED-84920-RU',
+    userFilter: 'all',
+    searchQuery: '',
+    durationDays: 180,
+    topicSearchByAtlas: {}
+  };
+
+  try {
+    var savedPreview = JSON.parse(localStorage.getItem(PREVIEW_STORAGE_KEY) || 'null');
+    if (savedPreview && savedPreview.userId) {
+      state.activeBrowserUserId = savedPreview.userId;
+      state.selectedUserId = savedPreview.userId;
+    }
+  } catch (e) {}
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  var toastTimer = null;
+  function showToast(msg) {
+    var el = document.getElementById('adminToast');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      el.style.display = 'none';
+    }, 4000);
+  }
+
+  function formatExpiry(ms) {
+    if (!ms || ms <= Date.now()) return 'нет';
+    var daysLeft = Math.ceil((ms - Date.now()) / 86400000);
+    if (daysLeft > 1800) return 'Бессрочно';
+    return 'до ' + new Date(ms).toLocaleDateString('ru-RU') + ' (' + daysLeft + ' дн.)';
+  }
+
+  function getSelectedUser() {
+    for (var i = 0; i < state.users.length; i++) {
+      if (state.users[i].id === state.selectedUserId) return state.users[i];
+    }
+    return state.users[0] || null;
+  }
+
+  // Sync the active browser user's grants & security state to localStorage so opening any atlas on this device immediately reflects the admin panel
+  function syncActiveUserToBrowser(userObj, notify) {
+    if (!userObj) return;
+    state.activeBrowserUserId = userObj.id;
+    var previewPayload = {
+      policy: 'subject-subscription-v1',
+      userId: userObj.id,
+      email: userObj.email,
+      name: userObj.name,
+      grants: userObj.grants || {},
+      topicGrants: userObj.topicGrants || {},
+      securityStatus: (userObj.security && userObj.security.status) || 'ACTIVE',
+      banReason: (userObj.security && userObj.security.banReason) || ''
+    };
+    try {
+      localStorage.setItem(PREVIEW_STORAGE_KEY, JSON.stringify(previewPayload));
+      if (userObj.security) {
+        localStorage.setItem(DRM_STORAGE_KEY, JSON.stringify(userObj.security));
+      }
+    } catch (e) {}
+    if (notify) {
+      showToast('Профиль «' + userObj.name + '» (' + userObj.email + ') активирован для проверки в этом браузере.');
+    }
+  }
+
+  function loadAllData() {
+    return fetch('/api/admin/users', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        state.users = Array.isArray(data.users) ? data.users : [];
+        state.subjects = Array.isArray(data.subjects) ? data.subjects : [];
+        var current = getSelectedUser();
+        if (current && current.id === state.activeBrowserUserId) {
+          syncActiveUserToBrowser(current, false);
+        }
+        renderAll();
+      })
+      .catch(function () {
+        showToast('Не удалось загрузить данные с сервера.');
+      });
+  }
+
+  function updateUserInState(updatedUser) {
+    if (!updatedUser || !updatedUser.id) return;
+    var found = false;
+    for (var i = 0; i < state.users.length; i++) {
+      if (state.users[i].id === updatedUser.id) {
+        state.users[i] = updatedUser;
+        found = true;
+        break;
+      }
+    }
+    if (!found) state.users.unshift(updatedUser);
+    state.selectedUserId = updatedUser.id;
+    // Always sync if the edited user is the currently active browser user (or make it active so admin can immediately verify)
+    syncActiveUserToBrowser(updatedUser, false);
+    renderAll();
+  }
+
+  function renderMetrics() {
+    var totalUsers = state.users.length;
+    var subjectGrantsCount = 0;
+    var topicGrantsCount = 0;
+    var bannedCount = 0;
+
+    state.users.forEach(function (u) {
+      var g = u.grants || {};
+      subjectGrantsCount += Object.keys(g).length;
+      var tg = u.topicGrants || {};
+      Object.keys(tg).forEach(function (sid) {
+        topicGrantsCount += Object.keys(tg[sid] || {}).length;
+      });
+      if (u.security && u.security.status === 'BANNED') bannedCount++;
+    });
+
+    document.getElementById('statTotalUsers').textContent = String(totalUsers);
+    document.getElementById('statSubjectGrants').textContent = String(subjectGrantsCount);
+    document.getElementById('statTopicGrants').textContent = String(topicGrantsCount);
+    document.getElementById('statBannedUsers').textContent = String(bannedCount);
+
+    var activeUser = state.users.find(function (u) { return u.id === state.activeBrowserUserId; }) || getSelectedUser();
+    if (activeUser) {
+      document.getElementById('statActivePreviewNote').textContent = 'Активен в браузере: ' + activeUser.email;
+    }
+  }
+
+  function renderUserList() {
+    var container = document.getElementById('userListContainer');
+    var q = state.searchQuery.toLowerCase().trim();
+    var filtered = state.users.filter(function (u) {
+      var isBanned = u.security && u.security.status === 'BANNED';
+      var strikesLen = (u.security && Array.isArray(u.security.strikes)) ? u.security.strikes.length : 0;
+      if (state.userFilter === 'active' && isBanned) return false;
+      if (state.userFilter === 'banned' && !isBanned) return false;
+      if (state.userFilter === 'strikes' && strikesLen === 0) return false;
+      if (!q) return true;
+      return (u.name || '').toLowerCase().indexOf(q) >= 0 ||
+             (u.email || '').toLowerCase().indexOf(q) >= 0 ||
+             (u.id || '').toLowerCase().indexOf(q) >= 0;
+    });
+
+    document.getElementById('userCountLabel').textContent = filtered.length + ' из ' + state.users.length;
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--mute);font-size:13.5px">Пользователи по заданному фильтру не найдены.</div>';
+      return;
+    }
+
+    container.innerHTML = filtered.map(function (u) {
+      var isSelected = u.id === state.selectedUserId;
+      var isBrowserActive = u.id === state.activeBrowserUserId;
+      var isBanned = u.security && u.security.status === 'BANNED';
+      var strikesCount = (u.security && Array.isArray(u.security.strikes)) ? u.security.strikes.length : 0;
+      var devsCount = (u.security && Array.isArray(u.security.registeredDevices)) ? u.security.registeredDevices.length : 0;
+      var subjCount = Object.keys(u.grants || {}).length;
+      var topCount = 0;
+      Object.keys(u.topicGrants || {}).forEach(function (k) {
+        topCount += Object.keys(u.topicGrants[k] || {}).length;
+      });
+
+      var statusHtml = isBanned
+        ? '<span class="status-text-banned">БАН</span>'
+        : (strikesCount > 0 ? '<span class="status-text-warn">Страйки: ' + strikesCount + '/3</span>' : '<span class="status-text-active">Активен</span>');
+
+      return '<button type="button" class="user-row' + (isSelected ? ' is-selected' : '') + '" data-select-user="' + esc(u.id) + '">' +
+        '<div class="user-row-top">' +
+          '<span class="user-row-name">' + esc(u.name) + '</span>' +
+          '<span class="user-row-id">' + esc(u.id) + '</span>' +
+        '</div>' +
+        '<div class="user-row-email">' + esc(u.email) + (isBrowserActive ? ' · <strong style="color:var(--primary)">Текущий браузер</strong>' : '') + '</div>' +
+        '<div class="user-row-meta">' +
+          statusHtml +
+          ' · Атласов: ' + subjCount + '/6' +
+          (topCount > 0 ? ' · Тем: +' + topCount : '') +
+          ' · Устр: ' + devsCount + '/3' +
+        '</div>' +
+      '</button>';
+    }).join('');
+
+    [].forEach.call(container.querySelectorAll('[data-select-user]'), function (btn) {
+      btn.addEventListener('click', function () {
+        state.selectedUserId = btn.getAttribute('data-select-user');
+        var sel = getSelectedUser();
+        if (sel) syncActiveUserToBrowser(sel, false);
+        renderAll();
+      });
+    });
+  }
+
+  function renderSelectedUserDetail() {
+    var u = getSelectedUser();
+    if (!u) return;
+
+    var isBanned = u.security && u.security.status === 'BANNED';
+    var strikes = (u.security && Array.isArray(u.security.strikes)) ? u.security.strikes : [];
+    var devices = (u.security && Array.isArray(u.security.registeredDevices)) ? u.security.registeredDevices : [];
+    var rejected = Array.isArray(u.rejectedDevices) ? u.rejectedDevices : [];
+
+    document.getElementById('detailUserName').textContent = u.name;
+    document.getElementById('detailUserMeta').innerHTML =
+      '<span>' + esc(u.email) + '</span> · ' +
+      '<span class="mono-cell">ID: ' + esc(u.id) + '</span> · ' +
+      '<span>' + esc(u.course || 'Студент') + '</span> · ' +
+      (isBanned ? '<span class="status-text-banned">СТАТУС: ЗАБЛОКИРОВАН (БАН)</span>' : '<span class="status-text-active">СТАТУС: АКТИВЕН</span>');
+
+    var browserBtn = document.getElementById('setAsBrowserUserBtn');
+    if (u.id === state.activeBrowserUserId) {
+      browserBtn.textContent = '✓ Активен в этом браузере';
+      browserBtn.disabled = true;
+    } else {
+      browserBtn.textContent = 'Сделать активным в этом браузере';
+      browserBtn.disabled = false;
+    }
+
+    // Render 6 Subject Cards & Expandable Topics
+    var openDetailsIds = {};
+    [].forEach.call(document.querySelectorAll('#subjectsListContainer details[open]'), function (d) {
+      openDetailsIds[d.getAttribute('data-atlas-details')] = true;
+    });
+
+    var subjectsHtml = state.subjects.map(function (subj) {
+      var fullGrant = u.grants && u.grants[subj.id];
+      var isFullGranted = !!(fullGrant && fullGrant.expiresAt > Date.now());
+      var subjTopicGrants = (u.topicGrants && u.topicGrants[subj.id]) || {};
+      var grantedTopicIds = Object.keys(subjTopicGrants).filter(function (tid) {
+        return subjTopicGrants[tid] && subjTopicGrants[tid].expiresAt > Date.now();
+      });
+
+      var totalTopics = subj.topics.length;
+      var demoCount = (subj.demo || []).length;
+      var statusLine = isFullGranted
+        ? '<span class="status-text-active">Полный доступ ко всем ' + totalTopics + ' темам (' + formatExpiry(fullGrant.expiresAt) + ')</span>'
+        : (grantedTopicIds.length > 0
+            ? '<span style="color:var(--primary);font-weight:600">Точечный доступ: открыто ' + grantedTopicIds.length + ' доп. тем + ' + demoCount + ' демо</span>'
+            : 'Открыты только ' + demoCount + ' первых занятия (базовый демо-доступ)');
+
+      var topicFilter = (state.topicSearchByAtlas[subj.id] || '').toLowerCase().trim();
+      var visibleTopics = subj.topics.filter(function (t) {
+        if (!topicFilter) return true;
+        return t.title.toLowerCase().indexOf(topicFilter) >= 0 || t.id.toLowerCase().indexOf(topicFilter) >= 0;
+      });
+
+      var topicsGridHtml = visibleTopics.map(function (t) {
+        var isDemo = !!t.isDemo;
+        var isTopicGranted = isFullGranted || !!(subjTopicGrants[t.id] && subjTopicGrants[t.id].expiresAt > Date.now());
+        var tagText = isDemo ? 'Демо (открыто)' : (isTopicGranted ? 'Открыта' : 'Закрыта');
+        var hrefHash = subj.id === 'biochem' ? '#topic/' + t.id : '#' + t.id;
+        return '<div class="topic-check-item' + (isTopicGranted && !isDemo ? ' is-granted' : '') + (isDemo ? ' is-demo' : '') + '">' +
+          '<label class="topic-check-label">' +
+            '<input type="checkbox" data-topic-toggle="' + esc(subj.id) + '" data-topic-id="' + esc(t.id) + '"' +
+              (isDemo || isTopicGranted ? ' checked' : '') +
+              (isDemo || isFullGranted ? ' disabled' : '') + '>' +
+            '<span>' + esc(t.title) + '</span>' +
+          '</label>' +
+          '<a href="../' + esc(subj.dir) + '/' + esc(hrefHash) + '" class="topic-tag" title="Открыть тему в атласе">' + esc(tagText) + ' ↗</a>' +
+        '</div>';
+      }).join('');
+
+      var isDetailsOpen = !!openDetailsIds[subj.id];
+
+      return '<div class="subject-item">' +
+        '<div class="subject-row">' +
+          '<div class="subject-info">' +
+            '<div class="subject-title">' + esc(subj.title) + '</div>' +
+            '<div class="subject-meta">' + statusLine + ' · Всего тем в атласе: ' + totalTopics + '</div>' +
+          '</div>' +
+          '<div class="subject-actions">' +
+            '<a href="../' + esc(subj.dir) + '/" class="btn btn-sm">Открыть атлас ↗</a>' +
+            (isFullGranted
+              ? '<button type="button" class="btn btn-sm btn-danger-outline" data-atlas-revoke="' + esc(subj.id) + '">Отозвать предмет</button>'
+              : '<button type="button" class="btn btn-sm btn-primary" data-atlas-grant="' + esc(subj.id) + '">Выдать весь предмет</button>') +
+          '</div>' +
+        '</div>' +
+        '<details class="topics-details" data-atlas-details="' + esc(subj.id) + '"' + (isDetailsOpen ? ' open' : '') + '>' +
+          '<summary>' +
+            '<span>Поурочный доступ: выбрать отдельные занятия и темы (' + totalTopics + ')</span>' +
+            '<span class="mono-cell">' + (isFullGranted ? 'Все ' + totalTopics + ' открыты' : 'Доп. открыто: ' + grantedTopicIds.length) + ' ▾</span>' +
+          '</summary>' +
+          '<div class="topics-drawer-body">' +
+            '<div class="topics-drawer-controls">' +
+              '<input type="search" class="input" style="max-width:280px;padding:6px 10px;font-size:13px" data-topic-search="' + esc(subj.id) + '" value="' + esc(state.topicSearchByAtlas[subj.id] || '') + '" placeholder="Фильтр занятий и тем...">' +
+              '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
+                '<button type="button" class="btn btn-sm" data-grant-all-topics="' + esc(subj.id) + '">Открыть все темы предмета</button>' +
+                '<button type="button" class="btn btn-sm" data-revoke-all-topics="' + esc(subj.id) + '">Сбросить точечные темы</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="topics-grid">' + topicsGridHtml + '</div>' +
+          '</div>' +
+        '</details>' +
+      '</div>';
+    }).join('');
+
+    var subjContainer = document.getElementById('subjectsListContainer');
+    subjContainer.innerHTML = subjectsHtml;
+
+    // Bind Subject Grant/Revoke buttons
+    [].forEach.call(subjContainer.querySelectorAll('[data-atlas-grant]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var atlasId = btn.getAttribute('data-atlas-grant');
+        postGrant({ userId: u.id, action: 'grant', scope: 'atlas', atlas: atlasId, durationDays: state.durationDays }, 'Выдан полный доступ к предмету «' + atlasId + '».');
+      });
+    });
+    [].forEach.call(subjContainer.querySelectorAll('[data-atlas-revoke]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var atlasId = btn.getAttribute('data-atlas-revoke');
+        postGrant({ userId: u.id, action: 'revoke', scope: 'atlas', atlas: atlasId }, 'Полный доступ к предмету отозван.');
+      });
+    });
+
+    // Bind individual Topic checkboxes
+    [].forEach.call(subjContainer.querySelectorAll('[data-topic-toggle]'), function (chk) {
+      chk.addEventListener('change', function () {
+        var atlasId = chk.getAttribute('data-topic-toggle');
+        var topicId = chk.getAttribute('data-topic-id');
+        var action = chk.checked ? 'grant' : 'revoke';
+        postGrant(
+          { userId: u.id, action: action, scope: 'topics', atlas: atlasId, topics: [topicId], durationDays: state.durationDays },
+          chk.checked ? 'Тема «' + topicId + '» открыта для пользователя.' : 'Доступ к теме «' + topicId + '» закрыт.'
+        );
+      });
+    });
+
+    // Bind Grant All Topics / Revoke All Topics inside drawer
+    [].forEach.call(subjContainer.querySelectorAll('[data-grant-all-topics]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var atlasId = btn.getAttribute('data-grant-all-topics');
+        var subj = state.subjects.find(function (s) { return s.id === atlasId; });
+        if (!subj) return;
+        var allTopicIds = subj.topics.filter(function (t) { return !t.isDemo; }).map(function (t) { return t.id; });
+        postGrant({ userId: u.id, action: 'grant', scope: 'topics', atlas: atlasId, topics: allTopicIds, durationDays: state.durationDays }, 'Открыты все темы предмета.');
+      });
+    });
+    [].forEach.call(subjContainer.querySelectorAll('[data-revoke-all-topics]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var atlasId = btn.getAttribute('data-revoke-all-topics');
+        var subj = state.subjects.find(function (s) { return s.id === atlasId; });
+        if (!subj) return;
+        var allTopicIds = subj.topics.map(function (t) { return t.id; });
+        postGrant({ userId: u.id, action: 'revoke', scope: 'topics', atlas: atlasId, topics: allTopicIds }, 'Точечные доступы к темам предмета сброшены.');
+      });
+    });
+
+    // Bind Topic Search inputs
+    [].forEach.call(subjContainer.querySelectorAll('[data-topic-search]'), function (inp) {
+      inp.addEventListener('input', function () {
+        var atlasId = inp.getAttribute('data-topic-search');
+        state.topicSearchByAtlas[atlasId] = inp.value;
+        renderSelectedUserDetail();
+        var refocused = subjContainer.querySelector('[data-topic-search="' + atlasId + '"]');
+        if (refocused) {
+          refocused.focus();
+          refocused.setSelectionRange(refocused.value.length, refocused.value.length);
+        }
+      });
+    });
+
+    // Render Security & Ban state
+    var banBox = document.getElementById('banControlBox');
+    var banLabel = document.getElementById('banStatusLabel');
+    var banReasonText = document.getElementById('banCurrentReason');
+    if (isBanned) {
+      banBox.classList.add('is-banned-box');
+      banLabel.className = 'status-text-banned';
+      banLabel.textContent = 'ЗАБЛОКИРОВАН (БАН)';
+      banReasonText.textContent = 'Причина бана: ' + (u.security.banReason || 'Заблокирован администратором') + (u.security.bannedAt ? ' (в ' + u.security.bannedAt + ')' : '');
+    } else {
+      banBox.classList.remove('is-banned-box');
+      banLabel.className = 'status-text-active';
+      banLabel.textContent = 'АКТИВЕН';
+      banReasonText.textContent = 'Ограничений нет. Пользователь может открывать доступные конспекты.';
+    }
+
+    document.getElementById('strikeDeviceSummaryLabel').textContent =
+      'Страйки: ' + strikes.length + '/3 · Устройства: ' + devices.length + '/3';
+
+    var strikesLogEl = document.getElementById('strikesLogContainer');
+    if (strikes.length === 0) {
+      strikesLogEl.innerHTML = 'Нарушений не зафиксировано (0 из 3).';
+    } else {
+      strikesLogEl.innerHTML = strikes.map(function (s) {
+        return '<div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--border)">' +
+          '<span style="color:var(--ink)">' + esc(s.details) + '</span>' +
+          '<span class="mono-cell">' + esc(s.timestamp) + '</span>' +
+        '</div>';
+      }).join('');
+    }
+
+    // Render Devices Table
+    document.getElementById('devicesTableCount').textContent = devices.length + ' / 3 привязано' + (rejected.length ? ' (+ ' + rejected.length + ' откл.)' : '');
+    var devWrapper = document.getElementById('devicesTableWrapper');
+    if (devices.length === 0 && rejected.length === 0) {
+      devWrapper.innerHTML = '<div style="padding:12px 0;font-size:13px;color:var(--mute)">Привязанных устройств нет (0 из 3).</div>';
+    } else {
+      var rowsHtml = devices.map(function (d) {
+        return '<tr>' +
+          '<td><strong>' + esc(d.name) + '</strong></td>' +
+          '<td>' + esc((d.os || '') + ' · ' + (d.browser || '')) + '</td>' +
+          '<td class="mono-cell">' + esc(d.ip || '—') + ' (' + esc(d.location || 'РФ') + ')</td>' +
+          '<td><span class="status-text-active">Привязано</span> · ' + esc(d.lastActive || '') + '</td>' +
+          '<td style="text-align:right"><button type="button" class="btn btn-sm" data-remove-device="' + esc(d.deviceId) + '">Отвязать</button></td>' +
+        '</tr>';
+      }).join('') + rejected.map(function (r) {
+        return '<tr>' +
+          '<td><strong>' + esc(r.name) + '</strong></td>' +
+          '<td>Попытка входа сверх лимита</td>' +
+          '<td class="mono-cell">' + esc(r.ip || '—') + '</td>' +
+          '<td><span class="status-text-banned">Отклонено (4+ устр.)</span> · ' + esc(r.lastAttempt || '') + '</td>' +
+          '<td style="text-align:right"><button type="button" class="btn btn-sm" data-remove-device="' + esc(r.deviceId) + '">Удалить</button></td>' +
+        '</tr>';
+      }).join('');
+
+      devWrapper.innerHTML =
+        '<table class="data-table">' +
+          '<thead><tr><th>Устройство</th><th>Система и браузер</th><th>IP и регион</th><th>Статус</th><th style="text-align:right">Действие</th></tr></thead>' +
+          '<tbody>' + rowsHtml + '</tbody>' +
+        '</table>';
+
+      [].forEach.call(devWrapper.querySelectorAll('[data-remove-device]'), function (btn) {
+        btn.addEventListener('click', function () {
+          var devId = btn.getAttribute('data-remove-device');
+          postSecurity({ userId: u.id, action: 'remove_device', deviceId: devId }, 'Устройство отвязано от аккаунта.');
+        });
+      });
+    }
+  }
+
+  function renderAll() {
+    renderMetrics();
+    renderUserList();
+    renderSelectedUserDetail();
+  }
+
+  function postGrant(payload, toastMessage) {
+    return fetch('/api/admin/grant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && data.user) {
+          updateUserInState(data.user);
+          showToast(toastMessage || 'Права доступа обновлены.');
+        }
+      })
+      .catch(function () {
+        showToast('Ошибка при сохранении прав доступа.');
+      });
+  }
+
+  function postSecurity(payload, toastMessage) {
+    return fetch('/api/admin/security', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && data.user) {
+          updateUserInState(data.user);
+          showToast(toastMessage || 'Настройки безопасности применены.');
+        }
+      })
+      .catch(function () {
+        showToast('Ошибка при выполнении действия безопасности.');
+      });
+  }
+
+  // Bind Top-level UI Controls
+  document.getElementById('userSearchInput').addEventListener('input', function (e) {
+    state.searchQuery = e.target.value || '';
+    renderUserList();
+  });
+
+  [].forEach.call(document.querySelectorAll('[data-user-filter]'), function (btn) {
+    btn.addEventListener('click', function () {
+      state.userFilter = btn.getAttribute('data-user-filter');
+      [].forEach.call(document.querySelectorAll('[data-user-filter]'), function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      renderUserList();
+    });
+  });
+
+  [].forEach.call(document.querySelectorAll('#durationSelector [data-days]'), function (btn) {
+    btn.addEventListener('click', function () {
+      state.durationDays = Number(btn.getAttribute('data-days'));
+      [].forEach.call(document.querySelectorAll('#durationSelector [data-days]'), function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+    });
+  });
+
+  document.getElementById('grantAllAtlasesBtn').addEventListener('click', function () {
+    var u = getSelectedUser();
+    if (!u) return;
+    postGrant(
+      { userId: u.id, action: 'grant', scope: 'all', durationDays: state.durationDays },
+      'Выдан полный доступ ко всем 6 атласам для ' + u.email + '!'
+    );
+  });
+
+  document.getElementById('revokeAllAtlasesBtn').addEventListener('click', function () {
+    var u = getSelectedUser();
+    if (!u) return;
+    postGrant(
+      { userId: u.id, action: 'revoke', scope: 'all' },
+      'Все выданные доступы для ' + u.email + ' отозваны.'
+    );
+  });
+
+  [].forEach.call(document.querySelectorAll('[data-ban-preset]'), function (btn) {
+    btn.addEventListener('click', function () {
+      document.getElementById('banReasonInput').value = btn.getAttribute('data-ban-preset');
+    });
+  });
+
+  document.getElementById('issueBanBtn').addEventListener('click', function () {
+    var u = getSelectedUser();
+    if (!u) return;
+    var reason = document.getElementById('banReasonInput').value.trim() ||
+      'Доступ к конспектам заблокирован администратором за нарушение правил платформы.';
+    postSecurity(
+      { userId: u.id, action: 'ban', reason: reason },
+      'Аккаунт ' + u.email + ' заблокирован (БАН).'
+    );
+  });
+
+  document.getElementById('liftBanBtn').addEventListener('click', function () {
+    var u = getSelectedUser();
+    if (!u) return;
+    postSecurity(
+      { userId: u.id, action: 'unban' },
+      'Блокировка снята! Аккаунт ' + u.email + ' снова активен.'
+    );
+  });
+
+  document.getElementById('resetStrikesBtn').addEventListener('click', function () {
+    var u = getSelectedUser();
+    if (!u) return;
+    postSecurity(
+      { userId: u.id, action: 'reset_strikes' },
+      'Счётчик страйков сброшен до 0/3 для ' + u.email + '.'
+    );
+  });
+
+  document.getElementById('clearDevicesBtn').addEventListener('click', function () {
+    var u = getSelectedUser();
+    if (!u) return;
+    postSecurity(
+      { userId: u.id, action: 'clear_devices' },
+      'Все привязанные устройства отвязаны (0/3) для ' + u.email + '.'
+    );
+  });
+
+  document.getElementById('setAsBrowserUserBtn').addEventListener('click', function () {
+    var u = getSelectedUser();
+    if (!u) return;
+    syncActiveUserToBrowser(u, true);
+    renderAll();
+  });
+
+  document.getElementById('syncBrowserBtn').addEventListener('click', function () {
+    var u = getSelectedUser();
+    if (!u) return;
+    syncActiveUserToBrowser(u, true);
+    renderAll();
+  });
+
+  document.getElementById('refreshAllBtn').addEventListener('click', function () {
+    loadAllData().then(function () {
+      showToast('Данные пользователей и каталогов обновлены.');
+    });
+  });
+
+  document.getElementById('addUserForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var emailEl = document.getElementById('newUserEmail');
+    var nameEl = document.getElementById('newUserName');
+    var email = (emailEl.value || '').trim();
+    var name = (nameEl.value || '').trim();
+    if (!email) return;
+
+    fetch('/api/admin/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, name: name })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && data.user) {
+          emailEl.value = '';
+          nameEl.value = '';
+          updateUserInState(data.user);
+          showToast(data.created ? 'Создан и выбран аккаунт ' + data.user.email : 'Выбран существующий аккаунт ' + data.user.email);
+        } else if (data && data.message) {
+          showToast(data.message);
+        }
+      })
+      .catch(function () {
+        showToast('Не удалось добавить пользователя.');
+      });
+  });
+
+  loadAllData();
+})();
+</script>
+</body>
+</html>

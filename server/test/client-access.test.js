@@ -71,17 +71,32 @@ test('публичная патанатомия содержит 3 открыт�
   assert.deepEqual(catalog.demo,['norma','necrosis','infarction']);
   assert.deepEqual(catalog.publicRoutes,['diag','method']);
 });
-test('восстановлена исходная полная биохимия: 131 вещество, 275 реакций, формулы и все разделы без входа',()=>{
-  const read=n=>JSON.parse(fs.readFileSync(path.join(root,'biochem-atlas/data',n+'.json')));
-  const substances=read('substances'),reactions=read('reactions'),ids=new Set(substances.map(x=>x.id));
-  assert.equal(substances.length,131);assert.equal(reactions.length,275);
-  assert.equal(new Set(substances.map(x=>x.s)).size,10);
-  for(const reaction of reactions)for(const token of reaction.s.concat(reaction.p))if(token[1])assert.ok(ids.has(token[1]));
+test('публичная биохимия открывает только 2 первых раздела (aa, carb) и 2 конспекта; остальное закрыто до загрузки пакетов',()=>{
   const page=fs.readFileSync(path.join(root,'biochem-atlas/index.html'),'utf8');
-  assert.match(page,/const DB = \[/);assert.match(page,/const PATHS = \[/);
-  assert.doesNotMatch(page,/Начните с основ|bootAtlas|data-biochem-shell|src="\.\.\/auth/);
-  for(const name of ['ETC','Kin','Hb','Box','Camp'])assert.match(page,new RegExp('function mount'+name+'\\('));
-  assert.deepEqual(fs.readdirSync(path.join(root,'biochem-atlas/data')).sort(),['cheatsheets.json','formulas.json','mnemonics.json','pairs.json','reactions.json','substances.json']);
+  const m=page.match(/<script type="text\/plain" id="biochem-app">([\s\S]*?)<\/script>/);
+  assert.ok(m,'biochem-app script block found');
+  assert.match(page,/bootAtlas\('biochem','biochem-app'\)/);
+  assert.match(page,/anti-theft-guard\.js/);
+  for(const name of ['ETC','Kin','Hb','Box','Camp'])assert.doesNotMatch(page,new RegExp('function mount'+name+'\\('));
+  const makeEl=(id)=>{const c=[];let html='';const n={get innerHTML(){return html;},set innerHTML(v){html=String(v||'');if(id==='rxAll'){c.length=0;const k=(html.match(/<details\b/g)||[]).length;for(let i=0;i<k;i++)c.push(makeEl());}},textContent:'',value:'',hidden:false,children:c,nextSibling:null,style:{setProperty(){}},dataset:{},classList:{add(){},remove(){},toggle(){},contains:()=>false},setAttribute(){},getAttribute:()=>null,appendChild(ch){c.push(ch);return ch;},replaceChildren(...xs){c.length=0;c.push(...xs);},insertBefore(ch){c.push(ch);return ch;},remove(){},scrollIntoView(){},addEventListener(){},focus(){},blur(){},closest:()=>null,querySelector:()=>makeEl(),querySelectorAll:()=>[]};n.parentNode=n;return n;};
+  const byId=Object.create(null);
+  const ctx=vm.createContext({console,URL,setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,clearInterval(){},requestAnimationFrame:()=>1,cancelAnimationFrame(){},
+    window:{location:{hash:'',href:'https://site.invalid/biochem-atlas/'},matchMedia:()=>({matches:false,addEventListener(){}}),addEventListener(){},scrollTo(){},MA_TOPICS:JSON.parse(fs.readFileSync(path.join(root,'biochem-atlas/topics.json'),'utf8'))},
+    location:{hash:'',href:'https://site.invalid/biochem-atlas/'},history:{replaceState(){}},
+    document:{documentElement:{lang:'',classList:{add(){},remove(){},toggle(){}}},addEventListener(){},getElementById:id=>(byId[id]||(byId[id]=makeEl(id))),createElement:()=>makeEl(),createElementNS:()=>makeEl(),querySelector:()=>makeEl(),querySelectorAll:()=>[],body:{classList:{toggle(){},add(){},remove(){}},appendChild(){}}},
+    localStorage:{getItem:()=>null,setItem(){}},navigator:{clipboard:{writeText:async()=>{}}}});
+  vm.runInContext(m[1],ctx);
+  assert.equal(vm.runInContext('DB.length',ctx),40);
+  assert.equal(vm.runInContext("DB.every(x=>x.s==='aa'||x.s==='carb')",ctx),true);
+  assert.equal(vm.runInContext('RX.length',ctx),90);
+  assert.equal(vm.runInContext("NOTES.filter(n=>!n.locked).map(n=>n.id).join(',')",ctx),'proteins,enzymes');
+  assert.equal(vm.runInContext("NOTES.filter(n=>n.locked).every(n=>n.sum.length===0&&n.secs.length===0&&n.quiz.length===0)",ctx),true);
+  assert.equal(vm.runInContext('PATHS.every(p=>p.locked&&!p.nodes&&!p.edges&&!p.steps)',ctx),true);
+  assert.equal(vm.runInContext('ANIMS.every(a=>a.locked&&!a.mount)',ctx),true);
+  const catalog=JSON.parse(fs.readFileSync(path.join(root,'biochem-atlas/topics.json'),'utf8'));
+  assert.deepEqual(catalog.demo,['sec-aa','sec-carb','note-proteins','note-enzymes']);
+  assert.deepEqual(catalog.publicRoutes,['','atlas']);
+  assert.equal(catalog.topics.length,34);
 });
 test('полная фармакология восстанавливает данные и регистрирует все расширения', {skip:!fs.existsSync(path.join(root,'server/content/farma.js'))},()=>{
   const ctx=vm.createContext({window:{},localStorage:{getItem:()=>null}});
