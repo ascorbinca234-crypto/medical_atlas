@@ -264,6 +264,7 @@ html[data-atlas-design] :focus-visible {
   gap: 18px;
 }
 .atlas-cover-card {
+  position: relative;
   min-width: 0;
   border: 1px solid var(--atlas-line);
   background: var(--atlas-surface);
@@ -274,7 +275,7 @@ html[data-atlas-design] :focus-visible {
   width: 100%;
   border: 0;
   padding: 0;
-  cursor: zoom-in;
+  cursor: pointer;
   position: relative;
   display: block;
   background: #1b211e;
@@ -285,7 +286,6 @@ html[data-atlas-design] :focus-visible {
   height: 170px;
   display: block;
   object-fit: cover;
-  filter: grayscale(1);
 }
 .atlas-cover-image span {
   position: absolute;
@@ -862,3 +862,19 @@ html[data-atlas-design] :focus-visible {
 [data-atlas-design] :is(#pVk, #pYandex, #pV, #pY):hover {
   border-color: var(--atlas-accent);
 }
+
+/* Stretch the native atlas link across the complete card, including its image. */
+.atlas-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.atlas-cover-card:focus-within {
+  outline: 2px solid var(--atlas-accent);
+  outline-offset: 3px;
+}
+.atlas-cover-card:hover .atlas-cover-image img { transform: scale(1.045); }
+.atlas-cover-credits { margin-top: 18px; color: var(--atlas-muted); font-size: 12px; }
+.atlas-cover-credits summary { cursor: pointer; }
+.atlas-cover-credits a { color: var(--atlas-accent); }
